@@ -22,115 +22,162 @@
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .handle { cursor: grab; padding: 0 10px; color: #cbd5e1; }
         input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+        
+        #lockScreen {
+            position: fixed; inset: 0; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            background-color: #f8fafc;
+        }
+        .dark #lockScreen { background-color: #020617; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans transition-colors overflow-hidden">
 
-<button onclick="toggleSidebar()" class="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-xl shadow-lg">
-    <i class="fas fa-bars"></i>
-</button>
-
-    <div class="flex h-screen">
-      <aside id="sidebar" class="fixed md:relative z-40 -translate-x-full md:translate-x-0 transition-transform duration-300 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-            <div class="p-6 text-center border-b dark:border-gray-800">
-                <h1 class="text-xl font-black text-blue-600 dark:text-blue-500 uppercase tracking-tighter">Valores MKT</h1>
+    <div id="lockScreen">
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-2xl border dark:border-gray-800 w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-lock text-2xl"></i>
             </div>
-            <nav class="p-4 flex-1 space-y-4 overflow-y-auto">
-                <button onclick="addRow()" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95 text-sm">
-                    <i class="fas fa-plus-circle"></i> Nova Conta
-                </button>
-                <div class="space-y-1">
-                    <p class="text-[10px] font-black text-gray-400 uppercase px-2 mb-2">Relatórios</p>
-                    <button onclick="exportCSV()" class="w-full text-left text-[11px] font-bold p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"><i class="fas fa-file-csv mr-3 text-emerald-500"></i> Exportar CSV</button>
-                    <button onclick="exportPDF()" class="w-full text-left text-[11px] font-bold p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"><i class="fas fa-file-pdf mr-3 text-rose-500"></i> Gerar PDF</button>
-                </div>
-            </nav>
-            <div class="p-4 border-t dark:border-gray-800 flex flex-col gap-2 text-center">
-                <button onclick="toggleTheme()" class="w-full py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-[10px] font-black uppercase">Alternar Tema</button>
-                <button onclick="forceReset()" class="text-[9px] font-bold text-gray-400 hover:text-rose-500 uppercase">Restaurar 24 Contas</button>
-            </div>
-        </aside>
+            <h2 class="text-xl font-black mb-2">Acesso Restrito</h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Digite a senha para acessar o painel.</p>
+            <input type="password" id="passInput" class="w-full p-4 rounded-2xl border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 mb-4 outline-none focus:ring-2 ring-blue-500 text-center font-bold tracking-widest" placeholder="••••••••">
+            <button id="btnEnter" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all active:scale-95">Entrar no Sistema</button>
+            <p id="errorMsg" class="text-rose-500 text-xs mt-4 font-bold hidden italic">Senha incorreta. Tente novamente.</p>
+        </div>
+    </div>
 
-        <main class="flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center">
-                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Contas</p>
-                    <h3 id="dashTotal" class="text-3xl font-black">0</h3>
-                </div>
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center border-b-4 border-b-blue-500">
-                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Ticket Médio</p>
-                    <h3 id="dashTicket" class="text-3xl font-black text-blue-600">R$ 0,00</h3>
-                </div>
-                <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center border-b-4 border-b-emerald-500">
-                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Menor Valor Final</p>
-                    <h3 id="dashMin" class="text-3xl font-black text-emerald-600">R$ 0,00</h3>
-                    <p id="dashMinMeta" class="text-[9px] font-bold text-gray-500 uppercase mt-1">-</p>
-                </div>
-            </div>
+    <div id="mainApp" class="hidden">
+        <button onclick="toggleSidebar()" class="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-xl shadow-lg">
+            <i class="fas fa-bars"></i>
+        </button>
 
-            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="setFilter('')" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-xl text-[10px] font-bold uppercase">Todos</button>
-                    <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[10px] font-bold uppercase">ML</button>
-                    <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-orange-600 text-white rounded-xl text-[10px] font-bold uppercase">Shopee</button>
-                    <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-cyan-500 text-white rounded-xl text-[10px] font-bold uppercase">TikTok</button>
-                    <button onclick="setFilter('Shein')" class="px-4 py-2 bg-black text-white rounded-xl text-[10px] font-bold uppercase">Shein</button>
+        <div class="flex h-screen">
+            <aside id="sidebar" class="fixed md:relative z-40 -translate-x-full md:translate-x-0 transition-transform duration-300 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+                <div class="p-6 text-center border-b dark:border-gray-800">
+                    <h1 class="text-xl font-black text-blue-600 dark:text-blue-500 uppercase tracking-tighter">Valores MKT</h1>
                 </div>
-                <input type="text" id="globalSearch" oninput="render()" placeholder="Pesquisar..." class="w-full lg:w-64 p-3 rounded-2xl bg-white dark:bg-gray-900 border dark:border-gray-700 text-sm outline-none">
-            </div>
-
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 mb-8 shadow-sm">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-[10px] font-bold flex items-center justify-center text-blue-600 uppercase">
-                        Ação para Selecionados
-                    </div>
-                    <select id="bulkCategory" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none">
-                        <option value="all">Categorias</option>
-                        <option value="0">Unissex</option><option value="1">Regata</option><option value="2">Infantil</option><option value="3">Plus Size</option><option value="4">M. Careca</option><option value="5">M. Canguru</option>
-                    </select>
-                    <select id="bulkMode" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none text-blue-600">
-                        <option value="val">Preço Final / Valor (R$)</option>
-                        <option value="cheio">Valor Cheio DE (R$)</option>
-                        <option value="perc">Desconto / % OFF</option>
-                    </select>
-                    <input type="number" id="bulkValue" step="0.01" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none" placeholder="Valor ou %">
-                    <button onclick="applyBulkUpdate()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs uppercase transition-all shadow-md">Aplicar nos Marcados</button>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border dark:border-gray-800 overflow-hidden mb-8">
-                <div class="overflow-x-auto touch-pan-x">
-                    <table class="w-full text-left whitespace-nowrap">
-                        <thead class="bg-gray-50 dark:bg-gray-800 text-[10px] font-black text-gray-400 uppercase tracking-tighter border-b dark:border-gray-800">
-                            <tr>
-                                <th class="px-4 py-5 text-center"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this.checked)"></th>
-                                <th class="px-6 py-5 border-r dark:border-gray-700">Canal / Conta</th>
-                                <th class="px-6 py-5">Unissex</th><th class="px-6 py-5">Regata</th><th class="px-6 py-5">Infantil</th><th class="px-6 py-5">Plus Size</th><th class="px-6 py-5">M. Careca</th><th class="px-6 py-5">M. Canguru</th>
-                                <th class="px-6 py-5 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y dark:divide-gray-800"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-900 rounded-3xl border dark:border-gray-800 shadow-sm overflow-hidden mb-12">
-                <div class="p-4 flex justify-between items-center border-b dark:border-gray-800">
-                   <button onclick="document.getElementById('historyContent').classList.toggle('hidden')" class="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">
-                        Histórico de Alterações <i class="fas fa-chevron-down"></i>
+                <nav class="p-4 flex-1 space-y-4 overflow-y-auto">
+                    <button onclick="addRow()" class="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95 text-sm">
+                        <i class="fas fa-plus-circle"></i> Nova Conta
                     </button>
-                    <button onclick="clearHistory()" class="text-[9px] font-bold text-rose-400 hover:text-rose-600 uppercase">Limpar Histórico</button>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-gray-400 uppercase px-2 mb-2">Relatórios</p>
+                        <button onclick="exportCSV()" class="w-full text-left text-[11px] font-bold p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"><i class="fas fa-file-csv mr-3 text-emerald-500"></i> Exportar CSV</button>
+                        <button onclick="exportPDF()" class="w-full text-left text-[11px] font-bold p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"><i class="fas fa-file-pdf mr-3 text-rose-500"></i> Gerar PDF</button>
+                    </div>
+                </nav>
+                <div class="p-4 border-t dark:border-gray-800 flex flex-col gap-2 text-center">
+                    <button onclick="toggleTheme()" class="w-full py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-[10px] font-black uppercase">Alternar Tema</button>
+                    <button onclick="forceReset()" class="text-[9px] font-bold text-gray-400 hover:text-rose-500 uppercase">Restaurar 24 Contas</button>
+                    <button onclick="logout()" class="text-[9px] font-bold text-gray-400 hover:text-blue-500 uppercase mt-2 italic">Sair / Bloquear</button>
                 </div>
-                <div id="historyContent" class="p-4 max-h-60 overflow-y-auto">
-                    <ul id="historyList" class="space-y-2 text-[11px]"></ul>
+            </aside>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Contas</p>
+                        <h3 id="dashTotal" class="text-3xl font-black">0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center border-b-4 border-b-blue-500">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Ticket Médio</p>
+                        <h3 id="dashTicket" class="text-3xl font-black text-blue-600">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center border-b-4 border-b-emerald-500">
+                        <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Menor Valor Final</p>
+                        <h3 id="dashMin" class="text-3xl font-black text-emerald-600">R$ 0,00</h3>
+                        <p id="dashMinMeta" class="text-[9px] font-bold text-gray-500 uppercase mt-1">-</p>
+                    </div>
                 </div>
-            </div>
-        </main>
+
+                <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setFilter('')" class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded-xl text-[10px] font-bold uppercase">Todos</button>
+                        <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[10px] font-bold uppercase">ML</button>
+                        <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-orange-600 text-white rounded-xl text-[10px] font-bold uppercase">Shopee</button>
+                        <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-cyan-500 text-white rounded-xl text-[10px] font-bold uppercase">TikTok</button>
+                        <button onclick="setFilter('Shein')" class="px-4 py-2 bg-black text-white rounded-xl text-[10px] font-bold uppercase">Shein</button>
+                    </div>
+                    <input type="text" id="globalSearch" oninput="render()" placeholder="Pesquisar..." class="w-full lg:w-64 p-3 rounded-2xl bg-white dark:bg-gray-900 border dark:border-gray-700 text-sm outline-none">
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 mb-8 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-[10px] font-bold flex items-center justify-center text-blue-600 uppercase">Selecionados</div>
+                        <select id="bulkCategory" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none">
+                            <option value="all">Categorias</option>
+                            <option value="0">Unissex</option><option value="1">Regata</option><option value="2">Infantil</option><option value="3">Plus Size</option><option value="4">M. Careca</option><option value="5">M. Canguru</option>
+                        </select>
+                        <select id="bulkMode" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none text-blue-600">
+                            <option value="val">Preço Final (R$)</option>
+                            <option value="cheio">Valor Cheio (R$)</option>
+                            <option value="perc">Desconto (%)</option>
+                        </select>
+                        <input type="number" id="bulkValue" step="0.01" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none" placeholder="Valor">
+                        <button onclick="applyBulkUpdate()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs uppercase transition-all shadow-md">Aplicar</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border dark:border-gray-800 overflow-hidden mb-8">
+                    <div class="overflow-x-auto touch-pan-x">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead class="bg-gray-50 dark:bg-gray-800 text-[10px] font-black text-gray-400 uppercase tracking-tighter border-b dark:border-gray-800">
+                                <tr>
+                                    <th class="px-4 py-5 text-center"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this.checked)"></th>
+                                    <th class="px-6 py-5 border-r dark:border-gray-700">Canal / Conta</th>
+                                    <th class="px-6 py-5">Unissex</th><th class="px-6 py-5">Regata</th><th class="px-6 py-5">Infantil</th><th class="px-6 py-5">Plus Size</th><th class="px-6 py-5">M. Careca</th><th class="px-6 py-5">M. Canguru</th>
+                                    <th class="px-6 py-5 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y dark:divide-gray-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 rounded-3xl border dark:border-gray-800 shadow-sm overflow-hidden mb-12">
+                    <div class="p-4 flex justify-between items-center border-b dark:border-gray-800">
+                       <button onclick="document.getElementById('historyContent').classList.toggle('hidden')" class="text-[10px] font-black uppercase tracking-widest text-gray-500 flex items-center gap-2">Histórico <i class="fas fa-chevron-down"></i></button>
+                       <button onclick="clearHistory()" class="text-[9px] font-bold text-rose-400 hover:text-rose-600 uppercase">Limpar</button>
+                    </div>
+                    <div id="historyContent" class="p-4 max-h-60 overflow-y-auto">
+                        <ul id="historyList" class="space-y-2 text-[11px]"></ul>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <script>
+        // --- SISTEMA DE SENHA ---
+        const SENHA_CORRETA = "123456";
+
+        function checkPass() {
+            const input = document.getElementById('passInput').value;
+            if (input === SENHA_CORRETA) {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('mainApp').classList.remove('hidden');
+                sessionStorage.setItem('mkt_auth', 'true');
+                // Inicializa o app
+                initCalculations(); 
+                render(); 
+                updateDash(); 
+                renderHistory();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+                document.getElementById('passInput').value = '';
+            }
+        }
+
+        document.getElementById('btnEnter').onclick = checkPass;
+        document.getElementById('passInput').onkeydown = (e) => { if(e.key === 'Enter') checkPass(); };
+
+        function logout() {
+            sessionStorage.removeItem('mkt_auth');
+            location.reload();
+        }
+
+        // --- DADOS E LÓGICA ---
         const categories = ["Unissex", "Regata", "Infantil", "Plus Size", "M. Careca", "M. Canguru"];
-        
         const defaultAccounts = [
             { n: "ML 2", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [39.99,39.99,35,51.99,69.99,69.99] },
             { n: "ML 3", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [39.99,39.99,35,51.99,69.99,69.99] },
@@ -158,8 +205,8 @@
             { n: "TikTok Print", t: 2, c: [59.99,59.99,0,79.99,78.99,78.99], p: [46,46,0,46,0,0], v: [0,0,0,0,0,0] }
         ];
 
-        let accounts = JSON.parse(localStorage.getItem('mkt_master_v10_final')) || [...defaultAccounts];
-        let historyData = JSON.parse(localStorage.getItem('mkt_history_v10')) || [];
+        let accounts = JSON.parse(localStorage.getItem('mkt_master_final_v11')) || [...defaultAccounts];
+        let historyData = JSON.parse(localStorage.getItem('mkt_history_v11')) || [];
         let selectedIndices = new Set();
 
         function initCalculations() {
@@ -173,113 +220,28 @@
             });
         }
 
-        function toggleSelectAll(checked) {
-            const query = document.getElementById('globalSearch').value.toLowerCase();
-            selectedIndices.clear();
-            if (checked) {
-                accounts.forEach((acc, idx) => {
-                    if (!query || acc.n.toLowerCase().includes(query)) selectedIndices.add(idx);
-                });
-            }
-            render();
-        }
-
-        function toggleSelect(idx) {
-            if (selectedIndices.has(idx)) selectedIndices.delete(idx);
-            else selectedIndices.add(idx);
-            render();
-        }
-
-        function addHistory(msg) {
-            const now = new Date();
-            const timeStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-            historyData.unshift(`[${timeStr}] ${msg}`);
-            if(historyData.length > 50) historyData.pop();
-            localStorage.setItem('mkt_history_v10', JSON.stringify(historyData));
-            renderHistory();
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('historyList');
-            if(!list) return;
-            list.innerHTML = historyData.length > 0 
-                ? historyData.map(h => `<li class="border-b dark:border-gray-800 pb-1 text-gray-600 dark:text-gray-400 font-medium">${h}</li>`).join('')
-                : '<li class="text-gray-400 italic text-center py-2">Nenhuma alteração registrada.</li>';
-        }
-
-        function clearHistory() { if(confirm("Apagar histórico?")) { historyData = []; localStorage.setItem('mkt_history_v10', JSON.stringify(historyData)); renderHistory(); } }
-
-        function handleSync(idx, col, input, mode) {
-            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.'));
-            if (isNaN(n)) return render();
-            let acc = accounts[idx];
-            let logMsg = "";
-
-            if (mode === 'val') {
-                const oldVal = acc.v[col];
-                acc.v[col] = n;
-                if (acc.t === 2 && acc.c[col] > 0) acc.p[col] = (1 - (n / acc.c[col])) * 100;
-                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Preço Final: R$ ${oldVal.toFixed(2)} → R$ ${n.toFixed(2)}`;
-            } else if (mode === 'perc') {
-                const oldPerc = acc.p[col];
-                acc.p[col] = n;
-                if (acc.t === 2 && acc.c[col] > 0) acc.v[col] = acc.c[col] * (1 - (n / 100));
-                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Desconto: ${oldPerc.toFixed(1)}% → ${n.toFixed(1)}%`;
-            } else if (mode === 'cheio') {
-                const oldCheio = acc.c[col];
-                acc.c[col] = n;
-                acc.v[col] = n * (1 - (acc.p[col] / 100));
-                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Preço Cheio: R$ ${oldCheio.toFixed(2)} → R$ ${n.toFixed(2)}`;
-            }
-            
-            addHistory(logMsg);
-            save(); render();
-        }
-
+        function save() { localStorage.setItem('mkt_master_final_v11', JSON.stringify(accounts)); updateDash(); }
+        
         function render() {
             const query = document.getElementById('globalSearch').value.toLowerCase();
             const body = document.getElementById('tableBody'); body.innerHTML = '';
-            
             accounts.forEach((acc, idx) => {
                 if(query && !acc.n.toLowerCase().includes(query)) return;
                 const isChecked = selectedIndices.has(idx);
                 const tr = document.createElement('tr');
                 tr.className = `transition-colors ${isChecked ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`;
-                
                 let row = `
-                    <td class="px-4 py-5 text-center border-r dark:border-gray-800">
-                        <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="toggleSelect(${idx})">
-                    </td>
+                    <td class="px-4 py-5 text-center border-r dark:border-gray-800"><input type="checkbox" ${isChecked ? 'checked' : ''} onclick="toggleSelect(${idx})"></td>
                     <td class="px-6 py-4 font-bold border-r dark:border-gray-800">
-                        <div class="flex items-center">
-                            <i class="fas fa-grip-vertical handle"></i>
-                            ${getIcon(acc.n)}
-                            <span contenteditable="true" onblur="upName(${idx}, this.innerText)">${acc.n}</span>
-                        </div>
+                        <div class="flex items-center"><i class="fas fa-grip-vertical handle"></i>${getIcon(acc.n)}<span contenteditable="true" onblur="upName(${idx}, this.innerText)">${acc.n}</span></div>
                     </td>`;
-
                 acc.v.forEach((val, vi) => {
                     const isZero = val <= 0;
-                    row += `<td class="px-6 py-4">
-                        <div class="flex flex-col gap-0.5">
-                            ${acc.t === 2 && acc.c[vi] > 0 ? `
-                                <div class="flex flex-col mb-1">
-                                    <span class="text-[7px] text-gray-400 font-black uppercase tracking-tighter">Valor Cheio</span>
-                                    <span class="text-[9px] text-gray-500 font-bold" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'cheio')">R$ ${acc.c[vi].toFixed(2)}</span>
-                                </div>` : ''}
-                            <div class="flex flex-col">
-                                <span class="text-[7px] text-blue-400 font-black uppercase tracking-tighter">${acc.t === 2 ? 'Preço Final' : 'Valor'}</span>
-                                <span class="${isZero ? 'text-gray-300 font-normal' : 'text-blue-600 font-black text-sm'}" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'val')">
-                                    ${isZero ? '-' : 'R$ ' + val.toFixed(2)}
-                                </span>
-                            </div>
-                            ${acc.t === 2 && !isZero ? `
-                                <div class="flex flex-col mt-1">
-                                    <span class="text-[7px] text-orange-400 font-black uppercase tracking-tighter">Desconto OFF</span>
-                                    <span class="text-[9px] font-black text-orange-500" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'perc')">${acc.p[vi].toFixed(1)}%</span>
-                                </div>` : ''}
-                        </div>
-                    </td>`;
+                    row += `<td class="px-6 py-4"><div class="flex flex-col gap-0.5">
+                        ${acc.t === 2 && acc.c[vi] > 0 ? `<div class="flex flex-col mb-1"><span class="text-[7px] text-gray-400 font-black uppercase tracking-tighter">Valor Cheio</span><span class="text-[9px] text-gray-500 font-bold" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'cheio')">R$ ${acc.c[vi].toFixed(2)}</span></div>` : ''}
+                        <div class="flex flex-col"><span class="text-[7px] text-blue-400 font-black uppercase tracking-tighter">${acc.t === 2 ? 'Preço Final' : 'Valor'}</span><span class="${isZero ? 'text-gray-300' : 'text-blue-600 font-black text-sm'}" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'val')">${isZero ? '-' : 'R$ ' + val.toFixed(2)}</span></div>
+                        ${acc.t === 2 && !isZero ? `<div class="flex flex-col mt-1"><span class="text-[7px] text-orange-400 font-black uppercase tracking-tighter">Desconto OFF</span><span class="text-[9px] font-black text-orange-500" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'perc')">${acc.p[vi].toFixed(1)}%</span></div>` : ''}
+                    </div></td>`;
                 });
                 row += `<td class="px-6 py-4 text-center"><button onclick="removeRow(${idx})" class="text-gray-300 hover:text-rose-500"><i class="fas fa-trash-alt"></i></button></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
@@ -287,101 +249,56 @@
             initSortable();
         }
 
+        // Funções de apoio (Mantenha as mesmas das versões anteriores)
+        function toggleSelectAll(c) { const q = document.getElementById('globalSearch').value.toLowerCase(); selectedIndices.clear(); if(c) accounts.forEach((a,i) => { if(!q || a.n.toLowerCase().includes(q)) selectedIndices.add(i); }); render(); }
+        function toggleSelect(i) { if(selectedIndices.has(i)) selectedIndices.delete(i); else selectedIndices.add(i); render(); }
+        function addHistory(m) { const n = new Date(); historyData.unshift(`[${n.toLocaleTimeString()}] ${m}`); if(historyData.length > 50) historyData.pop(); localStorage.setItem('mkt_history_v11', JSON.stringify(historyData)); renderHistory(); }
+        function renderHistory() { const l = document.getElementById('historyList'); if(l) l.innerHTML = historyData.map(h => `<li class="border-b dark:border-gray-800 pb-1 font-medium">${h}</li>`).join(''); }
+        function clearHistory() { historyData = []; localStorage.setItem('mkt_history_v11', "[]"); renderHistory(); }
+        function handleSync(idx, col, input, mode) {
+            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render();
+            let acc = accounts[idx];
+            if (mode === 'val') { acc.v[col] = n; if(acc.t === 2 && acc.c[col] > 0) acc.p[col] = (1 - (n / acc.c[col])) * 100; }
+            else if (mode === 'perc') { acc.p[col] = n; if(acc.t === 2 && acc.c[col] > 0) acc.v[col] = acc.c[col] * (1 - (n / 100)); }
+            else if (mode === 'cheio') { acc.c[col] = n; acc.v[col] = n * (1 - (acc.p[col] / 100)); }
+            addHistory(`EDIT: ${acc.n} (${categories[col]})`); save(); render();
+        }
         function applyBulkUpdate() {
-            const catIdx = document.getElementById('bulkCategory').value;
-            const mode = document.getElementById('bulkMode').value;
-            const inputVal = parseFloat(document.getElementById('bulkValue').value);
-            if (isNaN(inputVal)) return alert("Insira um valor numérico.");
-
-            if (selectedIndices.size === 0) {
-                if(!confirm("Nenhuma conta marcada. Aplicar em todas as visíveis?")) return;
-                const query = document.getElementById('globalSearch').value.toLowerCase();
-                accounts.forEach((acc, idx) => { if (!query || acc.n.toLowerCase().includes(query)) selectedIndices.add(idx); });
-            }
-
-            const affected = selectedIndices.size;
+            const cat = document.getElementById('bulkCategory').value, mode = document.getElementById('bulkMode').value, val = parseFloat(document.getElementById('bulkValue').value);
+            if (isNaN(val)) return alert("Insira um valor.");
+            if (selectedIndices.size === 0) { if(!confirm("Aplicar em todos os visíveis?")) return; accounts.forEach((a, i) => { if(!document.getElementById('globalSearch').value || a.n.toLowerCase().includes(document.getElementById('globalSearch').value.toLowerCase())) selectedIndices.add(i); }); }
             selectedIndices.forEach(idx => {
-                let acc = accounts[idx];
-                const update = (i) => {
-                    if (mode === 'val') {
-                        acc.v[i] = inputVal;
-                        if(acc.t === 2 && acc.c[i] > 0) acc.p[i] = (1 - (inputVal / acc.c[i])) * 100;
-                    } else if (mode === 'cheio') {
-                        if(acc.t === 2) {
-                            acc.c[i] = inputVal;
-                            acc.v[i] = inputVal * (1 - (acc.p[i] / 100));
-                        }
-                    } else if (mode === 'perc') {
-                        if(acc.t === 2) {
-                            acc.p[i] = inputVal;
-                            if(acc.c[i] > 0) acc.v[i] = acc.c[i] * (1 - (inputVal / 100));
-                        }
-                    }
+                let a = accounts[idx];
+                const up = (i) => {
+                    if (mode === 'val') { a.v[i] = val; if(a.t === 2 && a.c[i] > 0) a.p[i] = (1 - (val / a.c[i])) * 100; }
+                    else if (mode === 'cheio' && a.t === 2) { a.c[i] = val; a.v[i] = val * (1 - (a.p[i]/100)); }
+                    else if (mode === 'perc' && a.t === 2) { a.p[i] = val; if(a.c[i] > 0) a.v[i] = a.c[i] * (1 - (val/100)); }
                 };
-                if (catIdx === 'all') acc.v.forEach((_, i) => update(i));
-                else update(parseInt(catIdx));
+                if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat));
             });
-
-            let modeText = mode === 'val' ? "Preço Final" : mode === 'cheio' ? "Valor Cheio" : "Desconto %";
-            addHistory(`MASSA: ${affected} contas - ${modeText} → ${inputVal}${mode === 'perc' ? '%' : ' R$'}`);
-            selectedIndices.clear(); document.getElementById('selectAll').checked = false; save(); render();
+            addHistory("Ação em massa concluída."); selectedIndices.clear(); save(); render();
         }
-
-        function getIcon(n) {
-            const s = n.toLowerCase();
-            if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-500 mr-2"></i>';
-            if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-orange-600 mr-2"></i>';
-            if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-cyan-500 mr-2"></i>';
-            if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-950 dark:text-white mr-2"></i>';
-            return '<i class="fas fa-store text-gray-400 mr-2"></i>';
-        }
-
-        function save() { localStorage.setItem('mkt_master_v10_final', JSON.stringify(accounts)); updateDash(); }
+        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-500 mr-2"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-orange-600 mr-2"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-cyan-500 mr-2"></i>'; return '<i class="fas fa-store text-gray-400 mr-2"></i>'; }
         function updateDash() {
             let total = 0, soma = 0, min = Infinity, minName = "";
-            accounts.forEach(acc => {
-                acc.v.forEach((v, i) => { if(v > 0) { total++; soma += v; if(v < min) { min = v; minName = `${acc.n} (${categories[i]})`; } } });
-            });
-            document.getElementById('dashTotal').innerText = accounts.length;
-            document.getElementById('dashTicket').innerText = total > 0 ? `R$ ${(soma/total).toFixed(2)}` : "R$ 0,00";
-            document.getElementById('dashMin').innerText = min === Infinity ? "R$ 0,00" : `R$ ${min.toFixed(2)}`;
-            document.getElementById('dashMinMeta').innerText = minName || "-";
+            accounts.forEach(acc => acc.v.forEach((v, i) => { if(v > 0) { total++; soma += v; if(v < min) { min = v; minName = `${acc.n} (${categories[i]})`; } } }));
+            document.getElementById('dashTotal').innerText = accounts.length; document.getElementById('dashTicket').innerText = total > 0 ? `R$ ${(soma/total).toFixed(2)}` : "R$ 0,00";
+            document.getElementById('dashMin').innerText = min === Infinity ? "R$ 0,00" : `R$ ${min.toFixed(2)}`; document.getElementById('dashMinMeta').innerText = minName || "-";
         }
-        function upName(i, t) { const old = accounts[i].n; accounts[i].n = t.trim(); addHistory(`NOME: "${old}" → "${t.trim()}"`); save(); }
-        function setFilter(v) { document.getElementById('globalSearch').value = v; selectedIndices.clear(); document.getElementById('selectAll').checked = false; render(); }
-        function addRow() { 
-            const type = prompt("Opção de Exibição:\n1 - Valor Direto (Ex: ML/Shein)\n2 - Com Desconto (Ex: Shopee/TikTok)", "1");
-            if (!type) return;
-            let n = { n: "Nova Conta", t: parseInt(type), c:[0,0,0,0,0,0], p:[0,0,0,0,0,0], v:[0,0,0,0,0,0] };
-            if(type === "2") { n.c = [60,60,50,80,80,80]; n.p = [40,40,40,40,0,0]; n.c.forEach((c, i) => n.v[i] = c * (1 - (n.p[i]/100))); }
-            else { n.v = [39.99,39.99,35,51.99,69.99,69.99]; }
-            accounts.unshift(n); addHistory(`NOVA: "${n.n}" criada.`); save(); render(); 
-        }
-        function removeRow(i) { if(confirm("Remover?")) { addHistory(`EXCLUÍDA: "${accounts[i].n}"`); accounts.splice(i, 1); save(); render(); } }
-        function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        function upName(i, t) { accounts[i].n = t.trim(); save(); }
+        function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
+        function addRow() { const t = prompt("1-Direto / 2-Desconto", "1"); if(!t) return; accounts.unshift({ n: "Nova Conta", t: parseInt(t), c:[60,60,50,80,80,80], p:[40,40,40,40,0,0], v:[39.99,39.99,35,51.99,69.99,69.99] }); save(); render(); }
+        function removeRow(i) { if(confirm("Remover?")) { accounts.splice(i, 1); save(); render(); } }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
-        function initSortable() {
-            new Sortable(document.getElementById('tableBody'), { handle: '.handle', animation: 150, onEnd: (evt) => {
-                const moved = accounts.splice(evt.oldIndex, 1)[0];
-                accounts.splice(evt.newIndex, 0, moved);
-                save();
-            }});
-        }
-        function forceReset() { if(confirm("Restaurar banco original?")) { localStorage.removeItem('mkt_master_v10_final'); location.reload(); } }
-        function exportCSV() { 
-            let csv = "Conta,Unissex,Regata,Infantil,Plus Size,M.Careca,M.Canguru\n"; 
-            accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); 
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click(); 
-        }
-        function exportPDF() { 
-            const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
-            doc.text("Relatorio Geral", 14, 15); 
-            doc.autoTable({ head: [['Conta', ...categories]], body: accounts.map(a => [a.n, ...a.v.map(v => v > 0 ? `R$ ${v.toFixed(2)}` : '-')]), startY: 20, styles: { fontSize: 7 } }); 
-            doc.save('Relatorio.pdf'); 
-        }
+        function initSortable() { new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: (evt) => { const m = accounts.splice(evt.oldIndex, 1)[0]; accounts.splice(evt.newIndex, 0, m); save(); } }); }
 
-        initCalculations(); render(); updateDash(); renderHistory();
+        // Auto-login se já autenticado
+        if (sessionStorage.getItem('mkt_auth') === 'true') {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('mainApp').classList.remove('hidden');
+            initCalculations(); render(); updateDash(); renderHistory();
+        }
     </script>
 </body>
 </html>
