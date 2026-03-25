@@ -20,14 +20,18 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
-        .sortable-ghost { opacity: 0.4; background: #dbeafe !important; }
         .handle { cursor: grab; padding: 0 10px; color: #cbd5e1; }
+        input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200 font-sans transition-colors overflow-hidden">
 
+<button onclick="toggleSidebar()" class="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-3 rounded-xl shadow-lg">
+    <i class="fas fa-bars"></i>
+</button>
+
     <div class="flex h-screen">
-        <aside class="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+      <aside id="sidebar" class="fixed md:relative z-40 -translate-x-full md:translate-x-0 transition-transform duration-300 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
             <div class="p-6 text-center border-b dark:border-gray-800">
                 <h1 class="text-xl font-black text-blue-600 dark:text-blue-500 uppercase tracking-tighter">Valores MKT</h1>
             </div>
@@ -58,7 +62,7 @@
                     <h3 id="dashTicket" class="text-3xl font-black text-blue-600">R$ 0,00</h3>
                 </div>
                 <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 shadow-sm text-center border-b-4 border-b-emerald-500">
-                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Menor Valor</p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Menor Valor Final</p>
                     <h3 id="dashMin" class="text-3xl font-black text-emerald-600">R$ 0,00</h3>
                     <p id="dashMinMeta" class="text-[9px] font-bold text-gray-500 uppercase mt-1">-</p>
                 </div>
@@ -77,25 +81,29 @@
 
             <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl border dark:border-gray-800 mb-8 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <select id="bulkTarget" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none"></select>
+                    <div class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-[10px] font-bold flex items-center justify-center text-blue-600 uppercase">
+                        Ação para Selecionados
+                    </div>
                     <select id="bulkCategory" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none">
                         <option value="all">Categorias</option>
                         <option value="0">Unissex</option><option value="1">Regata</option><option value="2">Infantil</option><option value="3">Plus Size</option><option value="4">M. Careca</option><option value="5">M. Canguru</option>
                     </select>
                     <select id="bulkMode" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none text-blue-600">
-                        <option value="val">Valor (R$)</option>
-                        <option value="perc">Margem (%)</option>
+                        <option value="val">Preço Final / Valor (R$)</option>
+                        <option value="cheio">Valor Cheio DE (R$)</option>
+                        <option value="perc">Desconto / % OFF</option>
                     </select>
                     <input type="number" id="bulkValue" step="0.01" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border text-xs font-bold outline-none" placeholder="Valor ou %">
-                    <button onclick="applyBulkUpdate()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs uppercase transition-all">Aplicar em Massa</button>
+                    <button onclick="applyBulkUpdate()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs uppercase transition-all shadow-md">Aplicar nos Marcados</button>
                 </div>
             </div>
 
             <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border dark:border-gray-800 overflow-hidden mb-8">
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto touch-pan-x">
                     <table class="w-full text-left whitespace-nowrap">
                         <thead class="bg-gray-50 dark:bg-gray-800 text-[10px] font-black text-gray-400 uppercase tracking-tighter border-b dark:border-gray-800">
                             <tr>
+                                <th class="px-4 py-5 text-center"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this.checked)"></th>
                                 <th class="px-6 py-5 border-r dark:border-gray-700">Canal / Conta</th>
                                 <th class="px-6 py-5">Unissex</th><th class="px-6 py-5">Regata</th><th class="px-6 py-5">Infantil</th><th class="px-6 py-5">Plus Size</th><th class="px-6 py-5">M. Careca</th><th class="px-6 py-5">M. Canguru</th>
                                 <th class="px-6 py-5 text-center">Ações</th>
@@ -123,70 +131,71 @@
     <script>
         const categories = ["Unissex", "Regata", "Infantil", "Plus Size", "M. Careca", "M. Canguru"];
         
-        // Carregamento Inicial
-let accounts = JSON.parse(localStorage.getItem('mkt_master_v18')) || [
-    { n: "ML 2", v: [39.99,39.99,35.00,51.99,69.99,69.99], p: [60,60,59,62,55,46] },
-    { n: "ML 3", v: [39.99,39.99,35.00,51.99,69.99,69.99], p: [60,60,59,62,55,46] },
-    { n: "ML 6", v: [39.99,39.99,35.00,51.99,69.99,69.99], p: [60,60,59,62,55,46] },
-    { n: "ML 5", v: [36.99,36.99,32.99,44.99,69.99,69.99], p: [48,48,50,41,55,46] },
-    { n: "ML 9", v: [36.99,36.99,32.99,44.99,69.99,69.99], p: [48,48,50,41,55,46] },
-    { n: "ML 10", v: [36.99,36.99,32.99,44.99,69.99,69.99], p: [48,48,50,41,55,46] },
+        const defaultAccounts = [
+            { n: "ML 2", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [39.99,39.99,35,51.99,69.99,69.99] },
+            { n: "ML 3", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [39.99,39.99,35,51.99,69.99,69.99] },
+            { n: "ML 6", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [39.99,39.99,35,51.99,69.99,69.99] },
+            { n: "ML 5", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [36.99,36.99,32.99,44.99,69.99,69.99] },
+            { n: "ML 9", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [36.99,36.99,32.99,44.99,69.99,69.99] },
+            { n: "ML 10", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [36.99,36.99,32.99,44.99,69.99,69.99] },
+            { n: "Shein 1", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [33.99,33.99,27.99,41.99,61.99,69.99] },
+            { n: "Shein 2", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [36.99,36.99,29.99,49.99,69.99,69.99] },
+            { n: "Shein 3", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [36.99,36.99,29.99,49.99,61.99,69.99] },
+            { n: "Shein 4", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [33.99,33.99,29.99,45.99,69.99,69.99] },
+            { n: "Shein 5", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [35.99,35.99,29.99,45.99,61.99,69.99] },
+            { n: "Shein 6", t: 1, c: [0,0,0,0,0,0], p: [0,0,0,0,0,0], v: [35.99,35.99,29.99,45.99,57.99,69.99] },
+            { n: "Shopee Custom", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [42,42,42,42,42,42], v: [0,0,0,0,0,0] },
+            { n: "Shopee Clothing", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [42,42,42,42,42,42], v: [0,0,0,0,0,0] },
+            { n: "Shopee New", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [40,40,30,40,12,12], v: [0,0,0,0,0,0] },
+            { n: "Shopee FG7", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [40,40,30,40,12,12], v: [0,0,0,0,0,0] },
+            { n: "Shopee Fashion", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [40,40,30,40,12,12], v: [0,0,0,0,0,0] },
+            { n: "Shopee Print", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [40,40,30,40,12,12], v: [0,0,0,0,0,0] },
+            { n: "TikTok New", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [48,48,30,48,0,0], v: [0,0,0,0,0,0] },
+            { n: "TikTok Custom", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [46,46,30,46,0,0], v: [0,0,0,0,0,0] },
+            { n: "TikTok Clothing", t: 2, c: [59.99,59.99,0,79.99,78.99,78.99], p: [46,46,0,46,0,0], v: [0,0,0,0,0,0] },
+            { n: "TikTok FG7", t: 2, c: [59.99,59.99,0,79.99,78.99,78.99], p: [46,46,0,46,0,0], v: [0,0,0,0,0,0] },
+            { n: "TikTok Fashion", t: 2, c: [59.99,59.99,49.99,79.99,78.99,78.99], p: [46,46,30,46,0,0], v: [0,0,0,0,0,0] },
+            { n: "TikTok Print", t: 2, c: [59.99,59.99,0,79.99,78.99,78.99], p: [46,46,0,46,0,0], v: [0,0,0,0,0,0] }
+        ];
 
-    { n: "Shein 1", v: [33.99,33.99,27.99,41.99,61.99,69.99], p: [36,36,27,31,38,46] },
-    { n: "Shein 2", v: [36.99,36.99,29.99,49.99,69.99,69.99], p: [48,48,36,56,55,46] },
-    { n: "Shein 3", v: [36.99,36.99,29.99,49.99,61.99,69.99], p: [48,48,36,56,38,46] },
-    { n: "Shein 4", v: [33.99,33.99,29.99,45.99,69.99,69.99], p: [36,36,36,44,55,46] },
-    { n: "Shein 5", v: [35.99,35.99,29.99,45.99,61.99,69.99], p: [44,44,36,44,38,46] },
-    { n: "Shein 6", v: [35.99,35.99,29.99,45.99,57.99,69.99], p: [44,44,36,44,29,46] },
+        let accounts = JSON.parse(localStorage.getItem('mkt_master_v10_final')) || [...defaultAccounts];
+        let historyData = JSON.parse(localStorage.getItem('mkt_history_v10')) || [];
+        let selectedIndices = new Set();
 
-    { n: "Shopee Custom", v: [34.79,34.79,34.79,34.79,34.79,34.79], p: [42,42,42,42,42,42] },
-    { n: "Shopee Clothing", v: [34.79,34.79,34.79,34.79,34.79,34.79], p: [42,42,42,42,42,42] },
-    { n: "Shopee New", v: [36.00,36.00,35.00,48.00,69.52,69.52], p: [40,40,30,40,12,12] },
-    { n: "Shopee FG7", v: [36.00,36.00,35.00,48.00,69.52,69.52], p: [40,40,30,40,12,12] },
-    { n: "Shopee Fashion", v: [36.00,36.00,35.00,48.00,69.52,69.52], p: [40,40,30,40,12,12] },
-    { n: "Shopee Print", v: [36.00,36.00,35.00,48.00,69.52,69.52], p: [40,40,30,40,12,12] },
-
-    { n: "TikTok New", v: [34.79,34.79,0,46.39,60.03,70.30], p: [42,42,0,42,24,11] },
-    { n: "TikTok Custom", v: [34.79,34.79,34.99,46.39,59.99,69.99], p: [42,42,30,42,40,40] },
-    { n: "TikTok Clothing", v: [34.79,34.79,0,46.39,60.03,70.30], p: [42,42,0,42,24,11] },
-    { n: "TikTok FG7", v: [34.79,34.79,0,46.39,59.99,69.99], p: [42,42,0,42,40,40] },
-    { n: "TikTok Fashion", v: [34.79,34.79,34.99,46.39,59.99,69.99], p: [42,42,30,42,40,40] },
-    { n: "TikTok Print", v: [34.79,34.79,0,46.39,59.99,69.99], p: [42,42,0,42,40,40] }
-];
-        let historyData = JSON.parse(localStorage.getItem('mkt_history')) || [];
-
-        function toggleTheme() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('mkt_theme', isDark ? 'dark' : 'light');
+        function initCalculations() {
+            accounts.forEach(acc => {
+                if(acc.t === 2) {
+                    acc.c.forEach((cheio, i) => {
+                        if(cheio > 0) acc.v[i] = cheio * (1 - (acc.p[i] / 100));
+                        else if(acc.v[i] === 0) acc.v[i] = 0;
+                    });
+                }
+            });
         }
 
-        function getIcon(name) {
-            const n = name.toLowerCase();
-            if(n.includes('ml')) return '<i class="fas fa-handshake text-yellow-500 mr-2"></i>';
-            if(n.includes('shopee')) return '<i class="fas fa-shopping-bag text-orange-600 mr-2"></i>';
-            if(n.includes('tiktok')) return '<i class="fab fa-tiktok text-cyan-500 mr-2"></i>';
-            if(n.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-900 dark:text-white mr-2"></i>';
-            return '<i class="fas fa-store text-gray-400 mr-2"></i>';
+        function toggleSelectAll(checked) {
+            const query = document.getElementById('globalSearch').value.toLowerCase();
+            selectedIndices.clear();
+            if (checked) {
+                accounts.forEach((acc, idx) => {
+                    if (!query || acc.n.toLowerCase().includes(query)) selectedIndices.add(idx);
+                });
+            }
+            render();
         }
 
-        function getMargemColor(perc, name) {
-            const n = name.toLowerCase();
-            if(n.includes('ml')) return perc > 50 ? 'text-emerald-500' : 'text-amber-500';
-            if(n.includes('shopee')) return perc > 35 ? 'text-orange-500' : 'text-rose-500';
-            if(n.includes('tiktok')) return perc > 30 ? 'text-cyan-500' : 'text-blue-500';
-            return 'text-gray-400';
+        function toggleSelect(idx) {
+            if (selectedIndices.has(idx)) selectedIndices.delete(idx);
+            else selectedIndices.add(idx);
+            render();
         }
 
-        // Histórico Persistente
         function addHistory(msg) {
-            const date = new Date();
-            const time = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-            historyData.unshift(`[${time}] ${msg}`);
-            
-            // Limita a 50 itens para não pesar o storage
+            const now = new Date();
+            const timeStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+            historyData.unshift(`[${timeStr}] ${msg}`);
             if(historyData.length > 50) historyData.pop();
-            
-            localStorage.setItem('mkt_history', JSON.stringify(historyData));
+            localStorage.setItem('mkt_history_v10', JSON.stringify(historyData));
             renderHistory();
         }
 
@@ -194,38 +203,37 @@ let accounts = JSON.parse(localStorage.getItem('mkt_master_v18')) || [
             const list = document.getElementById('historyList');
             if(!list) return;
             list.innerHTML = historyData.length > 0 
-                ? historyData.map(h => `<li class="border-b dark:border-gray-800 pb-1 text-gray-600 dark:text-gray-400">${h}</li>`).join('')
-                : '<li class="text-gray-400 italic">Nenhuma alteração registrada.</li>';
+                ? historyData.map(h => `<li class="border-b dark:border-gray-800 pb-1 text-gray-600 dark:text-gray-400 font-medium">${h}</li>`).join('')
+                : '<li class="text-gray-400 italic text-center py-2">Nenhuma alteração registrada.</li>';
         }
 
-        function clearHistory() {
-            if(confirm("Deseja apagar todo o histórico?")) {
-                historyData = [];
-                localStorage.setItem('mkt_history', JSON.stringify(historyData));
-                renderHistory();
+        function clearHistory() { if(confirm("Apagar histórico?")) { historyData = []; localStorage.setItem('mkt_history_v10', JSON.stringify(historyData)); renderHistory(); } }
+
+        function handleSync(idx, col, input, mode) {
+            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.'));
+            if (isNaN(n)) return render();
+            let acc = accounts[idx];
+            let logMsg = "";
+
+            if (mode === 'val') {
+                const oldVal = acc.v[col];
+                acc.v[col] = n;
+                if (acc.t === 2 && acc.c[col] > 0) acc.p[col] = (1 - (n / acc.c[col])) * 100;
+                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Preço Final: R$ ${oldVal.toFixed(2)} → R$ ${n.toFixed(2)}`;
+            } else if (mode === 'perc') {
+                const oldPerc = acc.p[col];
+                acc.p[col] = n;
+                if (acc.t === 2 && acc.c[col] > 0) acc.v[col] = acc.c[col] * (1 - (n / 100));
+                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Desconto: ${oldPerc.toFixed(1)}% → ${n.toFixed(1)}%`;
+            } else if (mode === 'cheio') {
+                const oldCheio = acc.c[col];
+                acc.c[col] = n;
+                acc.v[col] = n * (1 - (acc.p[col] / 100));
+                logMsg = `EDIT: ${acc.n} (${categories[col]}) - Preço Cheio: R$ ${oldCheio.toFixed(2)} → R$ ${n.toFixed(2)}`;
             }
-        }
-
-        function updateDash() {
-            let totalValores = 0, somaValores = 0, minVal = Infinity, minMeta = "";
-            accounts.forEach(acc => {
-                acc.v.forEach((v, i) => {
-                    if(v > 0) {
-                        totalValores++; somaValores += v;
-                        if(v < minVal) { minVal = v; minMeta = `${acc.n} (${categories[i]})`; }
-                    }
-                });
-            });
-            document.getElementById('dashTotal').innerText = accounts.length;
-            document.getElementById('dashTicket').innerText = totalValores > 0 ? `R$ ${(somaValores/totalValores).toFixed(2)}` : "R$ 0,00";
-            document.getElementById('dashMin').innerText = minVal === Infinity ? "R$ 0,00" : `R$ ${minVal.toFixed(2)}`;
-            document.getElementById('dashMinMeta').innerText = minMeta || "-";
-        }
-
-        function save() { 
-            localStorage.setItem('mkt_master_v18', JSON.stringify(accounts)); 
-            updateBulkSelectors(); 
-            updateDash(); 
+            
+            addHistory(logMsg);
+            save(); render();
         }
 
         function render() {
@@ -234,20 +242,44 @@ let accounts = JSON.parse(localStorage.getItem('mkt_master_v18')) || [
             
             accounts.forEach((acc, idx) => {
                 if(query && !acc.n.toLowerCase().includes(query)) return;
-                
+                const isChecked = selectedIndices.has(idx);
                 const tr = document.createElement('tr');
-                tr.setAttribute('data-id', idx);
-                tr.className = "hover:bg-blue-50/30 dark:hover:bg-gray-800/50 transition-colors";
-                let row = `<td class="px-6 py-4 font-bold border-r dark:border-gray-800">
-                    <div class="flex items-center">
-                        <i class="fas fa-grip-vertical handle"></i>
-                        ${getIcon(acc.n)}
-                        <span contenteditable="true" onblur="upName(${idx}, this.innerText)">${acc.n}</span>
-                    </div>
-                </td>`;
+                tr.className = `transition-colors ${isChecked ? 'bg-blue-50/50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`;
+                
+                let row = `
+                    <td class="px-4 py-5 text-center border-r dark:border-gray-800">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="toggleSelect(${idx})">
+                    </td>
+                    <td class="px-6 py-4 font-bold border-r dark:border-gray-800">
+                        <div class="flex items-center">
+                            <i class="fas fa-grip-vertical handle"></i>
+                            ${getIcon(acc.n)}
+                            <span contenteditable="true" onblur="upName(${idx}, this.innerText)">${acc.n}</span>
+                        </div>
+                    </td>`;
+
                 acc.v.forEach((val, vi) => {
-                    const isZero = val === 0;
-                    row += `<td class="px-6 py-4"><div class="flex flex-col"><span class="${isZero ? 'text-gray-300' : 'text-blue-600 font-bold'}" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'val')">${isZero ? '-' : 'R$ ' + val.toFixed(2)}</span><span class="text-[9px] font-black ${isZero ? '' : getMargemColor(acc.p[vi], acc.n)}" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'perc')">${isZero ? '' : acc.p[vi].toFixed(1) + '%'}</span></div></td>`;
+                    const isZero = val <= 0;
+                    row += `<td class="px-6 py-4">
+                        <div class="flex flex-col gap-0.5">
+                            ${acc.t === 2 && acc.c[vi] > 0 ? `
+                                <div class="flex flex-col mb-1">
+                                    <span class="text-[7px] text-gray-400 font-black uppercase tracking-tighter">Valor Cheio</span>
+                                    <span class="text-[9px] text-gray-500 font-bold" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'cheio')">R$ ${acc.c[vi].toFixed(2)}</span>
+                                </div>` : ''}
+                            <div class="flex flex-col">
+                                <span class="text-[7px] text-blue-400 font-black uppercase tracking-tighter">${acc.t === 2 ? 'Preço Final' : 'Valor'}</span>
+                                <span class="${isZero ? 'text-gray-300 font-normal' : 'text-blue-600 font-black text-sm'}" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'val')">
+                                    ${isZero ? '-' : 'R$ ' + val.toFixed(2)}
+                                </span>
+                            </div>
+                            ${acc.t === 2 && !isZero ? `
+                                <div class="flex flex-col mt-1">
+                                    <span class="text-[7px] text-orange-400 font-black uppercase tracking-tighter">Desconto OFF</span>
+                                    <span class="text-[9px] font-black text-orange-500" contenteditable="true" onblur="handleSync(${idx}, ${vi}, this.innerText, 'perc')">${acc.p[vi].toFixed(1)}%</span>
+                                </div>` : ''}
+                        </div>
+                    </td>`;
                 });
                 row += `<td class="px-6 py-4 text-center"><button onclick="removeRow(${idx})" class="text-gray-300 hover:text-rose-500"><i class="fas fa-trash-alt"></i></button></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
@@ -255,164 +287,101 @@ let accounts = JSON.parse(localStorage.getItem('mkt_master_v18')) || [
             initSortable();
         }
 
-        function initSortable() {
-            if(document.getElementById('globalSearch').value !== "") return; 
-            new Sortable(document.getElementById('tableBody'), {
-                handle: '.handle',
-                animation: 150,
-                onEnd: (evt) => {
-                    const movedItem = accounts.splice(evt.oldIndex, 1)[0];
-                    accounts.splice(evt.newIndex, 0, movedItem);
-                    save();
-                }
-            });
-        }
-
-        function handleSync(accI, colI, input, mode) {
-            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.'));
-            if(isNaN(n)) return render();
-            let acc = accounts[accI];
-            let custo = acc.v[colI] / (1 + (acc.p[colI] / 100)) || n/1.4;
-            
-            if(mode === 'val') { 
-                acc.v[colI] = n; 
-                acc.p[colI] = custo > 0 ? ((n - custo) / custo) * 100 : 40;
-                addHistory(`${acc.n} (${categories[colI]}): R$ ${n.toFixed(2)}`);
-            } else { 
-                acc.p[colI] = n; 
-                acc.v[colI] = custo * (1 + (n / 100));
-                addHistory(`${acc.n} (${categories[colI]}): ${n.toFixed(1)}%`);
-            }
-            save(); render();
-        }
-
         function applyBulkUpdate() {
-            const query = document.getElementById('globalSearch').value.toLowerCase();
-            const target = document.getElementById('bulkTarget').value;
             const catIdx = document.getElementById('bulkCategory').value;
             const mode = document.getElementById('bulkMode').value;
             const inputVal = parseFloat(document.getElementById('bulkValue').value);
+            if (isNaN(inputVal)) return alert("Insira um valor numérico.");
 
-            if(isNaN(inputVal)) return alert("Insira um valor numérico.");
+            if (selectedIndices.size === 0) {
+                if(!confirm("Nenhuma conta marcada. Aplicar em todas as visíveis?")) return;
+                const query = document.getElementById('globalSearch').value.toLowerCase();
+                accounts.forEach((acc, idx) => { if (!query || acc.n.toLowerCase().includes(query)) selectedIndices.add(idx); });
+            }
 
-            accounts.forEach((acc, idx) => {
-                const matchesFilter = acc.n.toLowerCase().includes(query);
-                const isTarget = (target === 'all' && matchesFilter) || (parseInt(target) === idx);
-
-                if(isTarget) {
-                    const updateLogic = (i) => {
-                        let currentVal = acc.v[i] || 0;
-                        let currentPerc = acc.p[i] || 40;
-                        let custo = currentVal / (1 + (currentPerc / 100)) || 25;
-                        if(mode === 'val') {
-                            acc.v[i] = inputVal;
-                            acc.p[i] = ((inputVal - custo) / custo) * 100;
-                        } else {
-                            acc.p[i] = inputVal;
-                            acc.v[i] = custo * (1 + (inputVal / 100));
+            const affected = selectedIndices.size;
+            selectedIndices.forEach(idx => {
+                let acc = accounts[idx];
+                const update = (i) => {
+                    if (mode === 'val') {
+                        acc.v[i] = inputVal;
+                        if(acc.t === 2 && acc.c[i] > 0) acc.p[i] = (1 - (inputVal / acc.c[i])) * 100;
+                    } else if (mode === 'cheio') {
+                        if(acc.t === 2) {
+                            acc.c[i] = inputVal;
+                            acc.v[i] = inputVal * (1 - (acc.p[i] / 100));
                         }
-                    };
-                    if(catIdx === 'all') acc.v.forEach((_, i) => updateLogic(i)); else updateLogic(parseInt(catIdx));
-                }
+                    } else if (mode === 'perc') {
+                        if(acc.t === 2) {
+                            acc.p[i] = inputVal;
+                            if(acc.c[i] > 0) acc.v[i] = acc.c[i] * (1 - (inputVal / 100));
+                        }
+                    }
+                };
+                if (catIdx === 'all') acc.v.forEach((_, i) => update(i));
+                else update(parseInt(catIdx));
             });
 
-            addHistory(`MASSA: [${target === 'all' ? (query || 'Todos') : accounts[target].n}] -> ${inputVal}${mode === 'val' ? 'R$' : '%'}`);
-            save(); render();
+            let modeText = mode === 'val' ? "Preço Final" : mode === 'cheio' ? "Valor Cheio" : "Desconto %";
+            addHistory(`MASSA: ${affected} contas - ${modeText} → ${inputVal}${mode === 'perc' ? '%' : ' R$'}`);
+            selectedIndices.clear(); document.getElementById('selectAll').checked = false; save(); render();
         }
 
-        function updateBulkSelectors() {
-            const sel = document.getElementById('bulkTarget'); if(!sel) return;
-            const currentVal = sel.value;
-            sel.innerHTML = '<option value="all">Filtro/Pesquisa Atual</option>';
-            accounts.forEach((a, i) => { sel.innerHTML += `<option value="${i}">${a.n}</option>`; });
-            sel.value = currentVal || 'all';
+        function getIcon(n) {
+            const s = n.toLowerCase();
+            if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-500 mr-2"></i>';
+            if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-orange-600 mr-2"></i>';
+            if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-cyan-500 mr-2"></i>';
+            if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-950 dark:text-white mr-2"></i>';
+            return '<i class="fas fa-store text-gray-400 mr-2"></i>';
         }
 
-        function setFilter(val) { document.getElementById('globalSearch').value = val; render(); }
-        function upName(i, t) { 
-            const oldName = accounts[i].n;
-            accounts[i].n = t.trim(); 
-            addHistory(`Conta renomeada: ${oldName} -> ${t.trim()}`);
-            save(); 
+        function save() { localStorage.setItem('mkt_master_v10_final', JSON.stringify(accounts)); updateDash(); }
+        function updateDash() {
+            let total = 0, soma = 0, min = Infinity, minName = "";
+            accounts.forEach(acc => {
+                acc.v.forEach((v, i) => { if(v > 0) { total++; soma += v; if(v < min) { min = v; minName = `${acc.n} (${categories[i]})`; } } });
+            });
+            document.getElementById('dashTotal').innerText = accounts.length;
+            document.getElementById('dashTicket').innerText = total > 0 ? `R$ ${(soma/total).toFixed(2)}` : "R$ 0,00";
+            document.getElementById('dashMin').innerText = min === Infinity ? "R$ 0,00" : `R$ ${min.toFixed(2)}`;
+            document.getElementById('dashMinMeta').innerText = minName || "-";
         }
-
+        function upName(i, t) { const old = accounts[i].n; accounts[i].n = t.trim(); addHistory(`NOME: "${old}" → "${t.trim()}"`); save(); }
+        function setFilter(v) { document.getElementById('globalSearch').value = v; selectedIndices.clear(); document.getElementById('selectAll').checked = false; render(); }
         function addRow() { 
-            accounts.unshift({ n: "Nova Conta", v: [0,0,0,0,0,0], p: [40,40,40,40,40,40] }); 
-            addHistory("Nova conta criada.");
-            save(); render(); 
+            const type = prompt("Opção de Exibição:\n1 - Valor Direto (Ex: ML/Shein)\n2 - Com Desconto (Ex: Shopee/TikTok)", "1");
+            if (!type) return;
+            let n = { n: "Nova Conta", t: parseInt(type), c:[0,0,0,0,0,0], p:[0,0,0,0,0,0], v:[0,0,0,0,0,0] };
+            if(type === "2") { n.c = [60,60,50,80,80,80]; n.p = [40,40,40,40,0,0]; n.c.forEach((c, i) => n.v[i] = c * (1 - (n.p[i]/100))); }
+            else { n.v = [39.99,39.99,35,51.99,69.99,69.99]; }
+            accounts.unshift(n); addHistory(`NOVA: "${n.n}" criada.`); save(); render(); 
         }
-
-        function removeRow(i) { 
-            if(confirm("Remover esta conta?")) { 
-                addHistory(`Conta removida: ${accounts[i].n}`);
-                accounts.splice(i, 1); 
-                save(); render(); 
-            } 
+        function removeRow(i) { if(confirm("Remover?")) { addHistory(`EXCLUÍDA: "${accounts[i].n}"`); accounts.splice(i, 1); save(); render(); } }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+        function initSortable() {
+            new Sortable(document.getElementById('tableBody'), { handle: '.handle', animation: 150, onEnd: (evt) => {
+                const moved = accounts.splice(evt.oldIndex, 1)[0];
+                accounts.splice(evt.newIndex, 0, moved);
+                save();
+            }});
         }
-
+        function forceReset() { if(confirm("Restaurar banco original?")) { localStorage.removeItem('mkt_master_v10_final'); location.reload(); } }
         function exportCSV() { 
             let csv = "Conta,Unissex,Regata,Infantil,Plus Size,M.Careca,M.Canguru\n"; 
-            accounts.forEach(a => csv += `${a.n},${a.v.join(",")}\n`); 
+            accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); 
             const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); 
-            link.href = URL.createObjectURL(blob); 
-            link.download = "Relatorio_Valores.csv"; 
-            link.click(); 
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Relatorio.csv"; link.click(); 
         }
-
         function exportPDF() { 
-            const { jsPDF } = window.jspdf; 
-            const doc = new jsPDF('l', 'mm', 'a4'); 
-            doc.text("Relatório Geral de Preços", 14, 15); 
-            doc.autoTable({ 
-                head: [['Conta', ...categories]], 
-                body: accounts.map(a => [a.n, ...a.v.map(v => v > 0 ? `R$ ${v.toFixed(2)}` : '-')]), 
-                startY: 20, 
-                theme: 'grid', 
-                styles: { fontSize: 8 } 
-            }); 
-            doc.save('Relatorio_MKT.pdf'); 
+            const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
+            doc.text("Relatorio Geral", 14, 15); 
+            doc.autoTable({ head: [['Conta', ...categories]], body: accounts.map(a => [a.n, ...a.v.map(v => v > 0 ? `R$ ${v.toFixed(2)}` : '-')]), startY: 20, styles: { fontSize: 7 } }); 
+            doc.save('Relatorio.pdf'); 
         }
 
-        function forceReset() {
-            if(!confirm("Isso apagará seus dados e restaurará o padrão. Continuar?")) return;
-            accounts = [
-                { n: "ML 2", v: [39.99, 39.99, 35.00, 51.99, 69.99, 69.99], p: [60,60,59,62,55,46] },
-                { n: "ML 3", v: [39.99, 39.99, 35.00, 51.99, 69.99, 69.99], p: [60,60,59,62,55,46] },
-                { n: "ML 6", v: [39.99, 39.99, 35.00, 51.99, 69.99, 69.99], p: [60,60,59,62,55,46] },
-                { n: "ML 5", v: [36.99, 36.99, 32.99, 44.99, 69.99, 69.99], p: [48,48,50,41,55,46] },
-                { n: "ML 9", v: [36.99, 36.99, 32.99, 44.99, 69.99, 69.99], p: [48,48,50,41,55,46] },
-                { n: "ML 10", v: [36.99, 36.99, 32.99, 44.99, 69.99, 69.99], p: [48,48,50,41,55,46] },
-                { n: "Shein 1", v: [33.99, 33.99, 27.99, 41.99, 61.99, 69.99], p: [36,36,27,31,38,46] },
-                { n: "Shein 2", v: [36.99, 36.99, 29.99, 49.99, 69.99, 69.99], p: [48,48,36,56,55,46] },
-                { n: "Shein 3", v: [36.99, 36.99, 29.99, 49.99, 61.99, 69.99], p: [48,48,36,56,38,46] },
-                { n: "Shein 4", v: [33.99, 33.99, 29.99, 45.99, 69.99, 69.99], p: [36,36,36,44,55,46] },
-                { n: "Shein 5", v: [35.99, 35.99, 29.99, 45.99, 61.99, 69.99], p: [44,44,36,44,38,46] },
-                { n: "Shein 6", v: [35.99, 35.99, 29.99, 45.99, 57.99, 69.99], p: [44,44,36,44,29,46] },
-                { n: "Shopee Custom", v: [34.79, 34.79, 34.79, 34.79, 34.79, 34.79], p: [42,42,42,42,42,42] },
-                { n: "Shopee Clothing", v: [34.79, 34.79, 34.79, 34.79, 34.79, 34.79], p: [42,42,42,42,42,42] },
-                { n: "Shopee New", v: [36.00, 36.00, 35.00, 48.00, 69.52, 69.52], p: [40,40,30,40,12,12] },
-                { n: "Shopee FG7", v: [36.00, 36.00, 35.00, 48.00, 69.52, 69.52], p: [40,40,30,40,12,12] },
-                { n: "Shopee Fashion", v: [36.00, 36.00, 35.00, 48.00, 69.52, 69.52], p: [40,40,30,40,12,12] },
-                { n: "Shopee Print", v: [36.00, 36.00, 35.00, 48.00, 69.52, 69.52], p: [40,40,30,40,12,12] },
-                { n: "TikTok New", v: [34.79, 34.79, 0, 46.39, 60.03, 70.30], p: [42,42,0,42,24,11] },
-                { n: "TikTok Custom", v: [34.79, 34.79, 34.99, 46.39, 59.99, 69.99], p: [42,42,30,42,40,40] },
-                { n: "TikTok Clothing", v: [34.79, 34.79, 0, 46.39, 60.03, 70.30], p: [42,42,0,42,24,11] },
-                { n: "TikTok FG7", v: [34.79, 34.79, 0, 46.39, 59.99, 69.99], p: [42,42,0,42,40,40] },
-                { n: "TikTok Fashion", v: [34.79, 34.79, 34.99, 46.39, 59.99, 69.99], p: [42,42,30,42,40,40] },
-                { n: "TikTok Print", v: [34.79, 34.79, 0, 46.39, 59.99, 69.99], p: [42,42,0,42,40,40] }
-            ];
-            historyData = [];
-            localStorage.setItem('mkt_history', JSON.stringify(historyData));
-            save(); render(); renderHistory();
-            addHistory("Sistema restaurado.");
-        }
-
-        // Init
-        render(); 
-        updateBulkSelectors(); 
-        updateDash(); 
-        renderHistory();
+        initCalculations(); render(); updateDash(); renderHistory();
     </script>
 </body>
 </html>
