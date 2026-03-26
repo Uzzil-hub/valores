@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v32</title>
+    <title>Valores MKT - Premium v31</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -29,8 +29,6 @@
         .admin-only-flex { display: none; }
         .handle { cursor: grab; margin-right: 8px; opacity: 0.3; }
         input[type="checkbox"] { accent-color: #FF6B00; width: 20px; height: 20px; cursor: pointer; }
-        
-        /* Layout Fix */
         .sidebar-transition { transition: transform 0.3s ease; }
         @media (max-width: 768px) {
             #sidebar { position: fixed; z-index: 100; height: 100vh; visibility: hidden; pointer-events: none; }
@@ -51,12 +49,11 @@
                 <button onclick="togglePassVisibility()" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-orange"><i id="eyeIcon" class="fas fa-eye"></i></button>
             </div>
             <button onclick="checkPass()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-5 rounded-2xl shadow-xl active:scale-95 uppercase text-sm tracking-widest transition-all">Entrar</button>
-            <p id="errorMsg" class="text-rose-500 text-xs mt-4 font-bold hidden italic">Código Incorreto</p>
+            <p id="errorMsg" class="text-rose-500 text-xs mt-4 font-bold hidden italic text-center">Código Incorreto</p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden">
-        
         <button onclick="toggleMobileSidebar()" class="md:hidden fixed top-6 right-6 z-[150] w-14 h-14 bg-brand-orange text-white rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-transform">
             <i class="fas fa-bars text-xl"></i>
         </button>
@@ -81,14 +78,14 @@
 
             <div class="p-6 border-t dark:border-white/5 space-y-3 text-center">
                 <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase">Mudar Tema</button>
-                <button onclick="logout()" class="text-[9px] font-black text-gray-400 hover:text-brand-orange uppercase italic tracking-widest">Sair do Painel</button>
+                <button onclick="logout()" class="text-[9px] font-black text-gray-400 hover:text-brand-orange uppercase italic tracking-widest">Sair e Bloquear</button>
             </div>
         </aside>
 
         <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto overflow-x-hidden">
             <main class="p-4 md:p-10">
                 <div class="mb-10">
-                    <h2 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4">Faturamento Comercial</h2>
+                    <h2 class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 text-center sm:text-left">Faturamento Comercial</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 shadow-sm text-center">
                             <p class="text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">Acumulado Mensal</p>
@@ -103,9 +100,9 @@
                             <h3 id="revProj" class="text-3xl font-black tracking-tighter text-brand-orange">R$ 0,00</h3>
                         </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden">
+                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm">
                         <div class="px-6 py-4 border-b dark:border-white/5 flex justify-between items-center bg-white/20 dark:bg-black/20">
-                            <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Histórico Mensal</span>
+                            <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest">Registros Mensais</span>
                             <button id="adminClearRev" onclick="clearAllRevenue()" class="hidden text-[9px] font-black text-rose-500 uppercase">Zerar Tudo</button>
                         </div>
                         <div class="max-h-48 overflow-y-auto px-2">
@@ -138,7 +135,7 @@
                         <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase">Shein</button>
                     </div>
                     <div class="relative w-full lg:w-80">
-                        <input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase">
+                        <input type="text" id="globalSearch" oninput="render()" placeholder="PESQUISAR..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase">
                         <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                     </div>
                 </div>
@@ -146,15 +143,14 @@
                 <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-20">
                     <table class="whitespace-nowrap text-left w-full border-collapse">
                         <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5">
-                            <tr id="tableHeadRow">
-                                </tr>
+                            <tr id="tableHeadRow"></tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y dark:divide-white/5"></tbody>
                     </table>
                 </div>
 
                 <div id="historyBlock" class="hidden bg-black text-white p-8 rounded-[40px] border border-white/5 mb-32 font-mono">
-                    <p class="text-[10px] font-black text-brand-orange mb-4 uppercase tracking-widest">Sistema Log</p>
+                    <p class="text-[10px] font-black text-brand-orange mb-4 uppercase tracking-widest">Log Auditoria</p>
                     <ul id="historyList" class="space-y-2 text-[10px] opacity-60"></ul>
                 </div>
             </main>
@@ -183,8 +179,16 @@
 
         function checkPass() {
             const v = document.getElementById('passInput').value.trim();
-            if (v === PASSWORDS.admin) { isAdmin = true; enterApp("ADMIN"); }
-            else if (v === PASSWORDS.viewer) { isAdmin = false; enterApp("CONVIDADO"); }
+            if (v === PASSWORDS.admin) { 
+                isAdmin = true; 
+                sessionStorage.setItem('mkt_logged', 'ADMIN');
+                enterApp("ADMIN"); 
+            }
+            else if (v === PASSWORDS.viewer) { 
+                isAdmin = false; 
+                sessionStorage.setItem('mkt_logged', 'CONVIDADO');
+                enterApp("CONVIDADO"); 
+            }
             else { document.getElementById('errorMsg').classList.remove('hidden'); }
         }
 
@@ -193,13 +197,15 @@
             document.getElementById('mainApp').classList.remove('hidden');
             const status = document.getElementById('userStatus');
             status.innerText = m;
-            if(isAdmin) {
+            if(m === 'ADMIN') {
+                isAdmin = true;
                 document.getElementById('adminMenu').style.display = 'flex';
                 document.getElementById('adminBulkArea').classList.remove('hidden');
                 document.getElementById('adminClearRev').classList.remove('hidden');
                 document.getElementById('historyBlock').classList.remove('hidden');
-                status.className = "text-[9px] font-black px-4 py-1.5 rounded-full mt-4 inline-block tracking-widest uppercase bg-brand-orange text-white shadow-lg";
+                status.className = "text-[9px] font-black px-4 py-1.5 rounded-full mt-4 inline-block tracking-widest uppercase bg-brand-orange text-white shadow-lg shadow-orange-500/10";
             } else {
+                isAdmin = false;
                 status.className = "text-[9px] font-black px-4 py-1.5 rounded-full mt-4 inline-block tracking-widest uppercase bg-gray-200 dark:bg-brand-card text-gray-500";
             }
             startSync();
@@ -211,45 +217,17 @@
             db.ref('revenue').on('value', snap => { if (snap.val()) { revenueData = snap.val(); updateRevenueDash(); } else { db.ref('revenue').set({ total: 0, daily: {} }); } });
         }
 
-        function inputRevenue() {
-            if(!isAdmin) return;
-            const d = prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString());
-            if(!d) return;
-            const p = d.split('/'); if(p.length !== 3) return alert("Erro.");
-            const v = parseFloat(prompt("Valor Vendido (R$):", "0")); if (isNaN(v)) return;
-            const key = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
-            if(!revenueData.daily) revenueData.daily = {};
-            revenueData.daily[key] = v;
-            let nt = 0; Object.values(revenueData.daily).forEach(x => nt += x);
-            revenueData.total = nt; db.ref('revenue').set(revenueData);
+        function logout() { 
+            sessionStorage.removeItem('mkt_logged'); 
+            location.reload(); 
         }
 
-        function updateRevenueDash() {
-            const totalVal = revenueData.total || 0;
-            const qtd = revenueData.daily ? Object.keys(revenueData.daily).length : 0;
-            const avg = qtd > 0 ? totalVal / qtd : 0;
-            const d = new Date(); const days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-            const proj = avg * days;
-            document.getElementById('revTotal').innerText = `R$ ${totalVal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('revAvg').innerText = `R$ ${avg.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('revProj').innerText = `R$ ${proj.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            const tb = document.getElementById('revenueTableBody'); tb.innerHTML = '';
-            if(revenueData.daily) {
-                Object.keys(revenueData.daily).sort().reverse().forEach(k => {
-                    const p = k.split('-');
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td class="px-8 py-4 font-bold text-gray-400 uppercase tracking-tighter">${p[2]}/${p[1]}/${p[0]}</td><td class="px-8 py-4 font-black text-brand-orange">R$ ${revenueData.daily[k].toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-8 py-4 text-right ${isAdmin ? '' : 'hidden'}"><button onclick="removeRevenueDay('${k}')" class="text-gray-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>`;
-                    tb.appendChild(tr);
-                });
-            }
-        }
-
+        // --- SISTEMA DE PREÇOS E RENDERIZAÇÃO ---
         function render() {
             const q = document.getElementById('globalSearch').value.toLowerCase();
             const head = document.getElementById('tableHeadRow');
             const body = document.getElementById('tableBody');
             
-            // Render Header
             let headHTML = isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this.checked)"></th>` : '';
             headHTML += `<th class="px-8 py-6 border-r dark:border-white/5">Canal / Conta</th>
                         <th class="px-8 py-6">Unissex</th><th class="px-8 py-6">Regata</th><th class="px-8 py-6">Infantil</th><th class="px-8 py-6">Plus</th><th class="px-8 py-6">Careca</th><th class="px-8 py-6">Canguru</th>`;
@@ -260,7 +238,7 @@
             accounts.forEach((acc, idx) => {
                 if(q && !acc.n.toLowerCase().includes(q)) return;
                 const tr = document.createElement('tr');
-                tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5' : '';
+                tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5 transition-colors' : 'transition-colors';
                 
                 let row = isAdmin ? `<td class="px-6 py-8 text-center"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
                 row += `<td class="px-8 py-8 font-black border-r dark:border-white/5"><div class="flex items-center">${isAdmin?'<i class="fas fa-grip-vertical handle"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div></td>`;
@@ -282,72 +260,34 @@
             document.getElementById('dashTotal').innerText = accounts.filter(a => !q || a.n.toLowerCase().includes(q)).length;
         }
 
-        function hSync(idx, col, input, m) {
-            if(!isAdmin) return;
-            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render();
-            let a = accounts[idx];
-            if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; }
-            else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); }
-            else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); }
-            db.ref('accounts').set(accounts);
-        }
-
-        function applyBulkUpdate() {
-            if(!isAdmin) return;
-            const cat = document.getElementById('bulkCategory').value, mode = document.getElementById('bulkMode').value, val = parseFloat(document.getElementById('bulkValue').value);
-            if (isNaN(val)) return;
-            if (selectedIndices.size === 0) { const q = document.getElementById('globalSearch').value.toLowerCase(); accounts.forEach((a, i) => { if (!q || a.n.toLowerCase().includes(q)) selectedIndices.add(i); }); }
-            selectedIndices.forEach(idx => {
-                let a = accounts[idx];
-                const up = (i) => {
-                    if (mode === 'val') { a.v[i] = val; if(a.t===2 && a.c[i]>0) a.p[i] = (1-(val/a.c[i]))*100; }
-                    else if (mode === 'cheio' && a.t===2) { a.c[i] = val; a.v[i] = val*(1-(a.p[i]/100)); }
-                    else if (mode === 'perc' && a.t===2) { a.p[i] = val; a.v[i] = a.c[i]*(1-(val/100)); }
-                };
-                if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat));
-            });
-            selectedIndices.clear(); db.ref('accounts').set(accounts);
-        }
-
+        // Funções auxiliares (Preservadas)
+        function hSync(idx, col, input, m) { if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx]; if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } db.ref('accounts').set(accounts); }
+        function upName(i, t) { accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
+        function removeRow(i) { if(isAdmin && confirm("Excluir conta?")) { accounts.splice(i, 1); db.ref('accounts').set(accounts); } }
+        function addRow() { if(!isAdmin) return; const t = prompt("Tipo (1 ou 2):", "1"); if(!t) return; accounts.unshift({n:"NOVA_LOJA", t:parseInt(t), c:[60,60,60,60,80,80], p:[40,40,40,40,0,0], v:[0,0,0,0,0,0]}); db.ref('accounts').set(accounts); }
+        function applyBulkUpdate() { if(!isAdmin) return; const cat = document.getElementById('bulkCategory').value, mode = document.getElementById('bulkMode').value, val = parseFloat(document.getElementById('bulkValue').value); if (isNaN(val)) return; if (selectedIndices.size === 0) { const q = document.getElementById('globalSearch').value.toLowerCase(); accounts.forEach((a, i) => { if (!q || a.n.toLowerCase().includes(q)) selectedIndices.add(i); }); } selectedIndices.forEach(idx => { let a = accounts[idx]; const up = (i) => { if (mode === 'val') { a.v[i] = val; if(a.t===2 && a.c[i]>0) a.p[i] = (1-(val/a.c[i]))*100; } else if (mode === 'cheio' && a.t===2) { a.c[i] = val; a.v[i] = val*(1-(a.p[i]/100)); } else if (mode === 'perc' && a.t===2) { a.p[i] = val; a.v[i] = a.c[i]*(1-(val/100)); } }; if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat)); }); selectedIndices.clear(); db.ref('accounts').set(accounts); }
+        function inputRevenue() { if(!isAdmin) return; const d = prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()); if(!d) return; const p = d.split('/'); if(p.length !== 3) return alert("Erro."); const v = parseFloat(prompt("Valor (R$):", "0")); if (isNaN(v)) return; const key = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`; if(!revenueData.daily) revenueData.daily = {}; revenueData.daily[key] = v; let nt = 0; Object.values(revenueData.daily).forEach(x => nt += x); revenueData.total = nt; db.ref('revenue').set(revenueData); }
+        function updateRevenueDash() { const totalVal = revenueData.total || 0; const qtd = revenueData.daily ? Object.keys(revenueData.daily).length : 0; const avg = qtd > 0 ? totalVal / qtd : 0; const d = new Date(); const days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); const proj = avg * days; document.getElementById('revTotal').innerText = `R$ ${totalVal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`; document.getElementById('revAvg').innerText = `R$ ${avg.toLocaleString('pt-BR', {minimumFractionDigits:2})}`; document.getElementById('revProj').innerText = `R$ ${proj.toLocaleString('pt-BR', {minimumFractionDigits:2})}`; const tb = document.getElementById('revenueTableBody'); tb.innerHTML = ''; if(revenueData.daily) { Object.keys(revenueData.daily).sort().reverse().forEach(k => { const p = k.split('-'); const tr = document.createElement('tr'); tr.innerHTML = `<td class="px-8 py-4 font-bold text-gray-400 uppercase">${p[2]}/${p[1]}/${p[0]}</td><td class="px-8 py-4 font-black text-brand-orange text-lg text-right sm:text-left">R$ ${revenueData.daily[k].toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-8 py-4 text-right ${isAdmin ? '' : 'hidden'}"><button onclick="removeRevenueDay('${k}')" class="text-gray-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>`; tb.appendChild(tr); }); } }
+        function removeRevenueDay(k) { if(isAdmin && confirm("Excluir?")) { delete revenueData.daily[k]; let nt = 0; Object.values(revenueData.daily).forEach(x => nt += x); revenueData.total = nt; db.ref('revenue').set(revenueData); } }
+        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) { revenueData = { total: 0, daily: {} }; db.ref('revenue').set(revenueData); } }
         function renderHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b border-white/5 pb-1 opacity-50">> ${h}</li>`).join(''); }
         function toggleSelect(i) { selectedIndices.has(i) ? selectedIndices.delete(i) : selectedIndices.add(i); render(); }
         function toggleSelectAll(c) { selectedIndices.clear(); if(c) { const q = document.getElementById('globalSearch').value.toLowerCase(); accounts.forEach((a,i) => { if(!q || a.n.toLowerCase().includes(q)) selectedIndices.add(i); }); } render(); }
         function toggleTheme() { const d = document.documentElement; d.classList.toggle('dark'); localStorage.setItem('mkt_theme', d.classList.contains('dark') ? 'dark' : 'light'); }
-        function logout() { sessionStorage.removeItem('mkt_auth'); location.reload(); }
-        function upName(i, t) { accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
         function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
         function initSortable() { if(!isAdmin) return; new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: (evt) => { const m = accounts.splice(evt.oldIndex, 1)[0]; accounts.splice(evt.newIndex, 0, m); db.ref('accounts').set(accounts); } }); }
-        function removeRow(i) { if(isAdmin && confirm("Excluir conta?")) { accounts.splice(i, 1); db.ref('accounts').set(accounts); } }
-        function addRow() { if(!isAdmin) return; const t = prompt("Tipo (1 ou 2):", "1"); if(!t) return; accounts.unshift({n:"NOVA_LOJA", t:parseInt(t), c:[60,60,60,60,80,80], p:[40,40,40,40,0,0], v:[0,0,0,0,0,0]}); db.ref('accounts').set(accounts); }
-        function clearHistory() { if(isAdmin && confirm("Limpar histórico?")) db.ref('history').remove(); }
-        function removeRevenueDay(k) { if(isAdmin && confirm("Excluir dia?")) { delete revenueData.daily[k]; let nt = 0; Object.values(revenueData.daily).forEach(x => nt += x); revenueData.total = nt; db.ref('revenue').set(revenueData); } }
-        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) { revenueData = { total: 0, daily: {} }; db.ref('revenue').set(revenueData); } }
+        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-3 text-lg"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-3 text-lg"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok dark:text-white text-black mr-3 text-lg"></i>'; if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-3 text-lg"></i>'; return '<i class="fas fa-store opacity-20 mr-3"></i>'; }
+        function clearHistory() { if(isAdmin && confirm("Limpar?")) db.ref('history').remove(); }
+        function exportCSV() { const q = document.getElementById('globalSearch').value.toLowerCase(); let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.filter(a => !q || a.n.toLowerCase().includes(q)).forEach(a => { csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`; }); const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio.csv`; link.click(); }
+        function exportPDF() { const q = document.getElementById('globalSearch').value.toLowerCase(); const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.text("Relatorio Cloud MKT", 14, 15); const filtered = accounts.filter(a => !q || a.n.toLowerCase().includes(q)); doc.autoTable({ head: [['Conta', ...categories]], body: filtered.map(a => [a.n, ...a.v.map(v => v > 0 ? `R$ ${v.toFixed(2)}` : '-')]), startY: 20, styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
 
-        function getIcon(n) { 
-            const s = n.toLowerCase(); 
-            if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-3 text-lg"></i>'; 
-            if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-3 text-lg"></i>'; 
-            if(s.includes('tiktok')) return '<i class="fab fa-tiktok dark:text-white text-black mr-3 text-lg"></i>'; 
-            if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-3 text-lg"></i>'; 
-            return '<i class="fas fa-store opacity-20 mr-3"></i>'; 
-        }
-
-        function exportCSV() { 
-            const q = document.getElementById('globalSearch').value.toLowerCase();
-            let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; 
-            accounts.filter(a => !q || a.n.toLowerCase().includes(q)).forEach(a => { csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`; });
-            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio.csv`; link.click(); 
-        }
-        function exportPDF() { 
-            const q = document.getElementById('globalSearch').value.toLowerCase();
-            const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
-            doc.text("Relatorio Cloud MKT", 14, 15); 
-            const filtered = accounts.filter(a => !q || a.n.toLowerCase().includes(q));
-            doc.autoTable({ head: [['Conta', ...categories]], body: filtered.map(a => [a.n, ...a.v.map(v => v > 0 ? `R$ ${v.toFixed(2)}` : '-')]), startY: 20, styles: { fontSize: 8 } }); 
-            doc.save('Relatorio.pdf'); 
-        }
-        if (sessionStorage.getItem('mkt_auth') === 'true') { isAdmin = true; enterApp("ADMIN"); }
+        // --- VERIFICAÇÃO DE SESSÃO ATIVA AO CARREGAR ---
+        window.onload = () => {
+            const savedSession = sessionStorage.getItem('mkt_logged');
+            if (savedSession) {
+                enterApp(savedSession);
+            }
+        };
     </script>
 </body>
 </html>
