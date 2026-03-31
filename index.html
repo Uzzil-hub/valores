@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v63</title>
+    <title>Valores MKT - Premium v67</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -27,13 +27,10 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #FF6B00; border-radius: 10px; }
         .admin-only { display: none; }
-        .handle { cursor: grab; margin-right: 8px; opacity: 0.3; }
-        input[type="checkbox"] { accent-color: #FF6B00; width: 22px; height: 22px; cursor: pointer; }
-        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-transition { transition: transform 0.3s ease; }
         @media (max-width: 768px) {
             #sidebar { position: fixed; z-index: 100; height: 100vh; width: 280px; box-shadow: 20px 0 50px rgba(0,0,0,0.2); }
             #sidebar:not(.open) { transform: translateX(-100%); }
-            .main-content { padding: 12px !important; }
         }
         .progress-glow { box-shadow: 0 0 25px rgba(255, 107, 0, 0.4); }
         .goal-card { cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
@@ -57,7 +54,7 @@
 
     <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden">
         
-        <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+        <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center">
             <i class="fas fa-bars text-lg"></i>
         </button>
 
@@ -74,31 +71,32 @@
                 </div>
                 <div class="space-y-2">
                     <p class="text-[9px] font-black text-gray-400 uppercase px-2 tracking-widest">Opções</p>
-                    <button onclick="exportCSV()" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase">Exportar CSV</button>
-                    <button onclick="exportPDF()" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase">Exportar PDF</button>
+                    <button onclick="exportCSV()" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase text-black dark:text-white">Exportar CSV</button>
+                    <button onclick="exportPDF()" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase text-black dark:text-white">Exportar PDF</button>
                 </div>
             </nav>
             <div class="p-6 border-t dark:border-white/5 space-y-3 text-center">
-                <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase text-black dark:text-white">Mudar Tema</button>
-                <button onclick="logout()" class="text-[9px] font-black text-gray-400 hover:text-brand-orange uppercase block w-full">Sair</button>
+                <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase text-black dark:text-white text-black dark:text-white text-black dark:text-white">Mudar Tema</button>
+                <button onclick="logout()" class="text-[9px] font-black text-gray-400 hover:text-brand-orange uppercase block w-full text-center">Sair</button>
             </div>
         </aside>
 
-        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content">
+        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto">
             <main class="p-4 md:p-10">
                 <div class="mb-10 text-black dark:text-white">
-                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4">Performance Comercial</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                    <h2 class="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4">Resumo Comercial</h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center">
-                            <p class="text-[8px] md:text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">Acumulado Mensal</p>
+                            <p class="text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">Acumulado</p>
                             <h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3>
                         </div>
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70">
-                            <p class="text-[8px] md:text-[9px] font-black uppercase mb-1 tracking-widest text-gray-400">Vendas/Dia</p>
-                            <h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">R$ 0,00</h3>
+                            <p class="text-[9px] font-black uppercase mb-1 tracking-widest text-gray-400">Média Diária</p>
+                            <h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3>
                         </div>
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center">
-                            <p class="text-[8px] md:text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">Projeção Final</p>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center shadow-sm">
+                            <p class="text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">Projeção Final</p>
                             <h3 id="revProj" class="text-2xl md:text-3xl font-black tracking-tighter text-brand-orange">R$ 0,00</h3>
                         </div>
                     </div>
@@ -106,92 +104,82 @@
                     <div class="bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8">
                         <div class="mb-6 flex justify-between items-center">
                             <div>
-                                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Visualizando:</p>
-                                <h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase tracking-tighter">Objetivo Nível 3</h4>
+                                <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Status da Barra:</p>
+                                <h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase">Nível 3</h4>
                             </div>
-                            <div class="text-right"><span id="barPerc" class="text-2xl font-black text-brand-orange">0%</span></div>
+                            <span id="barPerc" class="text-2xl font-black text-brand-orange">0%</span>
                         </div>
-                        <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8">
+                        <div class="relative w-full h-8 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8">
                             <div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow" style="width: 0%"></div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
-                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 1</span>
-                                <h4 id="l1Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
-                                <p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block">NÍVEL 1</span>
+                                <h4 id="l1Val" class="text-lg font-black">R$ 0,00</h4>
+                                <p id="l1Status" class="text-[9px] font-bold text-brand-orange uppercase">...</p>
                             </div>
                             <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
-                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 2</span>
-                                <h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
-                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block">NÍVEL 2</span>
+                                <h4 id="l2Val" class="text-lg font-black">R$ 0,00</h4>
+                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange uppercase">...</p>
                             </div>
                             <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter">
-                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase text-black dark:text-white">Nível 3</span>
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block">NÍVEL 3</span>
                                 <h4 id="l3Val" class="text-lg font-black text-brand-orange">R$ 0,00</h4>
-                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase">...</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm">
-                        <div class="px-6 py-4 border-b dark:border-white/5 flex justify-between items-center bg-white/20 dark:bg-black/20 text-black dark:text-white">
-                            <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic text-gray-600 dark:text-gray-400">Histórico do Mês</span>
-                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline">Zerar Tudo</button>
+                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm mb-8">
+                        <div class="px-6 py-4 border-b dark:border-white/5 flex justify-between items-center bg-white/20 dark:bg-black/20">
+                            <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic">Lançamentos Diários</span>
+                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase">Zerar Tudo</button>
                         </div>
                         <div class="max-h-64 overflow-y-auto">
                             <table class="w-full text-[11px] text-left">
-                                <tbody id="revenueTableBody" class="divide-y dark:divide-white/5 text-black dark:text-white"></tbody>
+                                <tbody id="histTable" class="divide-y dark:divide-white/5 text-black dark:text-white"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[30px] mb-8 border border-gray-200 dark:border-white/5 flex items-center justify-between px-8 text-black dark:text-white">
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">Lojas Monitoradas:</p>
-                    <h3 id="dashTotal" class="text-2xl md:text-3xl font-black text-brand-orange">0</h3>
-                </div>
-
                 <div id="adminBulkArea" class="admin-only bg-brand-orange p-1 rounded-[35px] mb-8 shadow-xl">
-                    <div class="bg-white dark:bg-brand-card rounded-[34px] p-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-2 h-2 bg-brand-orange rounded-full"></div>
-                            <span class="text-[10px] font-black text-brand-orange uppercase italic underline">Alteração Rápida em Massa</span>
-                        </div>
+                    <div class="bg-white dark:bg-brand-card rounded-[34px] p-6 text-black dark:text-white">
                         <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            <select id="bulkCategory" class="w-full p-4 rounded-2xl bg-gray-100 dark:bg-black border border-gray-200 dark:border-white/10 text-xs font-bold outline-none text-black dark:text-white">
+                            <select id="bulkCategory" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border-none text-xs font-bold outline-none text-black dark:text-white">
                                 <option value="all">Todas Categorias</option>
                                 <option value="0">Unissex</option><option value="1">Regata</option>
                                 <option value="2">Infantil</option><option value="3">Plus Size</option>
                                 <option value="4">M. Careca</option><option value="5">M. Canguru</option>
                             </select>
-                            <select id="bulkMode" class="w-full p-4 rounded-2xl bg-gray-100 dark:bg-black border border-gray-200 dark:border-white/10 text-xs font-bold outline-none text-brand-orange">
+                            <select id="bulkMode" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border-none text-xs font-bold outline-none text-brand-orange">
                                 <option value="val">Preço Final</option>
                                 <option value="cheio">Valor Cheio</option>
                                 <option value="perc">Desconto %</option>
                             </select>
-                            <input type="number" id="bulkValue" step="0.01" class="w-full p-4 rounded-2xl bg-gray-100 dark:bg-black border border-gray-200 dark:border-white/10 text-xs font-bold outline-none text-black dark:text-white" placeholder="VALOR">
-                            <button onclick="applyBulkUpdate()" class="lg:col-span-2 w-full bg-brand-orange text-white font-black rounded-2xl uppercase text-[10px] py-4 shadow-lg active:scale-95 transition-all">Aplicar nas Contas Selecionadas</button>
+                            <input type="number" id="bulkValue" step="0.01" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border-none text-xs font-bold outline-none text-black dark:text-white" placeholder="VALOR">
+                            <button onclick="applyBulkUpdate()" class="lg:col-span-2 bg-brand-orange text-white font-black rounded-2xl uppercase text-[10px] py-4 shadow-lg">Aplicar Massa</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4 text-black dark:text-white">
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange">Todos</button>
-                        <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase">ML</button>
-                        <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg shadow-orange-500/10">Shopee</button>
-                        <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-[9px] font-black uppercase">TikTok</button>
-                        <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase text-white dark:text-white">Shein</button>
-                    </div>
-                    <div class="relative w-full lg:w-80">
-                        <input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border border-transparent text-xs font-bold outline-none focus:border-brand-orange uppercase text-black dark:text-white">
-                        <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    </div>
-                </div>
-
                 <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-20 text-black dark:text-white">
+                    <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                         <div class="flex flex-wrap gap-2 justify-center">
+                            <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange text-black dark:text-white">Todos</button>
+                            <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase">ML</button>
+                            <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg">Shopee</button>
+                            <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-[9px] font-black uppercase">TikTok</button>
+                            <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase text-white dark:text-white">Shein</button>
+                        </div>
+                        <div class="relative w-full lg:w-80">
+                            <input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase text-black dark:text-white text-black dark:text-white text-black dark:text-white text-black dark:text-white">
+                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
                     <table class="whitespace-nowrap text-left w-full border-collapse">
-                        <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5">
+                        <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5 text-black dark:text-white">
                             <tr id="tableHeadRow"></tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y dark:divide-white/5"></tbody>
@@ -200,7 +188,7 @@
 
                 <div id="historyBlock" class="admin-only bg-gray-100 dark:bg-black text-gray-900 dark:text-white p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-32 font-mono overflow-hidden">
                     <div class="flex justify-between items-center mb-6">
-                        <p class="text-[10px] font-black text-brand-orange uppercase tracking-widest">Auditoria</p>
+                        <p class="text-[10px] font-black text-brand-orange uppercase tracking-widest">Logs Audit</p>
                         <button onclick="db.ref('history').remove()" class="text-[9px] text-gray-400 uppercase hover:text-brand-orange transition-colors">Limpar</button>
                     </div>
                     <ul id="historyList" class="space-y-2 text-[10px] opacity-80 dark:opacity-60"></ul>
@@ -227,11 +215,20 @@
         let goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 2000000 };
         let currentGoalFilter = 3; 
 
+        // GESTÃO DE SESSÃO
+        function checkSession() {
+            const role = localStorage.getItem('mkt_logged');
+            const last = localStorage.getItem('mkt_last_activity');
+            if (role && last && (Date.now() - parseInt(last) < 7200000)) { enterApp(role); }
+        }
+        function updateActivity() { localStorage.setItem('mkt_last_activity', Date.now().toString()); }
+        ['mousedown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, updateActivity));
+
         function checkPass() {
             const v = document.getElementById('passInput').value.trim();
-            if (v === PASSWORDS.admin) enterApp("ADMIN");
-            else if (v === PASSWORDS.viewer) enterApp("CONVIDADO");
-            else alert("Código Incorreto");
+            if (v === PASSWORDS.admin) { localStorage.setItem('mkt_logged', 'ADMIN'); updateActivity(); enterApp("ADMIN"); }
+            else if (v === PASSWORDS.viewer) { localStorage.setItem('mkt_logged', 'CONVIDADO'); updateActivity(); enterApp("CONVIDADO"); }
+            else alert("Incorreto");
         }
 
         function enterApp(m) {
@@ -243,19 +240,35 @@
             startSync();
         }
 
+        function logout() { localStorage.clear(); location.reload(); }
+
+        // SINCRONIZAÇÃO
         function startSync() {
             db.ref('goals').on('value', s => { if(s.val()) goals = s.val(); updateDash(); });
             db.ref('revenue').on('value', s => {
                 const data = s.val() || {}; 
-                revenueData.daily = data.daily || {};
+                const daily = data.daily || {};
+                revenueData.daily = daily;
+                
                 let sum = 0;
-                Object.values(revenueData.daily).forEach(v => {
+                Object.values(daily).forEach(v => {
                     let n = parseFloat(String(v).replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.'));
                     if(!isNaN(n)) sum += n;
                 });
                 revenueData.total = Math.round(sum * 100) / 100;
                 updateDash();
-                renderDailyHistory(); 
+                
+                // RENDERIZADOR INDEPENDENTE DO HISTÓRICO
+                const hTable = document.getElementById('histTable');
+                if(hTable) {
+                    hTable.innerHTML = '';
+                    Object.keys(daily).sort().reverse().forEach(k => {
+                        let val = parseFloat(String(daily[k]).replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.'));
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td class="px-6 py-4 font-bold opacity-50">${k.split('-').reverse().join('/')}</td><td class="px-6 py-4 font-black text-brand-orange text-lg">R$ ${val.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-6 py-4 text-right">${isAdmin ? `<button onclick="db.ref('revenue/daily/${k}').remove()" class="text-rose-500 hover:scale-125 transition-all">×</button>` : ''}</td>`;
+                        hTable.appendChild(tr);
+                    });
+                }
             });
             db.ref('accounts').on('value', s => { if(s.val()) { accounts = s.val(); render(); } });
             db.ref('history').limitToLast(30).on('value', snap => { if (snap.val()) { historyData = Object.values(snap.val()).reverse(); renderHistory(); } });
@@ -271,20 +284,6 @@
             updateDash();
         }
 
-        function renderDailyHistory() {
-            const tb = document.getElementById('revenueTableBody');
-            if(!tb) return; tb.innerHTML = '';
-            const logs = revenueData.daily || {};
-            const keys = Object.keys(logs).sort().reverse();
-            keys.forEach(k => {
-                let val = parseFloat(String(logs[k]).replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.'));
-                if(isNaN(val)) return;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="px-6 py-4 font-bold opacity-50">${k.split('-').reverse().join('/')}</td><td class="px-6 py-4 font-black text-brand-orange text-lg">R$ ${val.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-6 py-4 text-right">${isAdmin ? `<button onclick="db.ref('revenue/daily/${k}').remove()" class="text-rose-500 hover:scale-125">×</button>` : ''}</td>`;
-                tb.appendChild(tr);
-            });
-        }
-
         function updateDash() {
             const total = revenueData.total || 0;
             const count = Object.keys(revenueData.daily || {}).length;
@@ -298,7 +297,7 @@
             document.getElementById('revProj').innerText = `R$ ${proj.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
 
             let targetVal = goals[`lvl${currentGoalFilter}`] || 1;
-            document.getElementById('barTitle').innerText = `Objetivo Nível ${currentGoalFilter}`;
+            document.getElementById('barTitle').innerText = `Nível ${currentGoalFilter}`;
             const perc = Math.min((total / targetVal) * 100, 100);
             document.getElementById('goalProgressBar').style.width = perc + "%";
             document.getElementById('barPerc').innerText = Math.round(perc) + "%";
@@ -317,48 +316,41 @@
             const body = document.getElementById('tableBody');
             const q = document.getElementById('globalSearch')?.value.toLowerCase() || "";
             head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10">#</th>` : '') + 
-                `<th class="px-8 py-6 border-r dark:border-white/5 text-black dark:text-white text-black dark:text-white">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
+                `<th class="px-8 py-6 border-r dark:border-white/5 text-black dark:text-white">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             body.innerHTML = '';
             accounts.forEach((acc, idx) => {
                 if(q && !acc.n.toLowerCase().includes(q)) return;
                 const tr = document.createElement('tr');
                 tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5' : '';
-                let row = isAdmin ? `<td class="px-6 py-8 text-center text-black dark:text-white"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
-                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5 text-black dark:text-white"><div class="flex items-center text-black dark:text-white text-black dark:text-white">${isAdmin?'<i class="fas fa-grip-vertical handle"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div></td>`;
+                let row = isAdmin ? `<td class="px-6 py-8 text-center"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
+                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5 text-black dark:text-white"><div class="flex items-center text-black dark:text-white">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div></td>`;
                 acc.v.forEach((v, vi) => {
                     let dV = v; if (acc.t === 2 && acc.c[vi] > 0) dV = acc.c[vi] * (1 - (acc.p[vi] / 100));
-                    row += `<td class="px-8 py-8 font-mono text-black dark:text-white text-black dark:text-white"><div class="flex flex-col gap-1">
-                        ${acc.t===2 && acc.c[vi]>0?`<div class="flex flex-col opacity-50 text-[8px]"><span>Cheio: R$ ${acc.c[vi].toFixed(2)}</span></div>`:''}
-                        <div class="flex flex-col text-black dark:text-white"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm">R$ ${dV.toFixed(2)}</span></div>
-                        ${acc.t===2 && dV>0?`<div class="flex flex-col text-[8px] font-black text-brand-orange"><span>${acc.p[vi].toFixed(1)}% OFF</span></div>`:''}
+                    row += `<td class="px-8 py-8 font-mono text-black dark:text-white"><div class="flex flex-col gap-1 text-black dark:text-white">
+                        <div class="flex flex-col"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm">R$ ${dV.toFixed(2)}</span></div>
                     </div></td>`;
                 });
-                if(isAdmin) row += `<td class="px-8 py-8 text-center text-black dark:text-white text-black dark:text-white"><button onclick="removeRow(${idx})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></td>`;
+                if(isAdmin) row += `<td class="px-8 py-8 text-center"><button onclick="removeRow(${idx})" class="text-gray-400 hover:text-rose-500">×</button></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
             });
             document.getElementById('dashTotal').innerText = accounts.filter(a => !q || a.n.toLowerCase().includes(q)).length;
         }
 
-        // Funções preservadas
         function configGoals(){ if(!isAdmin) return; const l1=prompt("Meta 1:", goals.lvl1), l2=prompt("Meta 2:", goals.lvl2), l3=prompt("Meta 3:", goals.lvl3); if(l1) db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3)}); }
         function inputRevenue(){ if(!isAdmin) return; const d=prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()), v=prompt("Valor:"); if(v){ const p=d.split('/'); const key=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; db.ref('revenue/daily/'+key).set(v); } }
-        function logout() { sessionStorage.removeItem('mkt_logged'); location.reload(); }
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
-        function renderHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b border-gray-300 dark:border-white/5 pb-1 text-black dark:text-white text-black dark:text-white">> ${h}</li>`).join(''); }
+        function renderHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b border-gray-300 dark:border-white/5 pb-1 text-black dark:text-white">> ${h}</li>`).join(''); }
         function toggleSelect(i) { selectedIndices.has(i) ? selectedIndices.delete(i) : selectedIndices.add(i); render(); }
         function toggleSelectAll(c) { selectedIndices.clear(); if(c) accounts.forEach((a,i) => selectedIndices.add(i)); render(); }
         function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
-        function initSortable() { if(!isAdmin) return; new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: () => db.ref('accounts').set(accounts) }); }
-        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-3 text-lg"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-3 text-lg"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok dark:text-white text-black mr-3 text-lg text-black dark:text-white"></i>'; if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-3 text-lg text-black dark:text-white text-black dark:text-white"></i>'; return '<i class="fas fa-store opacity-20 mr-3"></i>'; }
+        function applyBulkUpdate() { if(!isAdmin) return; const cat = document.getElementById('bulkCategory').value, mode = document.getElementById('bulkMode').value, val = parseFloat(document.getElementById('bulkValue').value); if (isNaN(val)) return; selectedIndices.forEach(idx => { let a = accounts[idx]; const up = (i) => { if (mode === 'val') { a.v[i] = val; if(a.t===2 && a.c[i]>0) a.p[i] = (1-(val/a.c[i]))*100; } else if (mode === 'cheio' && a.t===2) { a.c[i] = val; a.v[i] = val*(1-(a.p[i]/100)); } else if (mode === 'perc' && a.t===2) { a.p[i] = val; a.v[i] = a.c[i]*(1-(val/100)); } }; if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat)); }); selectedIndices.clear(); db.ref('accounts').set(accounts); }
+        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) db.ref('revenue/daily').remove(); }
+        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-2"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-2"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok mr-2"></i>'; if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-2"></i>'; return '<i class="fas fa-store opacity-20 mr-2"></i>'; }
         function upName(i, t) { if(!isAdmin) return; accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
         function removeRow(i) { if(isAdmin && confirm("Excluir?")) { accounts.splice(i, 1); db.ref('accounts').set(accounts); } }
         function addRow() { if(!isAdmin) return; const t = prompt("Tipo (1 ou 2):", "1"); if(t) { accounts.unshift({n:"Nova Loja", t:parseInt(t), c:[60,60,60,60,80,80], p:[40,40,40,40,0,0], v:[0,0,0,0,0,0]}); db.ref('accounts').set(accounts); } }
-        function applyBulkUpdate() { if(!isAdmin) return; const cat = document.getElementById('bulkCategory').value, mode = document.getElementById('bulkMode').value, val = parseFloat(document.getElementById('bulkValue').value); if (isNaN(val)) return; selectedIndices.forEach(idx => { let a = accounts[idx]; const up = (i) => { if (mode === 'val') { a.v[i] = val; if(a.t===2 && a.c[i]>0) a.p[i] = (1-(val/a.c[i]))*100; } else if (mode === 'cheio' && a.t===2) { a.c[i] = val; a.v[i] = val*(1-(a.p[i]/100)); } else if (mode === 'perc' && a.t===2) { a.p[i] = val; a.v[i] = a.c[i]*(1-(val/100)); } }; if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat)); }); selectedIndices.clear(); db.ref('accounts').set(accounts); }
-        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) db.ref('revenue/daily').remove(); }
-        function exportCSV() { let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio.csv`; link.click(); }
-        function exportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.autoTable({ head: [['Conta', 'Unissex', 'Regata', 'Infantil', 'Plus', 'Careca', 'Canguru']], body: accounts.map(a => [a.n, ...a.v.map(v => `R$ ${v.toFixed(2)}`)]), styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
 
-        window.onload = () => { const s = sessionStorage.getItem('mkt_logged'); if(s) enterApp(s); };
+        window.onload = checkSession;
     </script>
 </body>
 </html>
