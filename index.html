@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v77</title>
+    <title>Valores MKT - Premium v78</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -29,12 +29,19 @@
         .admin-only { display: none; }
         .handle { cursor: grab; margin-right: 8px; opacity: 0.3; }
         input[type="checkbox"] { accent-color: #FF6B00; width: 22px; height: 22px; cursor: pointer; }
-        .sidebar-transition { transition: transform 0.3s ease; }
+        
+        .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Overlay para fechar ao clicar fora */
+        #sidebarOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; backdrop-filter: blur(2px); }
+        
         @media (max-width: 768px) {
             #sidebar { position: fixed; z-index: 100; height: 100vh; width: 280px; box-shadow: 20px 0 50px rgba(0,0,0,0.2); }
             #sidebar:not(.open) { transform: translateX(-100%); }
+            #sidebar.open ~ #sidebarOverlay { display: block; }
             .main-content { padding: 12px !important; }
         }
+        
         .progress-glow { box-shadow: 0 0 25px rgba(255, 107, 0, 0.4); }
         .goal-card { cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
         .goal-card.active-filter { border-color: #FF6B00 !important; transform: translateY(-4px); }
@@ -61,16 +68,19 @@
 
     <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden text-black dark:text-white">
         
-        <button onclick="document.getElementById('sidebar').classList.toggle('open')" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center active:scale-90">
+        <button onclick="toggleSidebar()" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center active:scale-90">
             <i class="fas fa-bars text-lg"></i>
         </button>
+
+        <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
         <aside id="sidebar" class="sidebar-transition bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-white/5 flex flex-col text-black dark:text-white">
             <div class="p-8 text-center border-b dark:border-white/5">
                 <h1 class="text-xl font-black tracking-tighter uppercase">Valores <span class="text-brand-orange">MKT</span></h1>
                 <span id="userStatus" class="text-[9px] font-black px-4 py-1.5 rounded-full mt-4 inline-block tracking-widest uppercase shadow-md bg-gray-100 dark:bg-brand-card"></span>
             </div>
-            <nav class="px-6 flex-1 space-y-6 overflow-y-auto mt-4">
+            
+            <nav class="px-6 flex-1 space-y-6 overflow-y-auto mt-4 text-black dark:text-white">
                 <div id="adminMenu" class="admin-only space-y-3">
                     <button onclick="addRow()" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase">Nova Loja <i class="fas fa-plus"></i></button>
                     <button onclick="inputRevenue()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl border border-gray-200 dark:border-white/10 text-[10px] uppercase">Lançar Venda <i class="fas fa-dollar-sign text-brand-orange"></i></button>
@@ -83,17 +93,18 @@
                     <button onclick="exportPDF()" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase">Exportar PDF</button>
                 </div>
             </nav>
-            <div class="p-6 border-t dark:border-white/5 space-y-3 text-center">
-                <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase">Mudar Tema</button>
-                <button onclick="logout()" class="text-[9px] font-black text-gray-400 hover:text-brand-orange uppercase block w-full text-center">Sair</button>
+
+            <div class="p-6 border-t dark:border-white/5 space-y-3 bg-gray-50 dark:bg-black">
+                <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase text-black dark:text-white">Trocar Tema</button>
+                <button onclick="logout()" class="w-full py-3 bg-rose-500/10 text-rose-500 rounded-xl text-[9px] font-black uppercase hover:bg-rose-500 hover:text-white transition-all">Sair do App</button>
             </div>
         </aside>
 
-        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content">
+        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content text-black dark:text-white">
             <main class="p-4 md:p-10">
                 <div class="mb-10 text-black dark:text-white">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4">Performance Comercial</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-black dark:text-white">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm">
                             <p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p>
                             <h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3>
@@ -108,18 +119,18 @@
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8 text-black dark:text-white">
-                        <div class="mb-6 flex justify-between items-center text-black dark:text-white">
+                    <div class="bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8 text-black dark:text-white text-black dark:text-white">
+                        <div class="mb-6 flex justify-between items-center">
                             <div>
                                 <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Meta Visualizada:</p>
                                 <h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase">Objetivo Nível 3</h4>
                             </div>
                             <span id="barPerc" class="text-2xl font-black text-brand-orange">0%</span>
                         </div>
-                        <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8">
+                        <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8 text-black dark:text-white">
                             <div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow" style="width: 0%"></div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-black dark:text-white">
                             <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase">Nível 1</span>
                                 <h4 id="l1Val" class="text-lg font-black">R$ 0,00</h4>
@@ -127,13 +138,13 @@
                             </div>
                             <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase">Nível 2</span>
-                                <h4 id="l2Val" class="text-lg font-black">R$ 0,00</h4>
-                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
+                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white">...</p>
                             </div>
                             <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase">Nível 3</span>
                                 <h4 id="l3Val" class="text-lg font-black text-brand-orange">R$ 0,00</h4>
-                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white">...</p>
                             </div>
                         </div>
                     </div>
@@ -144,10 +155,12 @@
                                 <span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic">Período:</span>
                                 <select id="monthSelector" onchange="changeViewMonth(this.value)" class="bg-white dark:bg-black text-brand-orange text-[10px] font-black px-4 py-2 rounded-xl outline-none border border-brand-orange/20"></select>
                             </div>
-                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline">Zerar Este Mês</button>
+                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline">Zerar Mês</button>
                         </div>
                         <div class="max-h-64 overflow-y-auto">
-                            <table class="w-full text-[11px] text-left text-black dark:text-white"><tbody id="histTable" class="divide-y dark:divide-white/5"></tbody></table>
+                            <table class="w-full text-[11px] text-left text-black dark:text-white">
+                                <tbody id="histTable" class="divide-y dark:divide-white/5"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -155,25 +168,34 @@
                 <div id="adminBulkArea" class="admin-only bg-brand-orange p-1 rounded-[35px] mb-8 shadow-xl">
                     <div class="bg-white dark:bg-brand-card rounded-[34px] p-6 text-black dark:text-white">
                         <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            <select id="bulkCategory" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border text-xs font-bold outline-none text-black dark:text-white"><option value="all">Todas Categorias</option><option value="0">Unissex</option><option value="1">Regata</option><option value="2">Infantil</option><option value="3">Plus Size</option><option value="4">M. Careca</option><option value="5">M. Canguru</option></select>
-                            <select id="bulkMode" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border text-xs font-bold outline-none text-brand-orange"><option value="val">Preço Final</option><option value="cheio">Valor Cheio</option><option value="perc">Desconto %</option></select>
+                            <select id="bulkCategory" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border text-xs font-bold outline-none text-black dark:text-white">
+                                <option value="all">Todas Categorias</option>
+                                <option value="0">Unissex</option><option value="1">Regata</option>
+                                <option value="2">Infantil</option><option value="3">Plus Size</option>
+                                <option value="4">M. Careca</option><option value="5">M. Canguru</option>
+                            </select>
+                            <select id="bulkMode" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border text-xs font-bold outline-none text-brand-orange">
+                                <option value="val">Preço Final</option>
+                                <option value="cheio">Valor Cheio</option>
+                                <option value="perc">Desconto %</option>
+                            </select>
                             <input type="number" id="bulkValue" step="0.01" class="p-4 rounded-2xl bg-gray-100 dark:bg-black border text-xs font-bold outline-none text-black dark:text-white" placeholder="VALOR">
                             <button onclick="applyBulkUpdate()" class="lg:col-span-2 bg-brand-orange text-white font-black rounded-2xl uppercase text-[10px] py-4 shadow-lg active:scale-95 transition-all">Alterar Massa</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-20 text-black dark:text-white">
-                    <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-white/5">
+                <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-20 text-black dark:text-white text-black dark:text-white text-black dark:text-white text-black dark:text-white">
+                    <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 text-black dark:text-white">
                          <div class="flex flex-wrap gap-2 justify-center">
-                            <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange">Todos</button>
+                            <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange text-black dark:text-white">Todos</button>
                             <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase text-black">ML</button>
-                            <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg">Shopee</button>
+                            <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg text-white dark:text-white">Shopee</button>
                             <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-[9px] font-black uppercase">TikTok</button>
                             <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase text-white dark:text-white">Shein</button>
                         </div>
                         <div class="relative w-full lg:w-80">
-                            <input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase">
+                            <input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase text-black dark:text-white text-black dark:text-white">
                             <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                         </div>
                     </div>
@@ -181,7 +203,7 @@
                         <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5 text-black dark:text-white">
                             <tr id="tableHeadRow"></tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y dark:divide-white/5"></tbody>
+                        <tbody id="tableBody" class="divide-y dark:divide-white/5 text-black dark:text-white text-black dark:text-white"></tbody>
                     </table>
                 </div>
 
@@ -218,6 +240,7 @@
         const now = new Date();
         let selectedMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
+        // GESTÃO DE SESSÃO
         function checkSession() {
             const role = localStorage.getItem('mkt_logged');
             const last = localStorage.getItem('mkt_last_activity');
@@ -252,6 +275,12 @@
                 renderMonthSelector();
                 startSync();
             });
+        }
+
+        // Função de Toggle para o Sidebar Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
@@ -368,30 +397,29 @@
             const body = document.getElementById('tableBody');
             const q = document.getElementById('globalSearch')?.value.toLowerCase() || "";
             head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" onclick="toggleSelectAll(this.checked)"></th>` : '') + 
-                `<th class="px-8 py-6 border-r dark:border-white/5">Canal / Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
+                `<th class="px-8 py-6 border-r dark:border-white/5">Canal / Conta</th><th class="px-8 py-6">Unissex</th><th class="px-8 py-6">Regata</th><th class="px-8 py-6">Infantil</th><th class="px-8 py-6">Plus Size</th><th class="px-8 py-6">M. Careca</th><th class="px-8 py-6">M. Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             body.innerHTML = '';
             accounts.forEach((acc, idx) => {
                 if(q && !acc.n.toLowerCase().includes(q)) return;
                 const tr = document.createElement('tr');
-                tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5' : '';
-                let row = isAdmin ? `<td class="px-6 py-8 text-center"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
-                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5"><div class="flex items-center text-black dark:text-white">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div></td>`;
+                tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5 transition-colors' : 'transition-colors';
+                let row = isAdmin ? `<td class="px-6 py-8 text-center text-black dark:text-white"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
+                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5 text-black dark:text-white"><div class="flex items-center text-black dark:text-white">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div></td>`;
                 acc.v.forEach((v, vi) => {
                     let dV = v; if (acc.t === 2 && acc.c[vi] > 0) dV = acc.c[vi] * (1 - (acc.p[vi] / 100));
                     row += `<td class="px-8 py-8 font-mono text-black dark:text-white"><div class="flex flex-col gap-1">
-                            ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px]"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>R$ ${acc.c[vi].toFixed(2)}</span></span></div>` : ''}
-                            <div class="flex flex-col"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>R$ ${dV.toFixed(2)}</span></div>
+                            ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px] text-black dark:text-white"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>R$ ${acc.c[vi].toFixed(2)}</span></span></div>` : ''}
+                            <div class="flex flex-col text-black dark:text-white"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>R$ ${dV.toFixed(2)}</span></div>
                             ${acc.t===2 && dV>0 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(1)}% OFF</span></div>` : ''}
                         </div></td>`;
                 });
-                if(isAdmin) row += `<td class="px-8 py-8 text-center"><button onclick="removeRow(${idx})" class="text-gray-400 hover:text-rose-500">×</button></td>`;
+                if(isAdmin) row += `<td class="px-8 py-8 text-center text-black dark:text-white"><button onclick="removeRow(${idx})" class="text-gray-400 hover:text-rose-500 transition-colors">×</button></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
             });
             if(isAdmin) initSortable();
             document.getElementById('dashTotal').innerText = accounts.filter(a => !q || a.n.toLowerCase().includes(q)).length;
         }
 
-        // Funções Admin
         function hSync(idx, col, input, m) { if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx]; if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } db.ref('accounts').set(accounts); }
         function upName(i, t) { if(!isAdmin) return; accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
         function addRow() { if(!isAdmin) return; const t = prompt("Tipo (1 ou 2):", "1"); if(t) { accounts.unshift({n:"Nova Loja", t:parseInt(t), c:[60,60,60,60,80,80], p:[40,40,40,40,0,0], v:[0,0,0,0,0,0]}); db.ref('accounts').set(accounts); } }
@@ -408,14 +436,14 @@
                 db.ref(`revenue/${mKey}/${key}`).set(v); 
             } 
         }
-        function clearAllRevenue() { if(isAdmin && confirm(`Zerar todos os dias do mês ${selectedMonthKey}?`)) db.ref(`revenue/${selectedMonthKey}`).remove(); }
+        function clearAllRevenue() { if(isAdmin && confirm(`Deseja apagar os dados do período ${selectedMonthKey}?`)) db.ref(`revenue/${selectedMonthKey}`).remove(); }
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
         function renderAuditHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b dark:border-white/5 pb-1 text-black dark:text-white">> ${h}</li>`).join(''); }
         function toggleSelect(i) { selectedIndices.has(i) ? selectedIndices.delete(i) : selectedIndices.add(i); render(); }
         function toggleSelectAll(c) { selectedIndices.clear(); if(c) accounts.forEach((a,i) => selectedIndices.add(i)); render(); }
         function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
         function initSortable() { if(!isAdmin) return; new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: () => db.ref('accounts').set(accounts) }); }
-        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-2"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-2"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok mr-2"></i>'; if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-2"></i>'; return '<i class="fas fa-store opacity-20 mr-2"></i>'; }
+        function getIcon(n) { const s = n.toLowerCase(); if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-2 text-black dark:text-white"></i>'; if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-brand-orange mr-2"></i>'; if(s.includes('tiktok')) return '<i class="fab fa-tiktok mr-2"></i>'; if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-2"></i>'; return '<i class="fas fa-store opacity-20 mr-2"></i>'; }
         function exportCSV() { let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio.csv`; link.click(); }
         function exportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.autoTable({ head: [['Conta', 'Unissex', 'Regata', 'Infantil', 'Plus', 'Careca', 'Canguru']], body: accounts.map(a => [a.n, ...a.v.map(v => `R$ ${v.toFixed(2)}`)]), styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
 
