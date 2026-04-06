@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v80</title>
+    <title>Valores MKT - Premium v81</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -89,7 +89,7 @@
 
         <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content">
             <main class="p-4 md:p-10">
-                <div class="mb-10 text-black dark:text-white text-black dark:text-white">
+                <div class="mb-10 text-black dark:text-white">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4">Performance Comercial</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3></div>
@@ -104,9 +104,24 @@
                         </div>
                         <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8"><div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow" style="width: 0%"></div></div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase">Nível 1</span><h4 id="l1Val" class="text-lg font-black">R$ 0,00</h4><p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p></div>
-                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase">Nível 2</span><h4 id="l2Val" class="text-lg font-black">R$ 0,00</h4><p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p></div>
-                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase text-black dark:text-white">Nível 3</span><h4 id="l3Val" class="text-lg font-black text-brand-orange">R$ 0,00</h4><p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p></div>
+                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 1</span>
+                                <h4 id="l1Val" class="text-lg font-black">R$ 0,00</h4>
+                                <p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black text-emerald-500">Premiação: $100</span></div>
+                            </div>
+                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 text-center">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 2</span>
+                                <h4 id="l2Val" class="text-lg font-black">R$ 0,00</h4>
+                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black text-emerald-500">Premiação: $300</span></div>
+                            </div>
+                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase text-white">Nível 3</span>
+                                <h4 id="l3Val" class="text-lg font-black text-brand-orange">R$ 0,00</h4>
+                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p>
+                                <div class="mt-2 pt-2 border-t border-brand-orange/10"><span class="text-[10px] font-black text-emerald-500">Premiação: $600</span></div>
+                            </div>
                         </div>
                     </div>
 
@@ -264,8 +279,13 @@
             document.getElementById('revTotal').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById('revAvg').innerText = `R$ ${avg.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
             document.getElementById('revProj').innerText = `R$ ${(avg * daysInMonth).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            
+            // CORREÇÃO: TÍTULO DINÂMICO DA BARRA
+            document.getElementById('barTitle').innerText = `Objetivo Nível ${currentGoalFilter}`;
+            
             let tV = goals[`lvl${currentGoalFilter}`] || 1; const p = Math.min((total/tV)*100, 100);
             document.getElementById('goalProgressBar').style.width = p + "%"; document.getElementById('barPerc').innerText = Math.round(p) + "%";
+            
             for(let i=1; i<=3; i++) {
                 const target = goals[`lvl${i}`]; document.getElementById(`l${i}Val`).innerText = `R$ ${target.toLocaleString('pt-BR')}`;
                 const st = document.getElementById(`l${i}Status`);
@@ -304,11 +324,7 @@
             document.getElementById('dashTotal').innerText = accounts.filter(a => !q || a.n.toLowerCase().includes(q)).length;
         }
 
-        // --- SISTEMA DE LOGS DETALHADOS ---
-        function logAction(msg) {
-            const time = new Date().toLocaleString('pt-BR');
-            db.ref('history').push(`[${time}] ${msg}`);
-        }
+        function logAction(msg) { const time = new Date().toLocaleString('pt-BR'); db.ref('history').push(`[${time}] ${msg}`); }
 
         function applyBulkUpdate() {
             if(!isAdmin) return;
@@ -316,11 +332,9 @@
             const mode = document.getElementById('bulkMode').value;
             const val = parseFloat(document.getElementById('bulkValue').value);
             if (isNaN(val) || selectedIndices.size === 0) { alert("Selecione contas e um valor!"); return; }
-            
             const cats = ["Unissex", "Regata", "Infantil", "Plus", "Careca", "Canguru"];
             const catName = cat === 'all' ? "Todas" : cats[parseInt(cat)];
             const modeName = mode === 'val' ? "Preço Final" : (mode === 'cheio' ? "Valor Cheio" : "Desconto %");
-
             selectedIndices.forEach(idx => {
                 let a = accounts[idx];
                 const up = (i) => {
@@ -330,22 +344,14 @@
                 };
                 if (cat === 'all') a.v.forEach((_, i) => up(i)); else up(parseInt(cat));
             });
-            
             logAction(`Massa: ${selectedIndices.size} lojas alteradas (${catName} -> ${modeName}: ${val})`);
-            selectedIndices.clear();
-            db.ref('accounts').set(accounts).then(() => { render(); });
+            selectedIndices.clear(); db.ref('accounts').set(accounts).then(() => { render(); });
         }
 
         function hSync(idx, col, input, m) { 
-            if(!isAdmin) return; 
-            let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); 
-            if (isNaN(n)) return render(); 
-            let a = accounts[idx];
-            const cats = ["Unissex", "Regata", "Infantil", "Plus", "Careca", "Canguru"];
-            const modeLabel = m === 'val' ? "Preço Final" : (m === 'cheio' ? "V. Cheio" : "% OFF");
-            
+            if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx];
+            const cats = ["Unissex", "Regata", "Infantil", "Plus", "Careca", "Canguru"]; const modeLabel = m === 'val' ? "Preço Final" : (m === 'cheio' ? "V. Cheio" : "% OFF");
             logAction(`Individual: ${a.n} (${cats[col]}) alterado para ${n} (${modeLabel})`);
-            
             if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } 
             else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } 
             else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } 
@@ -358,11 +364,7 @@
         function configGoals(){ if(!isAdmin) return; const l1=prompt("Meta 1:", goals.lvl1), l2=prompt("Meta 2:", goals.lvl2), l3=prompt("Meta 3:", goals.lvl3); if(l1) { logAction(`Alterou Metas: L1:${l1}, L2:${l2}, L3:${l3}`); db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3)}); } }
         function inputRevenue(){ 
             if(!isAdmin) return; const d=prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()); const v=prompt("Valor:"); 
-            if(v){ 
-                const p=d.split('/'); const k=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; const mKey=`${p[2]}-${p[1].padStart(2,'0')}`; 
-                logAction(`Lançou Venda: R$ ${v} para o dia ${d}`);
-                db.ref(`revenue/${mKey}/${k}`).set(v); 
-            } 
+            if(v){ const p=d.split('/'); const k=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; const mKey=`${p[2]}-${p[1].padStart(2,'0')}`; logAction(`Lançou Venda: R$ ${v} para o dia ${d}`); db.ref(`revenue/${mKey}/${k}`).set(v); } 
         }
         function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) { logAction(`Limpou todos os lançamentos do mês ${selectedMonthKey}`); db.ref(`revenue/${selectedMonthKey}`).remove(); } }
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
@@ -371,6 +373,7 @@
         function toggleSelectAll(c) { selectedIndices.clear(); if(c) accounts.forEach((a,i) => selectedIndices.add(i)); render(); }
         function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
         function initSortable() { if(!isAdmin) return; new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: () => db.ref('accounts').set(accounts) }); }
+        
         function getIcon(n) { 
             const s = n.toLowerCase(); 
             if(s.includes('ml')) return '<i class="fas fa-handshake text-yellow-400 mr-2"></i>'; 
@@ -379,8 +382,10 @@
             if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-gray-500 mr-2"></i>'; 
             return '<i class="fas fa-store opacity-20 mr-2"></i>'; 
         }
+        
         function exportCSV() { let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio.csv`; link.click(); }
         function exportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.autoTable({ head: [['Conta', 'Unissex', 'Regata', 'Infantil', 'Plus', 'Careca', 'Canguru']], body: accounts.map(a => [a.n, ...a.v.map(v => `R$ ${v.toFixed(2)}`)]), styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
+
         window.onload = checkSession;
     </script>
 </body>
