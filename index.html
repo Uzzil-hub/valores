@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v107</title>
+    <title>Valores MKT - Premium v110</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -73,11 +73,11 @@
                 <input type="password" id="passInput" onkeypress="if(event.key==='Enter') checkPass()" class="w-full p-4 md:p-5 pr-12 rounded-2xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-black/30 outline-none focus:border-brand-orange text-center font-black tracking-widest uppercase text-black dark:text-white" placeholder="CÓDIGO">
                 <button onclick="togglePassVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-orange"><i id="eyeIcon" class="fas fa-eye text-black dark:text-white"></i></button>
             </div>
-            <button onclick="checkPass()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-4 md:py-5 rounded-2xl shadow-xl active:scale-95 uppercase text-sm tracking-widest transition-all">Entrar</button>
+            <button onclick="checkPass()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-4 md:py-5 rounded-2xl shadow-xl active:scale-95 uppercase text-sm tracking-widest transition-all text-white">Entrar</button>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden text-black dark:text-white">
+    <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden">
         <button onclick="toggleSidebar()" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center active:scale-90"><i class="fas fa-bars text-lg text-white"></i></button>
         <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
@@ -89,14 +89,14 @@
             <nav class="px-6 flex-1 space-y-6 overflow-y-auto mt-4 text-black dark:text-white">
                 <div class="space-y-2">
                     <p class="text-[9px] font-black text-gray-400 uppercase px-2 tracking-widest">Navegação</p>
-                    <button onclick="switchPage('main')" id="btnNavMain" class="w-full text-left text-[10px] font-black p-4 bg-brand-orange text-white rounded-2xl transition-all uppercase flex justify-between items-center">Página Principal <i class="fas fa-home"></i></button>
-                    <button onclick="switchPage('orders')" id="btnNavOrders" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase flex justify-between items-center text-black dark:text-white">Contagem Pedidos <i class="fas fa-box"></i></button>
+                    <button onclick="switchPage('main')" id="btnNavMain" class="w-full text-left text-[10px] font-black p-4 bg-brand-orange text-white rounded-2xl transition-all uppercase flex justify-between items-center text-black dark:text-white">Página Principal <i class="fas fa-home text-white"></i></button>
+                    <button onclick="switchPage('orders')" id="btnNavOrders" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase flex justify-between items-center text-black dark:text-white">Contagem Pedidos <i class="fas fa-box text-black dark:text-white"></i></button>
                 </div>
 
-                <div id="adminMenu" class="admin-only space-y-3 border-t dark:border-white/5 pt-6 text-black dark:text-white">
+                <div id="adminMenu" class="admin-only space-y-3 border-t dark:border-white/5 pt-6 text-black dark:text-white text-black dark:text-white">
                     <div id="menuMainOps" class="space-y-3">
-                        <button onclick="addRow('main')" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase">Nova Loja <i class="fas fa-plus text-white"></i></button>
-                        <button onclick="inputRevenue()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl border border-gray-200 dark:border-white/10 text-[10px] uppercase text-black dark:text-white">Lançar Venda <i class="fas fa-dollar-sign text-brand-orange"></i></button>
+                        <button onclick="addRow('main')" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase text-white">Nova Loja <i class="fas fa-plus"></i></button>
+                        <button onclick="inputRevenue()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl border border-gray-200 dark:border-white/10 text-[10px] uppercase text-black dark:text-white">Lançar Venda <i class="fas fa-dollar-sign text-brand-orange text-black dark:text-white"></i></button>
                         <button onclick="configGoals()" class="w-full flex items-center justify-between p-4 bg-gray-800 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5 text-black dark:text-white">Config. Metas <i class="fas fa-bullseye text-brand-orange"></i></button>
                         <button onclick="manageMonths()" class="w-full flex items-center justify-between p-4 bg-gray-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5 text-black dark:text-white">Config. Meses <i class="fas fa-calendar-alt text-brand-orange"></i></button>
                     </div>
@@ -112,66 +112,66 @@
             </div>
         </aside>
 
-        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content text-black dark:text-white">
+        <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content text-black dark:text-white text-black dark:text-white">
             <main class="p-4 md:p-10 text-black dark:text-white">
                 
-                <div id="pageMain" class="page-content active text-black dark:text-white">
+                <div id="pageMain" class="page-content active text-black dark:text-white text-black dark:text-white">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 uppercase text-black dark:text-white">Performance Comercial</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-black dark:text-white">
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3></div>
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Vendas/Dia</p><h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">R$ 0,00</h3></div>
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-brand-orange uppercase mb-1 text-brand-orange">Projeção Final</p><h3 id="revProj" class="text-2xl md:text-3xl font-black tracking-tighter text-brand-orange">R$ 0,00</h3></div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter text-black dark:text-white">R$ 0,00</h3></div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400 text-black dark:text-white">Média Vendas/Dia</p><h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500 text-black dark:text-white">R$ 0,00</h3></div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-brand-orange uppercase mb-1 text-brand-orange">Projeção Final</p><h3 id="revProj" class="text-2xl md:text-3xl font-black tracking-tighter text-brand-orange text-black dark:text-white">R$ 0,00</h3></div>
                     </div>
 
                     <div class="bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8 text-black dark:text-white">
                         <div class="mb-6 flex justify-between items-center text-black dark:text-white">
-                            <div><p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 text-black dark:text-white">Meta Focada:</p><h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase">Objetivo Nível 3</h4></div>
-                            <span id="barPerc" class="text-2xl font-black text-brand-orange">0%</span>
+                            <div><p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 text-black dark:text-white">Meta Focada:</p><h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase text-black dark:text-white">Objetivo Nível 3</h4></div>
+                            <span id="barPerc" class="text-2xl font-black text-brand-orange text-black dark:text-white">0%</span>
                         </div>
-                        <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8 text-black dark:text-white"><div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow" style="width: 0%"></div></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-black dark:text-white">
-                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 1</span><h4 id="l1Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5 text-black dark:text-white"><span class="text-[10px] font-black text-[#10B981] uppercase"><span class="text-[#10B981]">Bônus:</span> $100</span></div></div>
-                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 2</span><h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5 text-black dark:text-white"><span class="text-[10px] font-black text-[#10B981] uppercase"><span class="text-[#10B981]">Bônus:</span> $300</span></div></div>
-                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase text-white">Nível 3</span><h4 id="l3Val" class="text-lg font-black text-brand-orange">R$ 0,00</h4><p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-brand-orange/10 text-black dark:text-white"><span class="text-[10px] font-black text-[#10B981] uppercase text-[#10B981]">Bônus:</span> $600</div></div>
+                        <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8"><div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow text-black dark:text-white" style="width: 0%"></div></div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-black dark:text-white text-black dark:text-white">
+                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 1</span><h4 id="l1Val" class="text-lg font-black text-black dark:text-white text-black dark:text-white">R$ 0,00</h4><p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5 text-black dark:text-white"><span class="text-[10px] font-black uppercase text-black dark:text-white"><span class="text-[#10B981]">Bônus:</span> $100</span></div></div>
+                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-gray-200 dark:bg-black mb-2 inline-block uppercase text-black dark:text-white">Nível 2</span><h4 id="l2Val" class="text-lg font-black text-black dark:text-white text-black dark:text-white">R$ 0,00</h4><p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5 text-black dark:text-white"><span class="text-[10px] font-black uppercase text-black dark:text-white"><span class="text-[#10B981]">Bônus:</span> $300</span></div></div>
+                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter text-black dark:text-white"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-brand-orange text-white mb-2 inline-block uppercase text-white">Nível 3</span><h4 id="l3Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic text-black dark:text-white">...</p><div class="mt-2 pt-2 border-t border-brand-orange/10 text-black dark:text-white"><span class="text-[10px] font-black uppercase text-black dark:text-white"><span class="text-[#10B981]">Bônus:</span> $600</span></div></div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm mb-12 text-black dark:text-white">
+                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm mb-12 text-black dark:text-white text-black dark:text-white">
                         <div class="px-6 py-4 border-b dark:border-white/5 flex flex-col md:flex-row justify-between items-center bg-white/20 dark:bg-black/20 gap-4 text-black dark:text-white">
-                            <div class="flex items-center gap-3 text-black dark:text-white"><span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic">Diário de Faturamento:</span><select id="monthSelector" onchange="changeViewMonth(this.value)" class="bg-white dark:bg-black text-brand-orange text-[10px] font-black px-4 py-2 rounded-xl outline-none border border-brand-orange/20 text-black dark:text-white"></select></div>
-                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline">Zerar Mês</button>
+                            <div class="flex items-center gap-3 text-black dark:text-white text-black dark:text-white"><span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic text-black dark:text-white">Diário de Faturamento:</span><select id="monthSelector" onchange="changeViewMonth(this.value)" class="bg-white dark:bg-black text-brand-orange text-[10px] font-black px-4 py-2 rounded-xl outline-none border border-brand-orange/20 text-black dark:text-white"></select></div>
+                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline text-black dark:text-white text-black dark:text-white">Zerar Mês</button>
                         </div>
-                        <div class="max-h-64 overflow-y-auto text-black dark:text-white"><table class="w-full text-[11px] text-left text-black dark:text-white"><tbody id="histTable" class="divide-y dark:divide-white/5 text-black dark:text-white"></tbody></table></div>
+                        <div class="max-h-64 overflow-y-auto text-black dark:text-white text-black dark:text-white"><table class="w-full text-[11px] text-left text-black dark:text-white text-black dark:text-white"><tbody id="histTable" class="divide-y dark:divide-white/5 text-black dark:text-white text-black dark:text-white"></tbody></table></div>
                     </div>
 
                     <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-10 text-black dark:text-white">
-                        <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-white/5 text-black dark:text-white">
-                            <div class="flex flex-wrap gap-2 justify-center">
-                                <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange text-black dark:text-white">Todos</button>
-                                <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase text-black">ML</button>
+                        <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-white/5 text-black dark:text-white text-black dark:text-white">
+                            <div class="flex flex-wrap gap-2 justify-center text-black dark:text-white text-black dark:text-white text-black dark:text-white">
+                                <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange text-black dark:text-white text-black dark:text-white">Todos</button>
+                                <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase text-black dark:text-white">ML</button>
                                 <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg text-white">Shopee</button>
-                                <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-[9px] font-black uppercase text-white">TikTok</button>
-                                <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase text-white">Shein</button>
+                                <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase text-white font-black"><span class="text-white">TikTok</span></button>
+                                <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase text-white text-black dark:text-white">Shein</button>
                             </div>
-                            <div class="relative w-full lg:w-80 text-black dark:text-white"><input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase text-black dark:text-white"><i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i></div>
+                            <div class="relative w-full lg:w-80 text-black dark:text-white text-black dark:text-white"><input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase text-black dark:text-white text-black dark:text-white"><i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i></div>
                         </div>
-                        <table class="whitespace-nowrap text-left w-full border-collapse text-black dark:text-white"><thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5 text-black dark:text-white"><tr id="tableHeadRow"></tr></thead><tbody id="tableBody" class="divide-y dark:divide-white/5 text-black dark:text-white"></tbody></table>
+                        <table class="whitespace-nowrap text-left w-full border-collapse text-black dark:text-white text-black dark:text-white"><thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5 text-black dark:text-white text-black dark:text-white"><tr id="tableHeadRow"></tr></thead><tbody id="tableBody" class="divide-y dark:divide-white/5 text-black dark:text-white text-black dark:text-white"></tbody></table>
                     </div>
                 </div>
 
-                <div id="pageOrders" class="page-content text-black dark:text-white">
-                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase text-black dark:text-white">Monitoramento de Pedidos Diários</h2>
+                <div id="pageOrders" class="page-content text-black dark:text-white text-black dark:text-white">
+                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase text-black dark:text-white">Monitoramento Operacional (Pedidos)</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-black dark:text-white">
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-emerald-500 uppercase mb-1 text-emerald-500">Total Pedidos</p><h3 id="ordersTotal" class="text-2xl md:text-3xl font-black tracking-tighter">0</h3></div>
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400 text-black dark:text-white">Média Pedidos/Dia</p><h3 id="ordersAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500 text-black dark:text-white">0.0</h3></div>
-                        <div id="alertCard" class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center transition-all duration-500 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400 text-black dark:text-white">Status Crítico</p><h3 id="orderAlert" class="text-xs font-black uppercase tracking-tighter text-[#10B981]">Operação Estável</h3></div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm text-black dark:text-white"><p class="text-[9px] font-black text-emerald-500 uppercase mb-1 text-emerald-500">Total Pedidos</p><h3 id="ordersTotal" class="text-2xl md:text-3xl font-black tracking-tighter text-black dark:text-white">0</h3></div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400 text-black dark:text-white text-black dark:text-white">Média Pedidos/Dia</p><h3 id="ordersAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500 text-black dark:text-white">0.0</h3></div>
+                        <div id="alertCard" class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center transition-all duration-500 text-black dark:text-white"><p class="text-[9px] font-black uppercase mb-1 text-gray-400 text-black dark:text-white text-black dark:text-white">Status Crítico</p><h3 id="orderAlert" class="text-xs font-black uppercase tracking-tighter text-[#10B981]">Operação Estável</h3></div>
                     </div>
 
-                    <div class="bg-gray-100/50 dark:bg-black/30 p-4 md:p-8 rounded-[40px] mb-8 text-black dark:text-white text-black dark:text-white">
+                    <div class="bg-gray-100/50 dark:bg-black/30 p-4 md:p-8 rounded-[40px] mb-8 text-black dark:text-white">
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 text-black dark:text-white text-black dark:text-white">
-                            <h3 class="font-black text-xs uppercase tracking-[0.2em] text-emerald-500 italic">Preenchimento Individual Diário</h3>
-                            <div class="flex items-center gap-3">
-                                <input type="date" id="orderLaunchDate" onchange="updateDash()" class="bg-white dark:bg-brand-card p-3 rounded-xl text-xs font-black border dark:border-white/10 outline-none text-black dark:text-white">
+                            <h3 class="font-black text-xs uppercase tracking-[0.2em] text-emerald-500 italic">Gestão de Pedidos Diários</h3>
+                            <div class="flex items-center gap-3 text-black dark:text-white">
+                                <input type="date" id="orderLaunchDate" onchange="updateDash()" class="bg-white dark:bg-brand-card p-3 rounded-xl text-xs font-black border dark:border-white/10 outline-none text-black dark:text-white text-black dark:text-white">
                                 <button onclick="submitAllOrders()" class="admin-only bg-emerald-600 text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] shadow-lg active:scale-95 transition-all text-white">Salvar Tudo</button>
                             </div>
                         </div>
@@ -180,13 +180,13 @@
                     </div>
 
                     <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-hidden mb-10 text-black dark:text-white text-black dark:text-white">
-                        <div class="px-6 py-4 border-b dark:border-white/5 bg-emerald-500/5 flex justify-between items-center text-black dark:text-white text-black dark:text-white"><span class="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-widest italic text-black dark:text-white">Histórico de Performance</span></div>
-                        <div class="max-h-[400px] overflow-y-auto text-black dark:text-white"><table class="w-full text-[11px] text-left text-black dark:text-white"><tbody id="orderTable" class="divide-y dark:divide-white/5 text-black dark:text-white text-black dark:text-white"></tbody></table></div>
+                        <div class="px-6 py-4 border-b dark:border-white/5 bg-emerald-500/5 flex justify-between items-center text-black dark:text-white"><span class="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-widest italic text-black dark:text-white text-black dark:text-white">Histórico de Performance</span></div>
+                        <div class="max-h-[400px] overflow-y-auto text-black dark:text-white text-black dark:text-white"><table class="w-full text-[11px] text-left text-black dark:text-white text-black dark:text-white text-black dark:text-white"><tbody id="orderTable" class="divide-y dark:divide-white/5 text-black dark:text-white text-black dark:text-white"></tbody></table></div>
                     </div>
                 </div>
 
                 <div id="historyBlock" class="admin-only bg-gray-100 dark:bg-black text-gray-900 dark:text-white p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-32 font-mono overflow-hidden text-black dark:text-white">
-                    <div class="flex justify-between items-center mb-6 text-black dark:text-white text-black dark:text-white"><p class="text-[10px] font-black text-brand-orange uppercase tracking-widest text-black dark:text-white">Logs de Auditoria</p><button onclick="db.ref('history').remove()" class="text-[9px] text-gray-400 uppercase hover:text-brand-orange text-black dark:text-white">Limpar</button></div>
+                    <div class="flex justify-between items-center mb-6 text-black dark:text-white text-black dark:text-white text-black dark:text-white"><p class="text-[10px] font-black text-brand-orange uppercase tracking-widest text-black dark:text-white">Logs de Auditoria</p><button onclick="db.ref('history').remove()" class="text-[9px] text-gray-400 uppercase hover:text-brand-orange text-black dark:text-white">Limpar</button></div>
                     <ul id="historyList" class="space-y-2 text-[10px] opacity-80 dark:opacity-60 text-black dark:text-white text-black dark:text-white"></ul>
                 </div>
             </main>
@@ -248,10 +248,7 @@
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('userStatus').innerText = m;
-            
-            // GARANTE DATA DE HOJE AO ENTRAR
             document.getElementById('orderLaunchDate').valueAsDate = new Date();
-            
             if(isAdmin) document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
             db.ref('monthConfig').on('value', s => { if(s.val()) customMonths = s.val(); renderMonthSelector(); startSync(); });
         }
@@ -294,7 +291,7 @@
                 const n = prompt("Formato AAAA-MM:", "2026-05");
                 if(n && !customMonths.includes(n)) { customMonths.push(n); customMonths.sort().reverse(); db.ref('monthConfig').set(customMonths); }
             } else if (action === 'DEL') {
-                if(confirm("Remover?")) { customMonths = customMonths.filter(m => m !== selectedMonthKey); db.ref('monthConfig').set(customMonths); }
+                if(confirm("Zerar?")) { customMonths = customMonths.filter(m => m !== selectedMonthKey); db.ref('monthConfig').set(customMonths); }
             }
         }
         function renderMonthSelector() {
@@ -320,16 +317,7 @@
                 orderData.total = sum; updateDash(); renderOrderTable();
             });
             db.ref('accounts').on('value', s => { if(s.val()) { accounts = s.val(); render(); } });
-            db.ref('orderAccounts').on('value', s => { 
-                const data = s.val();
-                if(!data || data.length === 0) {
-                    orderAccounts = INITIAL_ORDER_STORES.map(n => ({n: n}));
-                    db.ref('orderAccounts').set(orderAccounts);
-                } else {
-                    orderAccounts = data;
-                }
-                updateDash(); 
-            });
+            db.ref('orderAccounts').on('value', s => { orderAccounts = s.val() || INITIAL_ORDER_STORES.map(n => ({n: n})); updateDash(); });
             db.ref('history').limitToLast(30).on('value', snap => { if (snap.val()) { historyData = Object.values(snap.val()).reverse(); renderAuditHistory(); } });
         }
 
@@ -343,14 +331,14 @@
             } else {
                 if(!Array.isArray(orderAccounts)) orderAccounts = [];
                 orderAccounts.push({n: name});
-                db.ref('orderAccounts').set(orderAccounts).then(() => updateDash());
+                db.ref('orderAccounts').set(orderAccounts);
             }
         }
 
         function removeOrderStore(i) {
             if(isAdmin && confirm("Excluir conta de pedidos?")) {
                 orderAccounts.splice(i, 1);
-                db.ref('orderAccounts').set(orderAccounts).then(() => updateDash());
+                db.ref('orderAccounts').set(orderAccounts);
             }
         }
 
@@ -362,31 +350,31 @@
             inputs.forEach(input => {
                 const name = input.dataset.name; const val = input.value;
                 if(val !== "") db.ref(`orders/${mKey}/${dVal}/${name}`).set(parseInt(val));
+                else db.ref(`orders/${mKey}/${dVal}/${name}`).remove();
             });
             alert("Salvo!");
-            updateDash();
         }
 
         function renderHistTable() {
             const hTable = document.getElementById('histTable'); if(!hTable) return; hTable.innerHTML = '';
             Object.keys(revenueData.daily).sort().reverse().forEach(k => {
                 let v = parseFloat(String(revenueData.daily[k]).replace(/[^\d,.]/g, '').replace(',', '.'));
-                hTable.innerHTML += `<tr><td class="px-6 py-4 font-bold opacity-50 text-black dark:text-white">${k.split('-').reverse().join('/')}</td><td class="px-6 py-4 font-black text-brand-orange text-lg">R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-6 py-4 text-right">${isAdmin ? `<button onclick="deleteDay('${k}', 'revenue')" class="text-rose-500 hover:scale-125">×</button>` : ''}</td></tr>`;
+                hTable.innerHTML += `<tr><td class="px-6 py-4 font-bold opacity-50 text-black dark:text-white">${k.split('-').reverse().join('/')}</td><td class="px-6 py-4 font-black text-brand-orange text-lg">R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-6 py-4 text-right text-black dark:text-white">${isAdmin ? `<button onclick="deleteDay('${k}', 'revenue')" class="text-rose-500 hover:scale-125">×</button>` : ''}</td></tr>`;
             });
         }
 
         function renderOrderTable() {
             const oTable = document.getElementById('orderTable'); if(!oTable) return; oTable.innerHTML = '';
             Object.keys(orderData.daily).sort().reverse().forEach(k => {
-                const stores = orderData.daily[k]; let dSum = 0; Object.values(stores).forEach(v => dSum += v);
+                const stores = orderData.daily[k]; let daySum = 0; Object.values(stores).forEach(v => daySum += v);
                 const dt = Object.entries(stores).map(([n, q]) => `<span class="text-[8px] mr-2 opacity-50 text-black dark:text-white">${n}: ${q}</span>`).join('');
-                oTable.innerHTML += `<tr><td class="px-6 py-6 font-black opacity-50 border-r dark:border-white/5 w-32 text-black dark:text-white">${k.split('-').reverse().join('/')}</td><td class="px-6 py-6"><div class="flex justify-between items-center mb-2"><span class="text-[9px] font-black uppercase text-gray-400">Total:</span><span class="text-xl font-black text-emerald-500">${dSum}</span></div><div class="flex flex-wrap">${dt}</div></td><td class="px-6 py-6 text-right">${isAdmin ? `<button onclick="deleteDay('${k}', 'orders')" class="text-rose-500">×</button>` : ''}</td></tr>`;
+                oTable.innerHTML += `<tr><td class="px-6 py-6 font-black opacity-50 border-r dark:border-white/5 w-32 text-black dark:text-white">${k.split('-').reverse().join('/')}</td><td class="px-6 py-6"><div class="flex justify-between items-center mb-2 text-black dark:text-white"><span class="text-[9px] font-black uppercase text-gray-400">Total:</span><span class="text-xl font-black text-emerald-500">${daySum}</span></div><div class="flex flex-wrap">${dt}</div></td><td class="px-6 py-6 text-right">${isAdmin ? `<button onclick="deleteDay('${k}', 'orders')" class="text-rose-500">×</button>` : ''}</td></tr>`;
             });
         }
 
         function deleteDay(k, path) { if(confirm("Excluir?")) db.ref(`${path}/${selectedMonthKey}/${k}`).remove(); }
-        function clearOrders() { if(isAdmin && confirm("Zerar pedidos do mês?")) db.ref(`orders/${selectedMonthKey}`).remove(); }
-        function clearAllRevenue() { if(isAdmin && confirm("Zerar faturamento do mês?")) db.ref(`revenue/${selectedMonthKey}`).remove(); }
+        function clearOrders() { if(isAdmin && confirm("Zerar mês?")) db.ref(`orders/${selectedMonthKey}`).remove(); }
+        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) db.ref(`revenue/${selectedMonthKey}`).remove(); }
 
         function updateDash() {
             const total = revenueData.total || 0; const count = Object.keys(revenueData.daily).length; const avg = count > 0 ? total / count : 0;
@@ -420,7 +408,7 @@
                         <div class="pt-3 border-t dark:border-white/5"><p class="text-[7px] font-bold opacity-50 uppercase tracking-widest text-black dark:text-white">Média: ${sAvg.toFixed(1)}</p></div>
                     </div>`;
                 });
-                let alertMsg = drops.length > 0 ? `Queda: ${drops.join(', ')}` : "Operação Estável";
+                let alertMsg = drops.length > 0 ? `Queda: ${drops.join(', ')}` : "Normal";
                 document.getElementById('orderAlert').innerText = alertMsg;
                 document.getElementById('orderAlert').className = `text-xs font-black uppercase tracking-tighter ${drops.length > 0 ? 'text-rose-500 animate-pulse' : 'text-[#10B981]'}`;
                 document.getElementById('alertCard').className = `bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border ${drops.length > 0 ? 'border-rose-500/50 bg-rose-500/5' : 'border-gray-200 dark:border-white/5'} text-center transition-all duration-500`;
@@ -430,10 +418,14 @@
             let tV = goals[`lvl${currentGoalFilter}`] || 1; const p = Math.min((total/tV)*100, 100);
             document.getElementById('goalProgressBar').style.width = p + "%"; document.getElementById('barPerc').innerText = Math.round(p) + "%";
             for(let i=1; i<=3; i++) {
-                const target = goals[`lvl${i}`]; document.getElementById(`l${i}Val`).innerText = `R$ ${target.toLocaleString('pt-BR')}`;
+                const target = goals[`lvl${i}`]; 
+                const cardValEl = document.getElementById(`l${i}Val`);
+                cardValEl.innerText = `R$ ${target.toLocaleString('pt-BR')}`;
+                cardValEl.className = "text-lg font-black text-black dark:text-white"; // PADRONIZAÇÃO DO VALOR
+                
                 const st = document.getElementById(`l${i}Status`);
-                if (total >= target) { st.innerText = "Check! ✅"; st.className = "text-[9px] font-black text-[#10B981] uppercase"; }
-                else { st.innerText = `Falta R$ ${(target - total).toLocaleString('pt-BR', {minimumFractionDigits:2})}`; st.className = "text-[9px] font-bold text-brand-orange uppercase italic text-black dark:text-white"; }
+                if (total >= target) { st.innerHTML = '<span class="text-[#10B981]">Check! ✅</span>'; }
+                else { st.innerText = `Falta R$ ${(target - total).toLocaleString('pt-BR', {minimumFractionDigits:2})}`; st.className = "text-[9px] font-bold text-brand-orange uppercase italic"; }
             }
         }
 
@@ -441,18 +433,18 @@
 
         function render() {
             const head = document.getElementById('tableHeadRow'); const body = document.getElementById('tableBody'); const q = document.getElementById('globalSearch')?.value.toLowerCase() || "";
-            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10 text-black dark:text-white"><input type="checkbox" onclick="toggleSelectAll(this.checked)"></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
+            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10 text-black dark:text-white"><input type="checkbox" onclick="toggleSelectAll(this.checked)"></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center text-black dark:text-white">Ações</th>` : '');
             body.innerHTML = '';
             accounts.forEach((acc, idx) => {
                 if(q && !acc.n.toLowerCase().includes(q)) return;
-                const tr = document.createElement('tr'); tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5 transition-colors' : '';
-                let row = isAdmin ? `<td class="px-6 py-8 text-center"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
+                const tr = document.createElement('tr'); tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5 transition-colors text-black dark:text-white' : 'text-black dark:text-white';
+                let row = isAdmin ? `<td class="px-6 py-8 text-center text-black dark:text-white"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
                 row += `<td class="px-8 py-8 font-black border-r dark:border-white/5 text-black dark:text-white"><div class="flex items-center justify-between text-black dark:text-white"><div class="flex items-center text-black dark:text-white">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30 text-black dark:text-white"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div><button onclick="openNote(${idx})" class="ml-4 ${acc.note ? 'text-brand-orange scale-125' : 'text-gray-300 dark:text-white/20'} transition-all"><i class="fas fa-sticky-note text-xs text-black dark:text-white"></i></button></div></td>`;
                 acc.v.forEach((v, vi) => {
                     let dV = acc.t === 2 && acc.c[vi] > 0 ? acc.c[vi] * (1 - (acc.p[vi] / 100)) : v;
                     row += `<td class="px-8 py-8 font-mono text-black dark:text-white"><div class="flex flex-col gap-1 text-black dark:text-white">
-                        ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px] text-black dark:text-white"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>R$ ${acc.c[vi].toFixed(2)}</span></span></div>` : ''}
-                        <div class="flex flex-col text-black dark:text-white"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>R$ ${dV.toFixed(2)}</span></div>
+                        ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px]"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>R$ ${acc.c[vi].toFixed(2)}</span></span></div>` : ''}
+                        <div class="flex flex-col text-black dark:text-white text-black dark:text-white"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>R$ ${dV.toFixed(2)}</span></div>
                         ${acc.t===2 && dV>0 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange text-black dark:text-white"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(1)}% OFF</span></div>` : ''}
                     </div></td>`;
                 });
@@ -479,7 +471,6 @@
         function hSync(idx, col, input, m) { if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx]; if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } db.ref('accounts').set(accounts); }
         function upName(i, t) { if(!isAdmin) return; accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
         function upOrderName(i, t) { if(!isAdmin) return; orderAccounts[i].n = t.trim(); db.ref('orderAccounts').set(orderAccounts); }
-        function removeRow(i) { if(isAdmin && confirm("Excluir?")) { accounts.splice(i, 1); db.ref('accounts').set(accounts); } }
         function configGoals(){ if(!isAdmin) return; const l1=prompt("Meta 1:", goals.lvl1), l2=prompt("Meta 2:", goals.lvl2), l3=prompt("Meta 3:", goals.lvl3); if(l1) db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3)}); }
         function inputRevenue(){ 
             if(!isAdmin) return; const d=prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()), v=prompt("Valor:"); 
@@ -496,9 +487,9 @@
             const s = n.toLowerCase(); 
             if(s.includes('ml') || s.includes('conta')) return '<i class="fas fa-handshake text-[#FACC15] mr-2"></i>'; 
             if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-[#FB923C] mr-2"></i>'; 
-            if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-gray-400 mr-2 text-black dark:text-white text-black dark:text-white"></i>'; 
+            if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-gray-400 mr-2 text-black dark:text-white"></i>'; 
             if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-[#9CA3AF] mr-2 text-black dark:text-white"></i>'; 
-            return '<i class="fas fa-store opacity-20 mr-2 text-black dark:text-white text-black dark:text-white text-black dark:text-white"></i>'; 
+            return '<i class="fas fa-store opacity-20 mr-2 text-black dark:text-white"></i>'; 
         }
         function exportCSV() { let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); const b = new Blob(["\ufeff" + csv], { type: 'text/csv;' }); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = `Relatorio.csv`; l.click(); }
         function exportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.autoTable({ head: [['Conta', 'Unissex', 'Regata', 'Infantil', 'Plus', 'Careca', 'Canguru']], body: accounts.map(a => [a.n, ...a.v.map(v => `R$ ${v.toFixed(2)}`)]), styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
