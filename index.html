@@ -31,12 +31,16 @@
         input[type="checkbox"] { accent-color: #FF6B00; width: 22px; height: 22px; cursor: pointer; }
         .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         #sidebarOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; backdrop-filter: blur(2px); }
+        
         @media (max-width: 768px) {
             #sidebar { position: fixed; z-index: 100; height: 100vh; width: 280px; box-shadow: 20px 0 50px rgba(0,0,0,0.2); }
             #sidebar:not(.open) { transform: translateX(-100%); }
             #sidebar.open ~ #sidebarOverlay { display: block; }
             .main-content { padding: 12px !important; }
+            .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .card-grid { grid-template-columns: 1fr !important; }
         }
+
         .progress-glow { box-shadow: 0 0 25px rgba(255, 107, 0, 0.4); }
         .goal-card { cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent; }
         .goal-card.active-filter { border-color: #FF6B00 !important; transform: translateY(-4px); }
@@ -55,6 +59,7 @@
 </head>
 <body class="bg-white dark:bg-brand-dark text-gray-900 dark:text-gray-100 min-h-screen">
 
+    <!-- Modal de Notas -->
     <div id="noteModal">
         <div class="bg-white dark:bg-brand-card w-full max-w-lg rounded-[40px] p-8 border border-gray-200 dark:border-white/10 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -68,6 +73,7 @@
         </div>
     </div>
 
+    <!-- Tela de Bloqueio -->
     <div id="lockScreen" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-gray-100 dark:bg-black">
         <div class="bg-white dark:bg-brand-card p-8 md:p-10 rounded-[40px] shadow-2xl border border-gray-200 dark:border-white/5 w-full max-w-sm text-center">
             <div class="w-16 h-16 md:w-20 md:h-20 bg-brand-orange text-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3"><i class="fas fa-bolt text-2xl md:text-3xl"></i></div>
@@ -81,9 +87,11 @@
     </div>
 
     <div id="mainApp" class="hidden h-screen flex flex-col md:flex-row overflow-hidden">
+        <!-- Menu Mobile Toggle -->
         <button onclick="toggleSidebar()" class="md:hidden fixed top-4 right-4 z-[150] w-12 h-12 bg-brand-orange text-white rounded-xl shadow-lg flex items-center justify-center active:scale-90"><i class="fas fa-bars text-lg"></i></button>
         <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar-transition bg-gray-50 dark:bg-black border-r border-gray-200 dark:border-white/5 flex flex-col">
             <div class="p-8 text-center border-b dark:border-white/5">
                 <h1 class="text-xl font-black tracking-tighter uppercase">Valores <span class="text-brand-orange">MKT</span></h1>
@@ -115,10 +123,14 @@
             </div>
         </aside>
 
+        <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content">
             <main class="p-4 md:p-10">
+                
+                <!-- PAGINA PRINCIPAL (FATURAMENTO) -->
                 <div id="pageMain" class="page-content active">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 uppercase">Performance Comercial</h2>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3></div>
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Vendas/Dia</p><h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">R$ 0,00</h3></div>
@@ -181,28 +193,32 @@
                     </div>
 
                     <!-- TABELA DE PRECIFICAÇÃO PRINCIPAL -->
-                    <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-x-auto mb-10">
+                    <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-hidden mb-10">
                         <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-white/5">
                             <div class="flex flex-wrap gap-2 justify-center">
                                 <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange">Todos</button>
                                 <button onclick="setFilter('ML')" class="px-4 py-2 bg-yellow-400 text-black rounded-xl text-[9px] font-black uppercase">ML</button>
                                 <button onclick="setFilter('Shopee')" class="px-4 py-2 bg-brand-orange text-white rounded-xl text-[9px] font-black uppercase shadow-lg">Shopee</button>
-                                <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase font-black">TikTok</button>
+                                <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase">TikTok</button>
                                 <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase">Shein</button>
                             </div>
                             <div class="relative w-full lg:w-80"><input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase"><i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i></div>
                         </div>
-                        <table class="whitespace-nowrap text-left w-full border-collapse">
-                            <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5">
-                                <tr id="tableHeadRow"></tr>
-                            </thead>
-                            <tbody id="tableBody" class="divide-y dark:divide-white/5"></tbody>
-                        </table>
+                        <div class="mobile-scroll-x">
+                            <table class="whitespace-nowrap text-left w-full border-collapse">
+                                <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5">
+                                    <tr id="tableHeadRow"></tr>
+                                </thead>
+                                <tbody id="tableBody" class="divide-y dark:divide-white/5"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
+                <!-- PAGINA DE PEDIDOS (OPERAÇÕES) -->
                 <div id="pageOrders" class="page-content">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase">Monitoramento Operacional (Pedidos)</h2>
+                    
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-emerald-500 uppercase mb-1">Total Pedidos</p><h3 id="ordersTotal" class="text-2xl md:text-3xl font-black tracking-tighter">0</h3></div>
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Pedidos/Dia</p><h3 id="ordersAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">0.0</h3></div>
@@ -217,7 +233,7 @@
                                 <button onclick="submitAllOrders()" class="admin-only bg-emerald-600 text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] shadow-lg active:scale-95 transition-all">Salvar Tudo</button>
                             </div>
                         </div>
-                        <div id="accountPerformanceGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                        <div id="accountPerformanceGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 card-grid"></div>
                     </div>
 
                     <!-- HISTÓRICO MENSAL DE PEDIDOS -->
@@ -229,6 +245,7 @@
                     </div>
                 </div>
 
+                <!-- AUDITORIA (LOGS) -->
                 <div id="historyBlock" class="admin-only bg-gray-100 dark:bg-black p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-32 font-mono overflow-hidden">
                     <div class="flex justify-between items-center mb-6"><p class="text-[10px] font-black text-brand-orange uppercase tracking-widest">Logs de Auditoria</p><button onclick="db.ref('history').remove()" class="text-[9px] text-gray-400 uppercase hover:text-brand-orange">Limpar</button></div>
                     <ul id="historyList" class="space-y-2 text-[10px] opacity-80 dark:opacity-60"></ul>
@@ -524,11 +541,6 @@
             const body = document.getElementById('tableBody'); 
             const q = document.getElementById('globalSearch')?.value.toLowerCase() || "";
             
-            const allVisibleSelected = accounts.filter(a => !q || a.n.toLowerCase().includes(q)).every((_, i) => {
-                const realIdx = accounts.findIndex(acc => acc === accounts.filter(a => !q || a.n.toLowerCase().includes(q))[i]);
-                return selectedIndices.has(realIdx);
-            });
-
             head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             
             body.innerHTML = '';
