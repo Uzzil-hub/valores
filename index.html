@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Valores MKT - Premium v111</title>
+    <title>Valores MKT - Premium v112</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -38,7 +38,7 @@
             #sidebar.open ~ #sidebarOverlay { display: block; }
             .main-content { padding: 12px !important; }
             .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .card-grid { grid-template-columns: 1fr !important; }
+            .card-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
 
         .progress-glow { box-shadow: 0 0 25px rgba(255, 107, 0, 0.4); }
@@ -55,6 +55,33 @@
         
         .month-block { margin-bottom: 24px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; background: rgba(0,0,0,0.2); }
         .month-block-header { padding: 16px 24px; background: rgba(16, 185, 129, 0.05); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* NOVO: Estilos para análise de tendência */
+        .trend-up { color: #10B981; }
+        .trend-down { color: #EF4444; }
+        .trend-stable { color: #6B7280; }
+        .drop-alert-card { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0%, 100% { border-color: rgba(239, 68, 68, 0.3); } 50% { border-color: rgba(239, 68, 68, 0.8); } }
+        .insight-badge { font-size: 7px; padding: 2px 6px; border-radius: 6px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 30px; margin-top: 6px; }
+        .mini-chart-bar { width: 4px; border-radius: 2px; transition: all 0.3s; min-height: 2px; }
+
+        /* Drag & Drop nos cards de pedidos */
+        .order-card-draggable { transition: transform 0.2s, box-shadow 0.2s; }
+        .order-card-draggable .drag-handle-order { cursor: grab; position: absolute; top: 12px; left: 12px; opacity: 0.25; transition: opacity 0.2s; }
+        .order-card-draggable:hover .drag-handle-order { opacity: 0.6; }
+        .order-card-draggable .drag-handle-order:active { cursor: grabbing; }
+        .sortable-ghost { opacity: 0.4; transform: scale(0.95); }
+        .sortable-chosen { box-shadow: 0 10px 40px rgba(255, 107, 0, 0.3); transform: scale(1.03); z-index: 50; }
+        @media (max-width: 768px) {
+            .order-card-draggable .drag-handle-order { opacity: 0.6; font-size: 16px; padding: 10px; touch-action: none; }
+            #accountPerformanceGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+            #accountPerformanceGrid .order-card-draggable { padding: 12px !important; border-radius: 20px !important; }
+            #accountPerformanceGrid .order-card-draggable p { font-size: 7px !important; }
+        }
+        @media (max-width: 480px) {
+            #accountPerformanceGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+        }
     </style>
 </head>
 <body class="bg-white dark:bg-brand-dark text-gray-900 dark:text-gray-100 min-h-screen">
@@ -137,17 +164,38 @@
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Projeção Final</p><h3 id="revProj" class="text-2xl md:text-3xl font-black tracking-tighter text-brand-orange">R$ 0,00</h3></div>
                     </div>
 
-                    <!-- DASHBOARD DE METAS -->
+                    <!-- DASHBOARD DE METAS - ATUALIZADO COM 4 NÍVEIS -->
                     <div class="bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8">
                         <div class="mb-6 flex justify-between items-center">
                             <div><p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Meta Focada:</p><h4 id="barTitle" class="text-lg md:text-xl font-black text-brand-orange italic uppercase">Objetivo Nível 3</h4></div>
                             <span id="barPerc" class="text-2xl font-black text-brand-orange">0%</span>
                         </div>
                         <div class="relative w-full h-8 md:h-10 bg-gray-200 dark:bg-black rounded-full overflow-hidden p-1.5 shadow-inner mb-8"><div id="goalProgressBar" class="h-full bg-brand-orange rounded-full transition-all duration-700 progress-glow" style="width: 0%"></div></div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 1</span><h4 id="l1Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> $100</span></div></div>
-                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 2</span><h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p><div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> $300</span></div></div>
-                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center active-filter"><span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 3</span><h4 id="l3Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4><p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p><div class="mt-2 pt-2 border-t border-brand-orange/10"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> $600</span></div></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div id="goalCard1" onclick="setBarFilter(1)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 1</span>
+                                <h4 id="l1Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
+                                <p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 100</span></div>
+                            </div>
+                            <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 2</span>
+                                <h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
+                                <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 300</span></div>
+                            </div>
+                            <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center active-filter">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 3</span>
+                                <h4 id="l3Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
+                                <p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 450</span></div>
+                            </div>
+                            <div id="goalCard4" onclick="setBarFilter(4)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center">
+                                <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gradient-to-r from-brand-orange to-yellow-500 text-white mb-2 inline-block uppercase">Extraordinário</span>
+                                <h4 id="l4Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
+                                <p id="l4Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p>
+                                <div class="mt-2 pt-2 border-t border-brand-orange/10"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 700</span></div>
+                            </div>
                         </div>
                     </div>
 
@@ -215,14 +263,36 @@
                     </div>
                 </div>
 
-                <!-- PAGINA DE PEDIDOS (OPERAÇÕES) -->
+                <!-- PAGINA DE PEDIDOS (OPERAÇÕES) - MELHORADA -->
                 <div id="pageOrders" class="page-content">
                     <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase">Monitoramento Operacional (Pedidos)</h2>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-emerald-500 uppercase mb-1">Total Pedidos</p><h3 id="ordersTotal" class="text-2xl md:text-3xl font-black tracking-tighter">0</h3></div>
-                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Pedidos/Dia</p><h3 id="ordersAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">0.0</h3></div>
-                        <div id="alertCard" class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center transition-all duration-500"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Status Crítico</p><h3 id="orderAlert" class="text-xs font-black uppercase tracking-tighter text-[#10B981]">Operação Estável</h3></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm">
+                            <p class="text-[9px] font-black text-emerald-500 uppercase mb-1">Total Pedidos (Mês)</p>
+                            <h3 id="ordersTotal" class="text-2xl md:text-3xl font-black tracking-tighter">0</h3>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center">
+                            <p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Geral/Dia</p>
+                            <h3 id="ordersAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">0.0</h3>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center">
+                            <p class="text-[9px] font-black uppercase mb-1 text-blue-400">Tendência</p>
+                            <h3 id="ordersTrend" class="text-lg font-black tracking-tighter"><i class="fas fa-minus text-gray-400"></i> <span class="text-sm">Estável</span></h3>
+                        </div>
+                        <div id="alertCard" class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center transition-all duration-500">
+                            <p class="text-[9px] font-black uppercase mb-1 text-gray-400">Status Crítico</p>
+                            <h3 id="orderAlert" class="text-xs font-black uppercase tracking-tighter text-[#10B981]">Operação Estável</h3>
+                        </div>
+                    </div>
+
+                    <!-- PAINEL DE INSIGHTS DE QUEDA -->
+                    <div id="dropInsightsPanel" class="hidden bg-rose-500/5 border border-rose-500/20 p-6 md:p-8 rounded-[40px] mb-8">
+                        <div class="flex items-center gap-3 mb-4">
+                            <i class="fas fa-exclamation-triangle text-rose-500 text-lg"></i>
+                            <h3 class="font-black text-sm uppercase tracking-widest text-rose-500">Alertas de Queda Detectados</h3>
+                        </div>
+                        <div id="dropInsightsList" class="space-y-3"></div>
                     </div>
 
                     <div class="bg-gray-100/50 dark:bg-black/30 p-4 md:p-8 rounded-[40px] mb-8">
@@ -233,7 +303,7 @@
                                 <button onclick="submitAllOrders()" class="admin-only bg-emerald-600 text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] shadow-lg active:scale-95 transition-all">Salvar Tudo</button>
                             </div>
                         </div>
-                        <div id="accountPerformanceGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 card-grid"></div>
+                        <div id="accountPerformanceGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 card-grid"></div>
                     </div>
 
                     <!-- HISTÓRICO MENSAL DE PEDIDOS -->
@@ -270,7 +340,7 @@
         
         let isAdmin = false, accounts = [], orderAccounts = [], historyData = [], selectedIndices = new Set();
         let revenueData = { daily: {}, total: 0 }, orderData = { daily: {}, total: 0 };
-        let goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 2000000 };
+        let goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 1800000, lvl4: 2000000 };
         let customMonths = ["2026-03", "2026-04"]; 
         let currentGoalFilter = 3, currentNoteIndex = null, currentPage = 'main'; 
         const now = new Date();
@@ -367,7 +437,17 @@
         function changeViewMonth(key) { selectedMonthKey = key; startSync(); }
 
         function startSync() {
-            db.ref('goals').on('value', s => { if(s.val()) goals = s.val(); updateDash(); });
+            db.ref('goals').on('value', s => { 
+                if(s.val()) {
+                    goals = s.val(); 
+                    // Se lvl4 não existir no Firebase, atualizar com os novos valores
+                    if(!goals.lvl4) {
+                        goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 1800000, lvl4: 2000000 };
+                        db.ref('goals').set(goals);
+                    }
+                }
+                updateDash(); 
+            });
             db.ref(`revenue/${selectedMonthKey}`).on('value', s => {
                 const daily = s.val() || {}; revenueData.daily = daily;
                 let sum = 0; Object.values(daily).forEach(v => { let n = parseFloat(String(v).replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.')); if(!isNaN(n)) sum += n; });
@@ -484,6 +564,86 @@
         function clearOrders() { if(isAdmin && confirm("Zerar mês?")) db.ref(`orders/${selectedMonthKey}`).remove(); }
         function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) db.ref(`revenue/${selectedMonthKey}`).remove(); }
 
+        // ==========================================
+        // FUNÇÃO DE ANÁLISE DE TENDÊNCIA (NOVO)
+        // ==========================================
+        function analyzeStoreTrend(storeName) {
+            const keys = Object.keys(orderData.daily).sort();
+            const values = [];
+            keys.forEach(k => {
+                if(orderData.daily[k][storeName] !== undefined) {
+                    values.push({ date: k, val: orderData.daily[k][storeName] });
+                }
+            });
+            
+            if(values.length < 3) return { trend: 'neutral', avg: 0, lastValues: values.map(v => v.val), drop: false, dropPercent: 0, message: 'Dados insuficientes' };
+            
+            const allVals = values.map(v => v.val);
+            const avg = allVals.reduce((a, b) => a + b, 0) / allVals.length;
+            
+            // Últimos 3 dias vs média geral
+            const last3 = allVals.slice(-3);
+            const last3Avg = last3.reduce((a, b) => a + b, 0) / last3.length;
+            
+            // Últimos 7 dias vs anteriores (se houver dados suficientes)
+            let recentAvg = avg, olderAvg = avg;
+            if(allVals.length >= 7) {
+                const recent = allVals.slice(-3);
+                const older = allVals.slice(-7, -3);
+                recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
+                olderAvg = older.reduce((a, b) => a + b, 0) / older.length;
+            }
+            
+            // Detectar queda significativa (mais de 30% abaixo da média)
+            const lastVal = allVals[allVals.length - 1];
+            const dropPercent = avg > 0 ? ((avg - lastVal) / avg) * 100 : 0;
+            const isDrop = dropPercent > 30 && allVals.length > 3;
+            
+            // Tendência baseada nos últimos dias vs período anterior
+            let trend = 'neutral';
+            if(recentAvg > olderAvg * 1.15) trend = 'up';
+            else if(recentAvg < olderAvg * 0.7) trend = 'down';
+            
+            // Mensagem de insight
+            let message = '';
+            if(isDrop) {
+                message = `Queda de ${dropPercent.toFixed(0)}% (último: ${lastVal}, média: ${avg.toFixed(0)})`;
+            } else if(trend === 'up') {
+                message = `Crescendo +${((recentAvg/olderAvg - 1) * 100).toFixed(0)}%`;
+            } else if(trend === 'down') {
+                message = `Recuando ${((1 - recentAvg/olderAvg) * 100).toFixed(0)}%`;
+            } else {
+                message = 'Estável';
+            }
+            
+            return { trend, avg, lastValues: allVals.slice(-7), drop: isDrop, dropPercent, message, lastVal, recentAvg, olderAvg };
+        }
+
+        // Calcular tendência geral do dia
+        function calculateOverallTrend() {
+            const keys = Object.keys(orderData.daily).sort();
+            if(keys.length < 3) return { icon: 'fa-minus', text: 'Aguardando dados', class: 'text-gray-400' };
+            
+            const dailyTotals = keys.map(k => {
+                let sum = 0;
+                Object.values(orderData.daily[k]).forEach(v => sum += (parseInt(v) || 0));
+                return sum;
+            });
+            
+            const last3 = dailyTotals.slice(-3);
+            const prev3 = dailyTotals.slice(-6, -3);
+            
+            if(prev3.length === 0) return { icon: 'fa-minus', text: 'Aguardando dados', class: 'text-gray-400' };
+            
+            const last3Avg = last3.reduce((a, b) => a + b, 0) / last3.length;
+            const prev3Avg = prev3.reduce((a, b) => a + b, 0) / prev3.length;
+            const change = prev3Avg > 0 ? ((last3Avg - prev3Avg) / prev3Avg) * 100 : 0;
+            
+            if(change > 10) return { icon: 'fa-arrow-up', text: `+${change.toFixed(0)}% vs anterior`, class: 'text-emerald-500' };
+            if(change < -10) return { icon: 'fa-arrow-down', text: `${change.toFixed(0)}% vs anterior`, class: 'text-rose-500' };
+            return { icon: 'fa-equals', text: 'Estável', class: 'text-blue-400' };
+        }
+
         function updateDash() {
             const total = revenueData.total || 0; const count = Object.keys(revenueData.daily).length; const avg = count > 0 ? total / count : 0;
             const [y, m] = selectedMonthKey.split('-'); const daysInMonth = new Date(y, m, 0).getDate();
@@ -495,46 +655,129 @@
             document.getElementById('ordersTotal').innerText = oTotal;
             document.getElementById('ordersAvg').innerText = oAvg.toFixed(1);
 
+            // Tendência geral (NOVO)
+            const trend = calculateOverallTrend();
+            document.getElementById('ordersTrend').innerHTML = `<i class="fas ${trend.icon} ${trend.class}"></i> <span class="text-sm ${trend.class}">${trend.text}</span>`;
+
+            // Grid de performance com análise melhorada
             const perfGrid = document.getElementById('accountPerformanceGrid');
             if(perfGrid) {
                 const dateKey = document.getElementById('orderLaunchDate').value;
-                perfGrid.innerHTML = ''; let drops = [];
+                perfGrid.innerHTML = ''; 
+                let drops = [];
+                let dropInsights = [];
+
                 orderAccounts.forEach((acc, i) => {
-                    let sSum = 0, sCount = 0, lastVal = 0, dateVal = "";
+                    const analysis = analyzeStoreTrend(acc.n);
+                    let dateVal = "";
                     const keys = Object.keys(orderData.daily).sort();
-                    keys.forEach(k => { if(orderData.daily[k][acc.n] !== undefined) { sSum += orderData.daily[k][acc.n]; sCount++; lastVal = orderData.daily[k][acc.n]; if(k === dateKey) dateVal = orderData.daily[k][acc.n]; } });
-                    const sAvg = sCount > 0 ? sSum / sCount : 0;
-                    const valToShow = (dateVal !== "") ? dateVal : 0;
-                    const isDrop = (valToShow < (sAvg * 0.6)) && sCount > 2;
-                    if(isDrop) drops.push(acc.n);
+                    keys.forEach(k => { if(orderData.daily[k][acc.n] !== undefined && k === dateKey) dateVal = orderData.daily[k][acc.n]; });
                     
-                    perfGrid.innerHTML += `<div class="p-6 rounded-[35px] border ${isDrop ? 'border-rose-500 bg-rose-500/10' : 'border-gray-200 dark:border-white/5'} text-center bg-white dark:bg-brand-card shadow-sm relative">
+                    const valToShow = (dateVal !== "") ? dateVal : 0;
+                    const isDrop = analysis.drop;
+                    if(isDrop) {
+                        drops.push(acc.n);
+                        dropInsights.push({ name: acc.n, message: analysis.message, dropPercent: analysis.dropPercent, avg: analysis.avg, lastVal: analysis.lastVal });
+                    }
+                    
+                    // Mini gráfico dos últimos valores
+                    const miniChartBars = analysis.lastValues.map(v => {
+                        const maxVal = Math.max(...analysis.lastValues, 1);
+                        const height = Math.max((v / maxVal) * 28, 2);
+                        const color = v < analysis.avg * 0.7 ? '#EF4444' : v > analysis.avg * 1.2 ? '#10B981' : '#FF6B00';
+                        return `<div class="mini-chart-bar" style="height:${height}px; background:${color};"></div>`;
+                    }).join('');
+
+                    // Badge de tendência
+                    let trendBadge = '';
+                    if(analysis.trend === 'up') trendBadge = '<span class="insight-badge bg-emerald-500/20 text-emerald-500">Crescendo</span>';
+                    else if(analysis.trend === 'down') trendBadge = '<span class="insight-badge bg-rose-500/20 text-rose-500">Recuando</span>';
+                    else if(analysis.lastValues.length >= 3) trendBadge = '<span class="insight-badge bg-blue-500/20 text-blue-400">Estável</span>';
+                    
+                    perfGrid.innerHTML += `<div class="order-card-draggable p-6 rounded-[35px] border ${isDrop ? 'border-rose-500 bg-rose-500/10 drop-alert-card' : 'border-gray-200 dark:border-white/5'} text-center bg-white dark:bg-brand-card shadow-sm relative" data-index="${i}">
+                        ${isAdmin ? `<i class="fas fa-grip-vertical drag-handle-order text-gray-400"></i>` : ''}
                         ${isAdmin ? `<button onclick="removeOrderStore(${i})" class="absolute top-4 right-4 text-rose-500 opacity-30 hover:opacity-100 transition-all"><i class="fas fa-times"></i></button>` : ''}
                         <div class="flex justify-center mb-2">${getIcon(acc.n)}</div>
                         <p class="text-[9px] font-black uppercase text-gray-400 mb-1" ${isAdmin?'contenteditable="true" onblur="upOrderName('+i+', this.innerText)"':''}>${acc.n}</p>
-                        ${isAdmin ? `<input type="number" data-name="${acc.n}" class="order-card-field order-card-input mb-3 text-lg" value="${dateVal}" placeholder="${lastVal}">` : `<h5 class="text-xl font-black ${isDrop?'text-rose-500':'text-[#10B981]'} mb-3">${valToShow}</h5>`}
-                        <div class="pt-3 border-t dark:border-white/5"><p class="text-[7px] font-bold opacity-50 uppercase tracking-widest">Média: ${sAvg.toFixed(1)}</p></div>
+                        ${isAdmin ? `<input type="number" data-name="${acc.n}" class="order-card-field order-card-input mb-3 text-lg" value="${dateVal}" placeholder="${analysis.lastVal || 0}">` : `<h5 class="text-xl font-black ${isDrop?'text-rose-500':'text-[#10B981]'} mb-3">${valToShow}</h5>`}
+                        <div class="flex justify-center mb-2">${trendBadge}</div>
+                        <div class="mini-chart flex justify-center">${miniChartBars}</div>
+                        <div class="pt-3 mt-2 border-t dark:border-white/5">
+                            <p class="text-[7px] font-bold opacity-50 uppercase tracking-widest">Média: ${analysis.avg.toFixed(1)}</p>
+                            ${isDrop ? `<p class="text-[7px] font-black text-rose-500 mt-1">-${analysis.dropPercent.toFixed(0)}% da média</p>` : ''}
+                        </div>
                     </div>`;
                 });
-                let alertMsg = drops.length > 0 ? `Queda: ${drops.join(', ')}` : "Normal";
+
+                // Inicializar Sortable no grid de pedidos (NOVO)
+                initOrderGridSortable();
+
+                // Painel de insights de queda (NOVO)
+                const insightsPanel = document.getElementById('dropInsightsPanel');
+                const insightsList = document.getElementById('dropInsightsList');
+                if(dropInsights.length > 0) {
+                    insightsPanel.classList.remove('hidden');
+                    insightsList.innerHTML = dropInsights.map(d => `
+                        <div class="bg-white dark:bg-brand-card p-4 rounded-2xl border border-rose-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div class="flex items-center gap-3">
+                                ${getIcon(d.name)}
+                                <div>
+                                    <p class="text-xs font-black uppercase">${d.name}</p>
+                                    <p class="text-[9px] text-rose-400">${d.message}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-center">
+                                    <p class="text-[7px] font-bold text-gray-400 uppercase">Média</p>
+                                    <p class="text-sm font-black">${d.avg.toFixed(0)}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-[7px] font-bold text-gray-400 uppercase">Último</p>
+                                    <p class="text-sm font-black text-rose-500">${d.lastVal}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-[7px] font-bold text-gray-400 uppercase">Queda</p>
+                                    <p class="text-sm font-black text-rose-500">-${d.dropPercent.toFixed(0)}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    insightsPanel.classList.add('hidden');
+                }
+
+                let alertMsg = drops.length > 0 ? `${drops.length} loja(s) em queda` : "Operação Estável";
                 document.getElementById('orderAlert').innerText = alertMsg;
                 document.getElementById('orderAlert').className = `text-xs font-black uppercase tracking-tighter ${drops.length > 0 ? 'text-rose-500 animate-pulse' : 'text-[#10B981]'}`;
                 document.getElementById('alertCard').className = `bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border ${drops.length > 0 ? 'border-rose-500/50 bg-rose-500/5' : 'border-gray-200 dark:border-white/5'} text-center transition-all duration-500`;
             }
 
-            document.getElementById('barTitle').innerText = `Objetivo Nível ${currentGoalFilter}`;
+            // Atualizar barra de metas (agora com 4 níveis)
+            const goalNames = { 1: 'Nível 1', 2: 'Nível 2', 3: 'Nível 3', 4: 'Extraordinário' };
+            document.getElementById('barTitle').innerText = `Objetivo ${goalNames[currentGoalFilter]}`;
             let tV = goals[`lvl${currentGoalFilter}`] || 1; const p = Math.min((total/tV)*100, 100);
             document.getElementById('goalProgressBar').style.width = p + "%"; document.getElementById('barPerc').innerText = Math.round(p) + "%";
-            for(let i=1; i<=3; i++) {
+            
+            for(let i=1; i<=4; i++) {
                 const target = goals[`lvl${i}`]; 
-                document.getElementById(`l${i}Val`).innerText = `R$ ${target.toLocaleString('pt-BR')}`;
-                const st = document.getElementById(`l${i}Status`);
-                if (total >= target) { st.innerHTML = '<span class="text-[#10B981]">Check! ✅</span>'; }
-                else { st.innerText = `Falta R$ ${(target - total).toLocaleString('pt-BR', {minimumFractionDigits:2})}`; }
+                const valEl = document.getElementById(`l${i}Val`);
+                const stEl = document.getElementById(`l${i}Status`);
+                if(valEl) valEl.innerText = `R$ ${target.toLocaleString('pt-BR')}`;
+                if(stEl) {
+                    if (total >= target) { stEl.innerHTML = '<span class="text-[#10B981]">Check! ✅</span>'; }
+                    else { stEl.innerText = `Falta R$ ${(target - total).toLocaleString('pt-BR', {minimumFractionDigits:2})}`; }
+                }
             }
         }
 
-        function setBarFilter(level) { currentGoalFilter = level; [1, 2, 3].forEach(i => { const card = document.getElementById(`goalCard${i}`); i === level ? card.classList.add('active-filter') : card.classList.remove('active-filter'); }); updateDash(); }
+        function setBarFilter(level) { 
+            currentGoalFilter = level; 
+            [1, 2, 3, 4].forEach(i => { 
+                const card = document.getElementById(`goalCard${i}`); 
+                if(card) { i === level ? card.classList.add('active-filter') : card.classList.remove('active-filter'); }
+            }); 
+            updateDash(); 
+        }
 
         function render() {
             const head = document.getElementById('tableHeadRow'); 
@@ -613,7 +856,17 @@
         function hSync(idx, col, input, m) { if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx]; if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } db.ref('accounts').set(accounts); }
         function upName(i, t) { if(!isAdmin) return; accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
         function upOrderName(i, t) { if(!isAdmin) return; orderAccounts[i].n = t.trim(); db.ref('orderAccounts').set(orderAccounts); }
-        function configGoals(){ if(!isAdmin) return; const l1=prompt("Meta 1:", goals.lvl1), l2=prompt("Meta 2:", goals.lvl2), l3=prompt("Meta 3:", goals.lvl3); if(l1) db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3)}); }
+        
+        // Config de metas atualizada para 4 níveis
+        function configGoals(){ 
+            if(!isAdmin) return; 
+            const l1=prompt("Meta Nível 1:", goals.lvl1); 
+            const l2=prompt("Meta Nível 2:", goals.lvl2); 
+            const l3=prompt("Meta Nível 3:", goals.lvl3); 
+            const l4=prompt("Meta Extraordinário:", goals.lvl4); 
+            if(l1) db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3), lvl4:parseFloat(l4)}); 
+        }
+
         function inputRevenue(){ 
             if(!isAdmin) return; const d=prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()), v=prompt("Valor:"); 
             if(v){ const p=d.split('/'), k=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`, mKey=`${p[2]}-${p[1].padStart(2,'0')}`; db.ref(`revenue/${mKey}/${k}`).set(v); } 
@@ -621,13 +874,64 @@
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
         function renderAuditHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b dark:border-white/5 pb-1">${h}</li>`).join(''); }
         function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
-        function initSortable() { if(!isAdmin) return; new Sortable(document.getElementById('tableBody'), { handle: '.handle', onEnd: () => db.ref('accounts').set(accounts) }); }
+        
+        // SORTABLE COM PERSISTÊNCIA NO FIREBASE (posição salva automaticamente)
+        function initSortable() { 
+            if(!isAdmin) return; 
+            new Sortable(document.getElementById('tableBody'), { 
+                handle: '.handle', 
+                animation: 200,
+                onEnd: (evt) => {
+                    // Reordenar o array de accounts conforme a nova posição
+                    const item = accounts.splice(evt.oldIndex, 1)[0];
+                    accounts.splice(evt.newIndex, 0, item);
+                    // Salvar no Firebase para persistir a ordem
+                    db.ref('accounts').set(accounts);
+                    logAction(`Reordenação: ${item.n} movido de posição ${evt.oldIndex+1} para ${evt.newIndex+1}`);
+                }
+            }); 
+        }
+
+        // SORTABLE PARA GRID DE PEDIDOS (cards reordenáveis com persistência)
+        let orderGridSortableInstance = null;
+        function initOrderGridSortable() {
+            if(!isAdmin) return;
+            const grid = document.getElementById('accountPerformanceGrid');
+            if(!grid) return;
+            
+            // Destruir instância anterior se existir
+            if(orderGridSortableInstance) {
+                orderGridSortableInstance.destroy();
+                orderGridSortableInstance = null;
+            }
+            
+            orderGridSortableInstance = new Sortable(grid, {
+                handle: '.drag-handle-order',
+                animation: 250,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                forceFallback: true, // Melhor suporte mobile
+                fallbackTolerance: 5,
+                delay: 150, // Delay para evitar conflito com scroll no mobile
+                delayOnTouchOnly: true,
+                onEnd: (evt) => {
+                    if(evt.oldIndex === evt.newIndex) return;
+                    // Reordenar o array de orderAccounts
+                    const item = orderAccounts.splice(evt.oldIndex, 1)[0];
+                    orderAccounts.splice(evt.newIndex, 0, item);
+                    // Salvar no Firebase para persistir a ordem
+                    db.ref('orderAccounts').set(orderAccounts);
+                    logAction(`Pedidos reordenados: ${item.n} movido de posição ${evt.oldIndex+1} para ${evt.newIndex+1}`);
+                }
+            });
+        }
         
         function getIcon(n) { 
             const s = n.toLowerCase(); 
             if(s.includes('ml') || s.includes('conta')) return '<i class="fas fa-handshake text-[#FACC15] mr-2"></i>'; 
             if(s.includes('shopee')) return '<i class="fas fa-shopping-bag text-[#FB923C] mr-2"></i>'; 
-            if(s.includes('tiktok')) return '<i class="fab fa-tiktok text-gray-400 mr-2"></i>'; 
+            if(s.includes('tiktok') || s.includes('tik tok')) return '<i class="fab fa-tiktok text-gray-400 mr-2"></i>'; 
             if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-[#9CA3AF] mr-2"></i>'; 
             return '<i class="fas fa-store opacity-20 mr-2"></i>'; 
         }
