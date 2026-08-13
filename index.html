@@ -37,8 +37,26 @@
             #sidebar:not(.open) { transform: translateX(-100%); }
             #sidebar.open ~ #sidebarOverlay { display: block; }
             .main-content { padding: 12px !important; }
-            .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+            .mobile-scroll-x table { min-width: 940px; }
+            .canguru-column { background: rgba(255, 107, 0, 0.045); box-shadow: inset 1px 0 rgba(255, 107, 0, 0.14), inset -1px 0 rgba(255, 107, 0, 0.14); }
             .card-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        /* Tabela de valores: leitura confortável sem reduzir o zoom no desktop. */
+        @media (min-width: 1024px) {
+            #platformValuesPanel .mobile-scroll-x { overflow-x: visible; }
+            #platformValuesPanel .mobile-scroll-x table { width: 100%; min-width: 0; table-layout: auto; }
+            #platformValuesPanel th, #platformValuesPanel td { padding: 14px 10px !important; vertical-align: middle; }
+            #platformValuesPanel td.font-mono { min-width: 88px; font-size: 11px; }
+            #platformValuesPanel td:nth-child(2) { min-width: 185px; }
+            #platformValuesPanel td:nth-child(3) { min-width: 88px; }
+            #platformValuesPanel .table-action-button { min-height: 30px; min-width: 30px; }
+        }
+        @media (max-width: 1023px) {
+            #platformValuesPanel .mobile-scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+            #platformValuesPanel .mobile-scroll-x table { min-width: 940px; }
+            #platformValuesPanel .mobile-scroll-x th:first-child, #platformValuesPanel .mobile-scroll-x td:first-child { position: sticky; left: 0; z-index: 2; background: inherit; }
         }
 
         .progress-glow { box-shadow: 0 0 25px rgba(255, 107, 0, 0.4); }
@@ -82,9 +100,60 @@
         @media (max-width: 480px) {
             #accountPerformanceGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
         }
+
+        /* Gestão avançada: interfaces compatíveis com celular e desktop */
+        .app-modal { display: none; position: fixed; inset: 0; z-index: 400; padding: 16px; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+        .app-modal.active { display: flex; }
+        .app-modal-panel { width: 100%; max-height: min(88vh, 860px); overflow-y: auto; }
+        .metric-card { min-width: 0; }
+        .metric-card button { touch-action: manipulation; }
+        .alert-item { border-left: 4px solid #FF6B00; }
+        .alert-item.is-critical { border-left-color: #EF4444; }
+        .alert-item.is-warning { border-left-color: #F59E0B; }
+        .alert-item.is-good { border-left-color: #10B981; }
+        .backup-list-item { transition: transform 0.18s ease, background-color 0.18s ease; }
+        .backup-list-item:hover { transform: translateY(-1px); }
+        .store-inactive { opacity: 0.58; filter: grayscale(0.35); }
+        .file-drop-zone { border: 2px dashed rgba(255, 107, 0, 0.42); }
+        .table-action-button { min-height: 34px; min-width: 34px; }
+        @media (max-width: 640px) {
+            .app-modal { padding: 10px; align-items: flex-end; }
+            .app-modal-panel { max-height: 92vh; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+            .metric-card { padding: 14px !important; border-radius: 22px !important; }
+            .metric-card .metric-store-name { font-size: 9px !important; }
+            .backup-list-item { padding: 14px !important; }
+        }
+
+        /* Experiência profissional: avisos, formulários, operação e calendário */
+        #toastRegion { position: fixed; right: 16px; bottom: 16px; z-index: 600; display: flex; flex-direction: column; gap: 10px; width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+        .app-toast { pointer-events: auto; display: flex; align-items: flex-start; gap: 12px; padding: 15px; border-radius: 20px; background: rgba(20,20,20,.95); color: #fff; box-shadow: 0 16px 42px rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.08); animation: toast-in .24s cubic-bezier(.23,1,.32,1); }
+        .app-toast.success { border-left: 4px solid #10B981; } .app-toast.error { border-left: 4px solid #EF4444; } .app-toast.warning { border-left: 4px solid #F59E0B; } .app-toast.info { border-left: 4px solid #FF6B00; }
+        @keyframes toast-in { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .dialog-field { width:100%; margin-top:6px; padding:14px 16px; border-radius:14px; background:rgba(0,0,0,.08); border:1px solid rgba(128,128,128,.18); font-size:12px; font-weight:700; outline:none; }
+        .dark .dialog-field { background:rgba(0,0,0,.28); color:#fff; }
+        .dialog-field:focus { border-color:#FF6B00; box-shadow:0 0 0 3px rgba(255,107,0,.16); }
+        .calendar-day { min-height:76px; border-radius:16px; padding:9px; border:1px solid rgba(128,128,128,.14); background:rgba(255,255,255,.45); transition:transform .16s ease, border-color .16s ease; text-align:left; }
+        .dark .calendar-day { background:rgba(0,0,0,.22); }
+        .calendar-day:not(:disabled):hover { transform:translateY(-2px); border-color:rgba(255,107,0,.6); }
+        .calendar-day.selected { border-color:#FF6B00; background:rgba(255,107,0,.1); }
+        .calendar-day.has-orders .calendar-total { color:#10B981; } .calendar-day.is-today { box-shadow:inset 0 0 0 1px rgba(59,130,246,.45); }
+        .order-stepper { display:grid; grid-template-columns:36px minmax(0,1fr) 36px; gap:6px; align-items:center; }
+        .order-stepper button { height:36px; border-radius:10px; background:rgba(255,107,0,.12); color:#FF6B00; font-weight:900; }
+        .order-stepper input { min-width:0; }
+        .pending-dot { width:8px; height:8px; border-radius:999px; background:#F59E0B; display:inline-block; animation:pulse-dot 1.3s infinite; }
+        @keyframes pulse-dot { 50% { opacity:.35; transform:scale(.75); } }
+        .online-indicator.offline { color:#F59E0B; background:rgba(245,158,11,.1); } .online-indicator.online { color:#10B981; background:rgba(16,185,129,.1); }
+        .comparison-bar { height:8px; min-width:4px; border-radius:999px; background:linear-gradient(90deg,#FF6B00,#F59E0B); }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [contenteditable="true"]:focus-visible { outline: 3px solid #2563EB !important; outline-offset: 3px; }
+        .skip-link { position:absolute; left:12px; top:-56px; z-index:999; padding:12px 16px; border-radius:12px; background:#FF6B00; color:#fff; font-size:12px; font-weight:900; transition:top .2s; }
+        .skip-link:focus { top:12px; }
+        button, input, select, textarea, [contenteditable="true"] { touch-action: manipulation; }
+        @media (max-width: 640px) { button, input, select { min-height: 44px; } .dialog-field { font-size: 16px; } }
+        @media (max-width:640px) { #toastRegion { right:10px; bottom:10px; width:calc(100vw - 20px); } .calendar-day { min-height:62px; padding:7px; } .calendar-day .calendar-total { font-size:9px; } }
     </style>
 </head>
-<body class="bg-white dark:bg-brand-dark text-gray-900 dark:text-gray-100 min-h-screen">
+    <body class="bg-white dark:bg-brand-dark text-gray-900 dark:text-gray-100 min-h-screen">
+    <a href="#appMainContent" class="skip-link">Pular para o conteúdo</a>
 
     <!-- Modal de Notas -->
     <div id="noteModal">
@@ -100,14 +169,65 @@
         </div>
     </div>
 
+    <!-- Modal de Cadastro de Loja -->
+    <div id="storeModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="storeModalTitle">
+        <div class="app-modal-panel max-w-2xl bg-white dark:bg-brand-card rounded-[32px] p-5 md:p-8 border border-gray-200 dark:border-white/10 shadow-2xl">
+            <div class="flex items-start justify-between gap-5 mb-6">
+                <div><p class="text-[9px] font-black text-brand-orange uppercase tracking-[0.2em] mb-1">Cadastro de conta</p><h3 id="storeModalTitle" class="text-xl font-black uppercase tracking-tight">Nova Loja</h3></div>
+                <button type="button" onclick="closeStoreModal()" class="table-action-button rounded-xl text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="hidden" id="storeEditIndex" value="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2"><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Nome da loja *</label><input id="storeNameInput" maxlength="80" class="w-full mt-2 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-2 ring-brand-orange" placeholder="Ex.: SHOPEE: NOVA CONTA"></div>
+                <div><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Marketplace</label><select id="storeMarketplaceInput" class="w-full mt-2 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-xs font-black outline-none"><option value="Outros">OUTROS</option><option value="ML">MERCADO LIVRE</option><option value="Shopee">SHOPEE</option><option value="TikTok">TIKTOK</option><option value="Shein">SHEIN</option></select></div>
+                <div><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Modelo de preço</label><select id="storeTypeInput" class="w-full mt-2 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-xs font-black outline-none"><option value="1">VALOR FINAL</option><option value="2">CHEIO + DESCONTO</option></select></div>
+                <div><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Status</label><select id="storeStatusInput" class="w-full mt-2 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-xs font-black outline-none"><option value="active">ATIVA</option><option value="inactive">INATIVA</option></select></div>
+                <div><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Meta mensal de pedidos</label><input id="storeGoalInput" type="number" min="0" step="1" class="w-full mt-2 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-xs font-black outline-none" placeholder="Opcional"></div>
+                <div class="md:col-span-2"><label class="text-[9px] font-black uppercase text-gray-400 ml-2">Observações internas</label><textarea id="storeNotesInput" maxlength="500" class="w-full mt-2 min-h-24 bg-gray-100 dark:bg-black/40 p-4 rounded-2xl text-xs font-bold outline-none focus:ring-2 ring-brand-orange" placeholder="Ex.: responsável, campanha ou informações operacionais."></textarea></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-6"><button type="button" onclick="closeStoreModal()" class="py-4 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] font-black uppercase">Cancelar</button><button type="button" onclick="saveStoreFromModal()" class="py-4 rounded-2xl bg-brand-orange text-white text-[10px] font-black uppercase shadow-lg">Salvar Loja</button></div>
+        </div>
+    </div>
+
+    <!-- Modal de Backup e Restauração -->
+    <div id="backupModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="backupModalTitle">
+        <div class="app-modal-panel max-w-3xl bg-white dark:bg-brand-card rounded-[32px] p-5 md:p-8 border border-gray-200 dark:border-white/10 shadow-2xl">
+            <div class="flex items-start justify-between gap-5 mb-6"><div><p class="text-[9px] font-black text-brand-orange uppercase tracking-[0.2em] mb-1">Proteção de dados</p><h3 id="backupModalTitle" class="text-xl font-black uppercase tracking-tight">Versões de Segurança</h3><p class="text-[10px] opacity-60 mt-1">A restauração cria uma nova cópia antes de aplicar a versão escolhida.</p></div><button type="button" onclick="closeBackupModal()" class="table-action-button rounded-xl text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div>
+            <div class="flex flex-col sm:flex-row gap-3 mb-5"><button onclick="createManualBackup()" class="flex-1 py-3 px-4 rounded-2xl bg-brand-orange text-white text-[10px] font-black uppercase"><i class="fas fa-shield-alt mr-2"></i>Criar cópia agora</button><button onclick="exportFullBackup()" class="flex-1 py-3 px-4 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] font-black uppercase"><i class="fas fa-download mr-2"></i>Baixar backup</button></div>
+            <div id="backupList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Importação -->
+    <div id="importModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+        <div class="app-modal-panel max-w-xl bg-white dark:bg-brand-card rounded-[32px] p-5 md:p-8 border border-gray-200 dark:border-white/10 shadow-2xl">
+            <div class="flex items-start justify-between gap-5 mb-6"><div><p class="text-[9px] font-black text-brand-orange uppercase tracking-[0.2em] mb-1">Importação de dados</p><h3 id="importModalTitle" class="text-xl font-black uppercase tracking-tight">Adicionar ou Atualizar Lojas</h3></div><button type="button" onclick="closeImportModal()" class="table-action-button rounded-xl text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div>
+            <div class="file-drop-zone rounded-3xl p-7 text-center bg-brand-orange/5"><i class="fas fa-file-csv text-3xl text-brand-orange mb-3"></i><p class="text-xs font-black uppercase">Selecione um CSV de lojas</p><p class="text-[10px] opacity-60 mt-2">Colunas aceitas: nome, marketplace, tipo, status, metaPedidos, observacoes, unissex, regata, infantil, plus, careca, canguru.</p><input id="importFileInput" type="file" accept=".csv,text/csv" class="mt-4 block w-full text-[10px] font-bold"></div>
+            <div class="mt-5 flex items-start gap-3 text-[10px] opacity-70"><i class="fas fa-info-circle mt-0.5 text-brand-orange"></i><p>Lojas com o mesmo nome serão atualizadas; as demais serão incluídas. Um backup é criado antes da importação.</p></div>
+            <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="downloadImportTemplate()" class="py-4 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] font-black uppercase">Baixar modelo</button><button onclick="importStoresFromFile()" class="py-4 rounded-2xl bg-brand-orange text-white text-[10px] font-black uppercase">Importar arquivo</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Profissional de Formulário e Confirmação -->
+    <div id="actionModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="actionModalTitle">
+        <div class="app-modal-panel max-w-lg bg-white dark:bg-brand-card rounded-[32px] p-5 md:p-7 border border-gray-200 dark:border-white/10 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 mb-5"><div><p id="actionModalEyebrow" class="text-[9px] font-black uppercase tracking-[.18em] text-brand-orange mb-1">Ação</p><h3 id="actionModalTitle" class="text-lg font-black uppercase tracking-tight">Título</h3><p id="actionModalDescription" class="text-[10px] opacity-65 mt-1"></p></div><button onclick="closeActionModal()" class="table-action-button rounded-xl text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div>
+            <form id="actionModalForm" class="space-y-4"></form>
+            <div class="grid grid-cols-2 gap-3 mt-6"><button type="button" onclick="closeActionModal()" class="py-3.5 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] font-black uppercase">Cancelar</button><button id="actionModalSubmit" type="button" class="py-3.5 rounded-2xl bg-brand-orange text-white text-[10px] font-black uppercase shadow-lg">Confirmar</button></div>
+        </div>
+    </div>
+    <div id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Tela de Bloqueio -->
     <div id="lockScreen" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-gray-100 dark:bg-black">
         <div class="bg-white dark:bg-brand-card p-8 md:p-10 rounded-[40px] shadow-2xl border border-gray-200 dark:border-white/5 w-full max-w-sm text-center">
             <div class="w-16 h-16 md:w-20 md:h-20 bg-brand-orange text-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3"><i class="fas fa-bolt text-2xl md:text-3xl"></i></div>
             <h2 class="text-xl md:text-2xl font-black mb-1 tracking-tighter uppercase">Valores <span class="text-brand-orange">MKT</span></h2>
             <div class="relative mb-6 mt-6">
-                <input type="password" id="passInput" onkeypress="if(event.key==='Enter') checkPass()" class="w-full p-4 md:p-5 pr-12 rounded-2xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-black/30 outline-none focus:border-brand-orange text-center font-black tracking-widest uppercase" placeholder="CÓDIGO">
-                <button onclick="togglePassVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-orange"><i id="eyeIcon" class="fas fa-eye"></i></button>
+                <input type="text" id="usernameInput" autocomplete="username" onkeypress="if(event.key==='Enter') document.getElementById('passInput').focus()" class="w-full p-4 md:p-5 mb-3 rounded-2xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-black/30 outline-none focus:border-brand-orange text-center font-black tracking-widest" placeholder="USUÁRIO CADASTRADO">
+                <input type="password" id="passInput" autocomplete="current-password" onkeypress="if(event.key==='Enter') checkPass()" class="w-full p-4 md:p-5 pr-12 rounded-2xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-black/30 outline-none focus:border-brand-orange text-center font-black tracking-widest" placeholder="SENHA">
+                <p class="text-[8px] text-gray-400 font-bold mt-1">Usuários cadastrados precisam informar usuário e senha.</p>
+                <button type="button" aria-label="Mostrar ou ocultar senha" onclick="togglePassVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-orange"><i id="eyeIcon" class="fas fa-eye"></i></button>
             </div>
             <button onclick="checkPass()" class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-4 md:py-5 rounded-2xl shadow-xl active:scale-95 uppercase text-sm tracking-widest transition-all">Entrar</button>
         </div>
@@ -127,16 +247,21 @@
             <nav class="px-6 flex-1 space-y-6 overflow-y-auto mt-4">
                 <div class="space-y-2">
                     <p class="text-[9px] font-black text-gray-400 uppercase px-2 tracking-widest">Navegação</p>
-                    <button onclick="switchPage('main')" id="btnNavMain" class="w-full text-left text-[10px] font-black p-4 bg-brand-orange text-white rounded-2xl transition-all uppercase flex justify-between items-center">Página Principal <i class="fas fa-home"></i></button>
-                    <button onclick="switchPage('orders')" id="btnNavOrders" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase flex justify-between items-center">Contagem Pedidos <i class="fas fa-box"></i></button>
+                    <button onclick="switchPage('main')" id="btnNavMain" class="w-full text-left text-[10px] font-black p-4 bg-brand-orange text-white rounded-2xl transition-all uppercase flex justify-between items-center">Vendas e Valores <i class="fas fa-tags"></i></button>
+                    <button onclick="switchPage('orders')" id="btnNavOrders" class="w-full text-left text-[10px] font-black p-4 hover:bg-brand-orange hover:text-white rounded-2xl transition-all uppercase flex justify-between items-center">Pedidos e Acompanhamento <i class="fas fa-box"></i></button>
                 </div>
 
                 <div id="adminMenu" class="admin-only space-y-3 border-t dark:border-white/5 pt-6">
                     <div id="menuMainOps" class="space-y-3">
-                        <button onclick="addRow('main')" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase">Nova Loja <i class="fas fa-plus"></i></button>
+                        <button onclick="openStoreModal()" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase">Nova Loja <i class="fas fa-plus"></i></button>
+                        <button onclick="openImportModal()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl border border-gray-200 dark:border-white/10 text-[10px] uppercase">Importar Lojas <i class="fas fa-file-import text-brand-orange"></i></button>
+                        <button onclick="openBackupModal()" class="w-full flex items-center justify-between p-4 bg-gray-800 text-white font-black rounded-2xl border border-white/5 text-[10px] uppercase">Backup e Versões <i class="fas fa-shield-alt text-brand-orange"></i></button>
                         <button onclick="inputRevenue()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl border border-gray-200 dark:border-white/10 text-[10px] uppercase">Lançar Venda <i class="fas fa-dollar-sign text-brand-orange"></i></button>
                         <button onclick="configGoals()" class="w-full flex items-center justify-between p-4 bg-gray-800 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Config. Metas <i class="fas fa-bullseye text-brand-orange"></i></button>
                         <button onclick="manageMonths()" class="w-full flex items-center justify-between p-4 bg-gray-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Config. Meses <i class="fas fa-calendar-alt text-brand-orange"></i></button>
+                        <button onclick="openSettingsPanel()" class="w-full flex items-center justify-between p-4 bg-slate-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Central de Configurações <i class="fas fa-sliders-h text-brand-orange"></i></button>
+                        <button onclick="openUserManager()" class="w-full flex items-center justify-between p-4 bg-indigo-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Usuários e Permissões <i class="fas fa-users-cog text-brand-orange"></i></button>
+                        <button onclick="undoRecentChange()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl text-[10px] uppercase border border-gray-200 dark:border-white/10">Desfazer Alteração <i class="fas fa-undo text-brand-orange"></i></button>
                     </div>
                     <div id="menuOrderOps" class="hidden space-y-3">
                          <button onclick="addRow('orders')" class="w-full flex items-center justify-between p-4 bg-brand-orange text-white font-black rounded-2xl shadow-lg text-[10px] uppercase">Nova Loja Pedidos <i class="fas fa-plus"></i></button>
@@ -145,6 +270,7 @@
                 </div>
             </nav>
             <div class="p-6 border-t dark:border-white/5 space-y-3 bg-gray-50 dark:bg-black">
+                <div data-connection-indicator class="online-indicator online text-[8px] font-black uppercase px-3 py-1.5 rounded-full inline-flex"><i class="fas fa-wifi mr-1"></i>Online</div>
                 <button onclick="toggleTheme()" class="w-full py-3 bg-gray-200 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase">Trocar Tema</button>
                 <button onclick="logout()" class="w-full py-3 bg-rose-500/10 text-rose-500 rounded-xl text-[9px] font-black uppercase hover:bg-rose-500 hover:text-white transition-all">Sair do App</button>
             </div>
@@ -152,16 +278,23 @@
 
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-brand-dark overflow-y-auto main-content">
-            <main class="p-4 md:p-10">
+            <main id="appMainContent" tabindex="-1" class="p-4 md:p-10" aria-label="Conteúdo principal da ferramenta">
                 
                 <!-- PAGINA PRINCIPAL (FATURAMENTO) -->
                 <div id="pageMain" class="page-content active">
-                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 uppercase">Performance Comercial</h2>
+                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 uppercase">Vendas e Valores por Plataforma</h2>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3></div>
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center opacity-70"><p class="text-[9px] font-black uppercase mb-1 text-gray-400">Média Vendas/Dia</p><h3 id="revAvg" class="text-2xl md:text-3xl font-black tracking-tighter text-gray-500">R$ 0,00</h3></div>
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-brand-orange/20 bg-brand-orange/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Projeção Final</p><h3 id="revProj" class="text-2xl md:text-3xl font-black tracking-tighter text-brand-orange">R$ 0,00</h3></div>
+                    </div>
+                    <div id="platformValuesTopAnchor"></div>
+
+                    <!-- PAINEL FINANCEIRO E COMPARATIVOS AVANÇADOS -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
+                        <section class="xl:col-span-2 bg-gray-50 dark:bg-brand-card p-5 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5"><div class="flex items-center justify-between gap-3 mb-5"><div><p class="text-[9px] font-black text-brand-orange uppercase tracking-widest">Financeiro ampliado</p><h3 class="text-sm font-black uppercase">Projeções e ritmo de meta</h3></div><span class="text-[8px] font-black uppercase px-3 py-1.5 rounded-full bg-brand-orange/10 text-brand-orange">Mês selecionado</span></div><div id="financialMetricsGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><p class="text-[9px] font-black uppercase opacity-55 mb-3">Preço médio por marketplace</p><div id="financialMarketplaceBreakdown" class="space-y-3"></div></div><div><p class="text-[9px] font-black uppercase opacity-55 mb-3">Lojas com maior preço médio</p><div id="storeComparisonList" class="space-y-3"></div></div></div></section>
+                        <section class="bg-gray-50 dark:bg-brand-card p-5 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5"><p class="text-[9px] font-black text-brand-orange uppercase tracking-widest">Projeção inteligente</p><h3 class="text-sm font-black uppercase mb-5">Próximo objetivo</h3><div id="goalProjectionPanel" class="space-y-4"></div></section>
                     </div>
 
                     <!-- DASHBOARD DE METAS - ATUALIZADO COM 4 NÍVEIS -->
@@ -176,37 +309,38 @@
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 1</span>
                                 <h4 id="l1Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
                                 <p id="l1Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
-                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 100</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 100,00</span></div>
                             </div>
                             <div id="goalCard2" onclick="setBarFilter(2)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 2</span>
                                 <h4 id="l2Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
                                 <p id="l2Status" class="text-[9px] font-bold text-brand-orange italic uppercase">...</p>
-                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 300</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 300,00</span></div>
                             </div>
                             <div id="goalCard3" onclick="setBarFilter(3)" class="goal-card p-5 rounded-[25px] bg-white dark:bg-brand-card border border-gray-200 dark:border-white/5 text-center active-filter">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-black text-white mb-2 inline-block uppercase">Nível 3</span>
                                 <h4 id="l3Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
                                 <p id="l3Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p>
-                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 450</span></div>
+                                <div class="mt-2 pt-2 border-t border-gray-200 dark:border-white/5"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 450,00</span></div>
                             </div>
                             <div id="goalCard4" onclick="setBarFilter(4)" class="goal-card p-5 rounded-[25px] border-2 border-brand-orange/20 bg-brand-orange/5 text-center">
                                 <span class="text-[8px] font-black px-2 py-0.5 rounded bg-gradient-to-r from-brand-orange to-yellow-500 text-white mb-2 inline-block uppercase">Extraordinário</span>
                                 <h4 id="l4Val" class="text-lg font-black text-black dark:text-white">R$ 0,00</h4>
                                 <p id="l4Status" class="text-[9px] font-bold text-brand-orange uppercase italic">...</p>
-                                <div class="mt-2 pt-2 border-t border-brand-orange/10"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 700</span></div>
+                                <div class="mt-2 pt-2 border-t border-brand-orange/10"><span class="text-[10px] font-black uppercase"><span class="text-[#10B981]">Bônus:</span> R$ 700,00</span></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TABELA DE HISTÓRICO -->
-                    <div class="bg-gray-50 dark:bg-brand-card rounded-[30px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm mb-12">
-                        <div class="px-6 py-4 border-b dark:border-white/5 flex flex-col md:flex-row justify-between items-center bg-white/20 dark:bg-black/20 gap-4">
-                            <div class="flex items-center gap-3"><span class="text-[9px] font-black uppercase text-gray-400 tracking-widest italic">Diário de Faturamento:</span><select id="monthSelector" onchange="changeViewMonth(this.value)" class="bg-white dark:bg-black text-brand-orange text-[10px] font-black px-4 py-2 rounded-xl outline-none border border-brand-orange/20"></select></div>
-                            <button onclick="clearAllRevenue()" class="admin-only text-[9px] font-black text-rose-500 uppercase hover:underline">Zerar Mês</button>
+                    <!-- FATURAMENTO DIÁRIO: PAINEL RESPONSIVO -->
+                    <section class="bg-gray-50 dark:bg-brand-card rounded-[32px] border border-gray-200 dark:border-white/5 overflow-hidden shadow-sm mb-12" aria-labelledby="dailyRevenueTitle">
+                        <div class="px-5 md:px-7 py-5 border-b dark:border-white/5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white/25 dark:bg-black/20">
+                            <div><p class="text-[9px] font-black uppercase text-brand-orange tracking-[0.18em]">Acompanhamento financeiro</p><h3 id="dailyRevenueTitle" class="text-sm md:text-base font-black uppercase mt-1">Faturamento diário</h3><p class="text-[9px] opacity-55 mt-1">Consulte rapidamente os lançamentos e o ritmo do mês selecionado.</p></div>
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3"><select id="monthSelector" aria-label="Mês exibido no faturamento diário" onchange="changeViewMonth(this.value)" class="bg-white dark:bg-black text-brand-orange text-[10px] font-black px-4 py-3 rounded-xl outline-none border border-brand-orange/20"></select><button onclick="clearAllRevenue()" class="admin-only py-3 px-4 rounded-xl bg-rose-500/10 text-[9px] font-black text-rose-500 uppercase hover:bg-rose-500 hover:text-white transition-colors">Zerar mês</button></div>
                         </div>
-                        <div class="max-h-64 overflow-y-auto"><table class="w-full text-[11px] text-left"><tbody id="histTable" class="divide-y dark:divide-white/5"></tbody></table></div>
-                    </div>
+                        <div id="revenueDailySummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3 p-5 md:p-7 border-b dark:border-white/5"></div>
+                        <div id="histTable" class="space-y-3 p-5 md:p-7 max-h-[520px] overflow-y-auto" aria-live="polite"></div>
+                    </section>
 
                     <!-- PAINEL DE ATUALIZAÇÃO EM MASSA -->
                     <div id="bulkUpdatePanel" class="admin-only bg-gray-50 dark:bg-brand-card p-6 md:p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-8">
@@ -234,14 +368,14 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[9px] font-black uppercase text-gray-400 ml-2">Valor</label>
-                                <input type="number" id="bulkValue" placeholder="Ex: 59.90" class="w-full bg-white dark:bg-black p-4 rounded-2xl text-[10px] font-black border border-gray-200 dark:border-white/10 outline-none">
+                                <input type="text" inputmode="decimal" id="bulkValue" placeholder="Ex.: 34.954,65" class="w-full bg-white dark:bg-black p-4 rounded-2xl text-[10px] font-black border border-gray-200 dark:border-white/10 outline-none">
                             </div>
                             <button onclick="applyBulkUpdate()" class="bg-brand-orange text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all hover:bg-orange-600">Aplicar às Selecionadas</button>
                         </div>
                     </div>
 
                     <!-- TABELA DE PRECIFICAÇÃO PRINCIPAL -->
-                    <div class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-hidden mb-10">
+                    <div id="platformValuesPanel" class="bg-white dark:bg-brand-card rounded-[35px] shadow-2xl border border-gray-200 dark:border-white/5 overflow-hidden mb-5">
                         <div class="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b dark:border-white/5">
                             <div class="flex flex-wrap gap-2 justify-center">
                                 <button onclick="setFilter('')" class="px-4 py-2 bg-gray-100 dark:bg-brand-card rounded-xl text-[9px] font-black uppercase border border-transparent hover:border-brand-orange">Todos</button>
@@ -250,8 +384,10 @@
                                 <button onclick="setFilter('TikTok')" class="px-4 py-2 bg-black text-white rounded-xl text-[9px] font-black uppercase">TikTok</button>
                                 <button onclick="setFilter('Shein')" class="px-4 py-2 bg-gray-800 text-white rounded-xl text-[9px] font-black uppercase">Shein</button>
                             </div>
-                            <div class="relative w-full lg:w-80"><input type="text" id="globalSearch" oninput="render()" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase"><i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i></div>
+                            <div class="relative w-full lg:w-80"><input type="search" id="globalSearch" oninput="render()" onkeydown="if(event.key==='Enter'){event.preventDefault();render();this.blur();}" placeholder="BUSCAR CONTA..." class="w-full p-4 pl-12 rounded-2xl bg-gray-100 dark:bg-brand-card border-none text-xs font-bold outline-none focus:ring-2 ring-brand-orange uppercase"><i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i></div>
                         </div>
+                        <div class="px-6 py-3 grid grid-cols-1 sm:grid-cols-3 gap-2 border-b dark:border-white/5 bg-gray-50/40 dark:bg-black/10"><select id="advancedMarketplaceFilter" onchange="render()" class="bg-white dark:bg-brand-card p-3 rounded-xl text-[9px] font-black uppercase outline-none"><option value="">Todos os marketplaces</option><option value="ML">Mercado Livre</option><option value="Shopee">Shopee</option><option value="TikTok">TikTok</option><option value="Shein">Shein</option><option value="Outros">Outros</option></select><select id="advancedStatusFilter" onchange="render()" class="bg-white dark:bg-brand-card p-3 rounded-xl text-[9px] font-black uppercase outline-none"><option value="">Todos os status</option><option value="active">Ativas</option><option value="inactive">Inativas</option></select><select id="advancedPriceFilter" onchange="render()" class="bg-white dark:bg-brand-card p-3 rounded-xl text-[9px] font-black uppercase outline-none"><option value="">Todas as configurações</option><option value="priced">Com preços</option><option value="unpriced">Sem preços</option><option value="discount">Com desconto</option></select></div>
+                        <div class="px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b dark:border-white/5 bg-gray-50/50 dark:bg-black/10"><p class="text-[9px] font-black uppercase tracking-widest text-gray-400">Exportação de cadastro e preços</p><div class="grid grid-cols-2 gap-2"><button onclick="exportCSV()" class="py-2.5 px-3 rounded-xl bg-white dark:bg-brand-card border border-gray-200 dark:border-white/10 text-[9px] font-black uppercase"><i class="fas fa-file-csv text-brand-orange mr-1"></i>CSV</button><button onclick="exportPDF()" class="py-2.5 px-3 rounded-xl bg-gray-800 text-white text-[9px] font-black uppercase"><i class="fas fa-file-pdf text-brand-orange mr-1"></i>PDF</button></div></div>
                         <div class="mobile-scroll-x">
                             <table class="whitespace-nowrap text-left w-full border-collapse">
                                 <thead class="bg-gray-50 dark:bg-black/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b dark:border-white/5">
@@ -265,7 +401,7 @@
 
                 <!-- PAGINA DE PEDIDOS (OPERAÇÕES) - MELHORADA -->
                 <div id="pageOrders" class="page-content">
-                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase">Monitoramento Operacional (Pedidos)</h2>
+                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-emerald-500 pl-4 uppercase">Pedidos e Acompanhamento Operacional</h2>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm">
@@ -286,6 +422,18 @@
                         </div>
                     </div>
 
+                    <!-- INDICADORES, ALERTAS E ACOMPANHAMENTO DE PEDIDOS -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
+                        <section class="xl:col-span-2 bg-gray-50 dark:bg-brand-card p-5 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5"><div><p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Acompanhamento por loja</p><h3 class="text-sm font-black uppercase">Pedidos e desempenho no mês</h3></div><select id="storeMetricFilter" onchange="renderStoreInsights()" class="bg-white dark:bg-black/30 p-3 rounded-xl text-[9px] font-black uppercase outline-none"><option value="all">Todas as lojas</option><option value="active">Somente ativas</option><option value="attention">Precisam de atenção</option></select></div>
+                            <div id="storeIndicatorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                        </section>
+                        <section class="bg-gray-50 dark:bg-brand-card p-5 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5">
+                            <div class="flex items-center justify-between gap-3 mb-5"><div><p class="text-[9px] font-black text-rose-500 uppercase tracking-widest">Alertas automáticos</p><h3 class="text-sm font-black uppercase">Acompanhamento</h3></div><span id="alertCountBadge" class="min-w-8 h-8 px-2 rounded-full flex items-center justify-center bg-rose-500/10 text-rose-500 text-[10px] font-black">0</span></div>
+                            <div id="autoAlertsList" class="space-y-3"></div>
+                        </section>
+                    </div>
+
                     <!-- PAINEL DE INSIGHTS DE QUEDA -->
                     <div id="dropInsightsPanel" class="hidden bg-rose-500/5 border border-rose-500/20 p-6 md:p-8 rounded-[40px] mb-8">
                         <div class="flex items-center gap-3 mb-4">
@@ -303,7 +451,15 @@
                                 <button onclick="submitAllOrders()" class="admin-only bg-emerald-600 text-white font-black px-6 py-3 rounded-xl uppercase text-[10px] shadow-lg active:scale-95 transition-all">Salvar Tudo</button>
                             </div>
                         </div>
+                        <div id="orderDailySummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5"></div>
+                        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-5"><div id="orderPendingStatus" class="text-[10px] font-black uppercase tracking-widest"></div><div class="grid grid-cols-2 sm:flex gap-2"><button onclick="copyPreviousDayOrders()" class="py-2.5 px-3 rounded-xl bg-white dark:bg-brand-card border border-gray-200 dark:border-white/10 text-[9px] font-black uppercase"><i class="fas fa-copy text-brand-orange mr-1"></i>Copiar anterior</button><button onclick="reviewPendingOrders()" class="py-2.5 px-3 rounded-xl bg-emerald-600 text-white text-[9px] font-black uppercase"><i class="fas fa-clipboard-check mr-1"></i>Conferir</button></div></div>
                         <div id="accountPerformanceGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 card-grid"></div>
+                    </div>
+
+                    <!-- CALENDÁRIO OPERACIONAL E COMPARATIVO DIÁRIO -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-8">
+                        <section class="xl:col-span-2 bg-gray-100/50 dark:bg-black/30 p-4 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5"><div class="flex items-center justify-between gap-3 mb-5"><div><p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Calendário operacional</p><h3 id="calendarTitle" class="text-sm font-black uppercase">Pedidos por dia</h3></div><div class="flex gap-2"><button onclick="moveOrderCalendar(-1)" class="table-action-button rounded-xl bg-white dark:bg-brand-card"><i class="fas fa-chevron-left"></i></button><button onclick="moveOrderCalendar(1)" class="table-action-button rounded-xl bg-white dark:bg-brand-card"><i class="fas fa-chevron-right"></i></button></div></div><div class="grid grid-cols-7 gap-2 mb-2 text-center text-[8px] font-black uppercase opacity-50"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div><div id="orderCalendarGrid" class="grid grid-cols-7 gap-2"></div></section>
+                        <section class="bg-gray-100/50 dark:bg-black/30 p-4 md:p-7 rounded-[35px] border border-gray-200 dark:border-white/5"><p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Comparativo diário</p><h3 class="text-sm font-black uppercase mb-5">Por marketplace</h3><div id="dailyMarketplaceComparison" class="space-y-4"></div></section>
                     </div>
 
                     <!-- HISTÓRICO MENSAL DE PEDIDOS -->
@@ -315,10 +471,15 @@
                     </div>
                 </div>
 
-                <!-- AUDITORIA (LOGS) -->
-                <div id="historyBlock" class="admin-only bg-gray-100 dark:bg-black p-8 rounded-[40px] border border-gray-200 dark:border-white/5 mb-32 font-mono overflow-hidden">
-                    <div class="flex justify-between items-center mb-6"><p class="text-[10px] font-black text-brand-orange uppercase tracking-widest">Logs de Auditoria</p><button onclick="db.ref('history').remove()" class="text-[9px] text-gray-400 uppercase hover:text-brand-orange">Limpar</button></div>
-                    <ul id="historyList" class="space-y-2 text-[10px] opacity-80 dark:opacity-60"></ul>
+                <!-- AUDITORIA DISCRETA: recolhida por padrão e disponível somente ao administrador -->
+                <div id="historyBlock" class="admin-only mb-32">
+                    <button id="auditToggleButton" onclick="toggleAuditPanel()" class="w-full flex items-center justify-between gap-4 p-4 md:p-5 rounded-2xl border border-gray-200/70 dark:border-white/5 bg-gray-50/60 dark:bg-black/20 text-left opacity-70 hover:opacity-100 hover:border-brand-orange/30 transition-all group">
+                        <div class="flex items-center gap-3"><span class="w-8 h-8 rounded-xl bg-gray-200 dark:bg-brand-card flex items-center justify-center text-gray-400 group-hover:text-brand-orange"><i class="fas fa-shield-alt text-xs"></i></span><div><p class="text-[9px] font-black uppercase tracking-widest text-gray-500">Segurança</p><p class="text-[8px] opacity-55 mt-0.5">Auditoria administrativa recolhida</p></div></div><span class="text-[9px] font-black uppercase text-gray-400">Ver registros <i id="auditToggleIcon" class="fas fa-chevron-down ml-2"></i></span>
+                    </button>
+                    <section id="auditPanel" class="hidden mt-3 bg-gray-100 dark:bg-black p-5 md:p-7 rounded-[30px] border border-gray-200 dark:border-white/5 font-mono overflow-hidden">
+                        <div class="flex justify-between items-center gap-4 mb-5"><div><p class="text-[10px] font-black text-brand-orange uppercase tracking-widest">Logs de Auditoria</p><p class="text-[8px] opacity-50 mt-1">Histórico técnico de alterações da ferramenta.</p></div><button onclick="clearAuditHistory()" class="text-[9px] text-gray-400 uppercase hover:text-rose-500">Limpar</button></div>
+                        <ul id="historyList" class="space-y-2 text-[10px] opacity-80 dark:opacity-60 max-h-72 overflow-y-auto pr-2"></ul>
+                    </section>
                 </div>
             </main>
         </div>
@@ -336,15 +497,483 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const PASSWORDS = { admin: "748596", viewer: "convidado" };
+        // Acesso exclusivo do Administrador Geral. Todos os demais acessos devem existir em /users e estar ativos.
+        const GENERAL_ADMIN_PASSWORD = "748596";
+        const GENERAL_ADMIN_SESSION = "administrador-geral";
         
-        let isAdmin = false, accounts = [], orderAccounts = [], historyData = [], selectedIndices = new Set();
+        let isAdmin = false, isGeneralAdmin = false, accounts = [], orderAccounts = [], historyData = [], selectedIndices = new Set();
+        let currentUser = { username: 'CONVIDADO', displayName: 'Convidado', role: 'CONVIDADO', permissions: ['dashboard.view'] };
+        let mainTableSortableInstance = null;
         let revenueData = { daily: {}, total: 0 }, orderData = { daily: {}, total: 0 };
         let goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 1800000, lvl4: 2000000 };
         let customMonths = ["2026-03", "2026-04"]; 
         let currentGoalFilter = 3, currentNoteIndex = null, currentPage = 'main'; 
         const now = new Date();
         let selectedMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        let backupVersions = [], migrationSaving = false, activeRevenuePath = null;
+        const BACKUP_LIMIT = 40;
+        const PRODUCT_FIELDS = Object.freeze(['unissex', 'regata', 'infantil', 'plus', 'careca', 'canguru']);
+        const CANGURU_PRODUCT_INDEX = PRODUCT_FIELDS.indexOf('canguru');
+        let appSettings = { alertDropPercent: 30, dailyOrderTarget: 0, requireOrderReview: true, rolePermissions: { ADMIN: ['all'], GESTOR: ['view', 'prices', 'reports'], OPERADOR: ['view', 'orders'], CONVIDADO: ['view'] } };
+        let currentUserRole = 'CONVIDADO';
+        let pendingOrderChanges = new Map();
+        let offlineQueue = JSON.parse(localStorage.getItem('mkt_offline_queue') || '[]');
+        let orderCalendarMonth = selectedMonthKey;
+
+        function showToast(message, type = 'info', timeout = 4200) {
+            const region = document.getElementById('toastRegion');
+            if(!region) return;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+            const toast = document.createElement('div');
+            toast.className = `app-toast ${type}`;
+            toast.innerHTML = `<i class="fas ${icons[type] || icons.info} mt-0.5"></i><div class="flex-1"><p class="text-[11px] font-black">${escapeHtml(message)}</p></div><button class="opacity-60 hover:opacity-100" aria-label="Fechar"><i class="fas fa-times"></i></button>`;
+            toast.querySelector('button').onclick = () => toast.remove();
+            region.appendChild(toast);
+            setTimeout(() => toast.remove(), timeout);
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.remove('active');
+            document.getElementById('actionModalForm').innerHTML = '';
+            document.getElementById('actionModalSubmit').onclick = null;
+        }
+
+        function openActionModal({ eyebrow = 'Ação', title, description = '', fields = [], submitLabel = 'Confirmar', tone = 'brand', onSubmit }) {
+            const modal = document.getElementById('actionModal');
+            const form = document.getElementById('actionModalForm');
+            document.getElementById('actionModalEyebrow').innerText = eyebrow;
+            document.getElementById('actionModalTitle').innerText = title;
+            document.getElementById('actionModalDescription').innerText = description;
+            form.innerHTML = fields.map(field => {
+                const label = `<label class="block text-[9px] font-black uppercase tracking-widest text-gray-400">${escapeHtml(field.label || '')}</label>`;
+                const common = `id="dialog_${field.name}" class="dialog-field" ${field.required ? 'required' : ''}`;
+                if(field.type === 'select') return `<div>${label}<select ${common}>${(field.options || []).map(option => `<option value="${escapeHtml(option.value)}" ${String(option.value) === String(field.value) ? 'selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select></div>`;
+                if(field.type === 'textarea') return `<div>${label}<textarea ${common} rows="4" placeholder="${escapeHtml(field.placeholder || '')}">${escapeHtml(field.value || '')}</textarea></div>`;
+                return `<div>${label}<input ${common} type="${field.type || 'text'}" value="${escapeHtml(field.value ?? '')}" min="${field.min ?? ''}" max="${field.max ?? ''}" step="${field.step ?? ''}" placeholder="${escapeHtml(field.placeholder || '')}"></div>`;
+            }).join('');
+            const submit = document.getElementById('actionModalSubmit');
+            submit.innerText = submitLabel;
+            submit.className = `py-3.5 rounded-2xl text-white text-[10px] font-black uppercase shadow-lg ${tone === 'danger' ? 'bg-rose-500' : tone === 'success' ? 'bg-emerald-600' : 'bg-brand-orange'}`;
+            submit.onclick = async () => {
+                const values = Object.fromEntries(fields.map(field => [field.name, document.getElementById(`dialog_${field.name}`)?.value ?? '']));
+                try { const result = await onSubmit(values); if(result !== false) closeActionModal(); }
+                catch(error) { console.error(error); showToast(error.message || 'Não foi possível concluir esta ação.', 'error'); }
+            };
+            modal.classList.add('active');
+            setTimeout(() => form.querySelector('input,select,textarea')?.focus(), 50);
+        }
+
+        document.addEventListener('keydown', event => {
+            if(event.key !== 'Enter' || event.shiftKey || event.target.tagName === 'TEXTAREA') return;
+            const modal = document.getElementById('actionModal');
+            if(modal?.classList.contains('active')) {
+                event.preventDefault();
+                document.getElementById('actionModalSubmit')?.click();
+            }
+        });
+
+        function requestConfirmation({ title, description, confirmLabel = 'Confirmar', danger = false, onConfirm }) {
+            openActionModal({ eyebrow: danger ? 'Ação sensível' : 'Confirmação', title, description, submitLabel: confirmLabel, tone: danger ? 'danger' : 'success', fields: [], onSubmit: async () => { await onConfirm(); } });
+        }
+
+        // Alertas legados passam a usar notificações discretas em vez de caixas nativas.
+        window.alert = message => showToast(String(message), 'info');
+
+        function persistOfflineQueue() { localStorage.setItem('mkt_offline_queue', JSON.stringify(offlineQueue)); }
+
+        function updateConnectionIndicator() {
+            const elements = document.querySelectorAll('[data-connection-indicator]');
+            const online = navigator.onLine;
+            elements.forEach(element => { element.className = `online-indicator ${online ? 'online' : 'offline'} text-[8px] font-black uppercase px-3 py-1.5 rounded-full`; element.innerHTML = online ? '<i class="fas fa-wifi mr-1"></i>Online' : `<i class="fas fa-cloud-upload-alt mr-1"></i>Offline · ${offlineQueue.length} pendente(s)`; });
+        }
+
+        function queueOfflineAction(action) {
+            offlineQueue.push({ id: makeStableId('queue'), createdAt: new Date().toISOString(), ...action });
+            persistOfflineQueue();
+            updateConnectionIndicator();
+            showToast('Sem internet: alteração guardada e será sincronizada ao reconectar.', 'warning');
+        }
+
+        async function flushOfflineQueue() {
+            if(!navigator.onLine || !offlineQueue.length || !isAdmin) return;
+            const queue = [...offlineQueue];
+            offlineQueue = [];
+            persistOfflineQueue();
+            try {
+                for(const item of queue) {
+                    if(item.operation === 'set') await db.ref(item.path).set(item.value);
+                    if(item.operation === 'remove') await db.ref(item.path).remove();
+                    if(item.operation === 'update') await db.ref().update(item.value);
+                    await logAction('Alteração offline sincronizada', { originalAction: item.action, queuedAt: item.createdAt });
+                }
+                showToast(`${queue.length} alteração(ões) offline sincronizada(s).`, 'success');
+            } catch(error) {
+                offlineQueue = [...queue, ...offlineQueue];
+                persistOfflineQueue();
+                showToast('A sincronização será tentada novamente quando a conexão estabilizar.', 'warning');
+            } finally { updateConnectionIndicator(); }
+        }
+
+        window.addEventListener('online', () => { updateConnectionIndicator(); flushOfflineQueue(); });
+        window.addEventListener('offline', updateConnectionIndicator);
+
+        function can(permission) {
+            const permissions = currentUser.permissions || appSettings.rolePermissions?.[currentUserRole] || [];
+            return isAdmin || permissions.includes('all') || permissions.includes(permission);
+        }
+
+        function permissionDefaults(role) {
+            const defaults = {
+                ADMIN: ['all'],
+                GESTOR: ['dashboard.view', 'sales.view', 'sales.edit', 'prices.view', 'prices.edit', 'orders.view', 'orders.edit', 'reports.export'],
+                OPERADOR: ['dashboard.view', 'orders.view', 'orders.edit'],
+                CONVIDADO: ['dashboard.view', 'sales.view', 'prices.view', 'orders.view']
+            };
+            return [...(defaults[role] || defaults.CONVIDADO)];
+        }
+
+        function openSettingsPanel() {
+            if(!isAdmin) return;
+            openActionModal({
+                eyebrow: 'Central de configurações', title: 'Regras da operação', description: 'Ajuste os critérios usados nos alertas e na revisão de pedidos.', submitLabel: 'Salvar configurações', tone: 'success',
+                fields: [
+                    { name: 'alertDropPercent', label: 'Queda que gera alerta (%)', type: 'number', min: 1, max: 100, step: 1, value: appSettings.alertDropPercent },
+                    { name: 'dailyOrderTarget', label: 'Meta diária geral de pedidos', type: 'number', min: 0, step: 1, value: appSettings.dailyOrderTarget },
+                    { name: 'requireOrderReview', label: 'Revisar pedidos antes de salvar', type: 'select', value: String(appSettings.requireOrderReview), options: [{ value: 'true', label: 'SIM, EXIGIR CONFERÊNCIA' }, { value: 'false', label: 'NÃO, SALVAR DIRETAMENTE' }] },
+                    { name: 'operatorPermissions', label: 'Permissão do perfil OPERADOR', type: 'select', value: appSettings.rolePermissions?.OPERADOR?.includes('orders') ? 'orders' : 'view', options: [{ value: 'orders', label: 'CONSULTAR E LANÇAR PEDIDOS' }, { value: 'view', label: 'SOMENTE CONSULTAR' }] }
+                ],
+                onSubmit: async values => {
+                    const next = { ...appSettings, alertDropPercent: Math.min(100, Math.max(1, Number(values.alertDropPercent) || 30)), dailyOrderTarget: Math.max(0, Number(values.dailyOrderTarget) || 0), requireOrderReview: values.requireOrderReview === 'true', rolePermissions: { ...(appSettings.rolePermissions || {}), OPERADOR: values.operatorPermissions === 'orders' ? ['view', 'orders'] : ['view'] } };
+                    await saveWithBackup('settings', next, 'Configurações da operação atualizadas', next);
+                    appSettings = next;
+                    updateDash();
+                    showToast('Configurações atualizadas.', 'success');
+                }
+            });
+        }
+
+        function normalizeUsername(value) { return String(value || '').trim().toLowerCase().replace(/[^a-z0-9_@-]/g, ''); }
+
+        function validateUserPassword(value) {
+            const password = String(value ?? '');
+            if(password.length < 8) return 'A senha precisa ter pelo menos 8 caracteres.';
+            if(password.length > 128) return 'A senha é longa demais.';
+            return '';
+        }
+
+        async function hashPassword(value) {
+            const bytes = new TextEncoder().encode(String(value));
+            const hash = await crypto.subtle.digest('SHA-256', bytes);
+            return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        function getRoleLabel(role) { return ({ ADMIN: 'Administrador', GESTOR: 'Gestor', OPERADOR: 'Operador', CONVIDADO: 'Convidado' })[role] || 'Convidado'; }
+
+        const USER_PERMISSION_MAP = { salesView: 'sales.view', salesEdit: 'sales.edit', pricesView: 'prices.view', pricesEdit: 'prices.edit', ordersView: 'orders.view', ordersEdit: 'orders.edit', reportsExport: 'reports.export', backupsManage: 'backups.manage', usersManage: 'users.manage' };
+
+        async function openUserManager() {
+            if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode gerenciar usuários.', 'warning');
+            const users = Object.values((await db.ref('users').once('value')).val() || {}).sort((a, b) => String(a.displayName || a.username).localeCompare(String(b.displayName || b.username), 'pt-BR'));
+            const form = document.getElementById('actionModalForm');
+            document.getElementById('actionModalEyebrow').innerText = 'Usuários e permissões';
+            document.getElementById('actionModalTitle').innerText = `Usuários cadastrados (${users.length})`;
+            document.getElementById('actionModalDescription').innerText = 'Visualize o status e o perfil de cada acesso. Você pode editar permissões, bloquear, reativar ou remover usuários.';
+            form.innerHTML = users.length ? `<div class="space-y-3 max-h-[58vh] overflow-y-auto pr-1">${users.map(user => { const permissions = user.permissions || permissionDefaults(user.role || 'CONVIDADO'); const active = user.active !== false; return `<article class="p-4 rounded-2xl border ${active ? 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20' : 'border-rose-500/20 bg-rose-500/5 opacity-70'}"><div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3"><div class="min-w-0"><p class="font-black text-xs truncate">${escapeHtml(user.displayName || user.username)}</p><p class="text-[9px] uppercase font-black text-gray-400 mt-1">@${escapeHtml(user.username)} · ${escapeHtml(getRoleLabel(user.role))} · ${active ? 'Ativo' : 'Bloqueado'}</p><p class="text-[8px] opacity-60 mt-2">${permissions.includes('all') ? 'Acesso total' : `${permissions.length} permissão(ões): ${permissions.join(', ')}`}</p></div><div class="grid grid-cols-2 gap-2 shrink-0"><button type="button" onclick="openUserEditor('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl bg-white dark:bg-brand-card text-brand-orange text-[8px] font-black uppercase border border-brand-orange/20">Editar</button><button type="button" onclick="toggleUserBlock('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl ${active ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600'} text-[8px] font-black uppercase">${active ? 'Bloquear' : 'Reativar'}</button><button type="button" onclick="removeManagedUser('${escapeHtml(user.username)}')" class="col-span-2 py-2 px-3 rounded-xl bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase">Remover usuário</button></div></div></article>`; }).join('')}</div>` : '<div class="p-5 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] opacity-70">Nenhum usuário individual cadastrado ainda. Use o botão abaixo para criar o primeiro acesso.</div>';
+            const submit = document.getElementById('actionModalSubmit'); submit.innerText = 'Novo usuário'; submit.className = 'py-3.5 rounded-2xl text-white text-[10px] font-black uppercase shadow-lg bg-indigo-600'; submit.onclick = () => openUserEditor();
+            document.getElementById('actionModal').classList.add('active');
+        }
+
+        async function openUserEditor(username = '') {
+            if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode editar usuários.', 'warning');
+            const existing = username ? (await db.ref(`users/${username}`).once('value')).val() : null;
+            const permissions = existing?.permissions || permissionDefaults(existing?.role || 'CONVIDADO');
+            const allow = [{ value: 'yes', label: 'PERMITIR' }, { value: 'no', label: 'NÃO PERMITIR' }];
+            openActionModal({
+                eyebrow: 'Usuários e permissões', title: existing ? `Editar: ${existing.displayName || existing.username}` : 'Novo usuário', description: 'Defina exatamente o que esta pessoa pode visualizar, alterar, exportar ou administrar.', submitLabel: 'Salvar usuário', tone: 'success',
+                fields: [
+                    { name: 'username', label: 'Usuário de acesso', type: 'text', value: existing?.username || '', placeholder: 'Ex.: joao_silva ou joao@empresa', required: true },
+                    { name: 'displayName', label: 'Nome de exibição', type: 'text', value: existing?.displayName || '', placeholder: 'Ex.: João Silva', required: true },
+                    { name: 'role', label: 'Perfil base', type: 'select', value: existing?.role || 'CONVIDADO', options: [{ value: 'ADMIN', label: 'ADMINISTRADOR' }, { value: 'GESTOR', label: 'GESTOR' }, { value: 'OPERADOR', label: 'OPERADOR' }, { value: 'CONVIDADO', label: 'CONVIDADO' }] },
+                    { name: 'password', label: 'Senha inicial ou nova senha', type: 'password', placeholder: existing ? 'Vazio mantém a senha atual' : 'Mínimo de 8 caracteres', required: !existing },
+                    ...Object.entries(USER_PERMISSION_MAP).map(([key, permission]) => ({ name: key, label: ({ salesView: 'Visualizar vendas e faturamento', salesEdit: 'Lançar ou editar vendas', pricesView: 'Visualizar valores e preços', pricesEdit: 'Alterar valores e preços', ordersView: 'Visualizar pedidos', ordersEdit: 'Lançar ou editar pedidos', reportsExport: 'Exportar relatórios', backupsManage: 'Gerenciar backups e restauração', usersManage: 'Gerenciar usuários e permissões' })[key], type: 'select', value: permissions.includes('all') || permissions.includes(permission) ? 'yes' : 'no', options: allow }))
+                ],
+                onSubmit: async values => {
+                    const userKey = normalizeUsername(values.username);
+                    if(userKey.length < 3) throw new Error('Informe um usuário com pelo menos 3 caracteres.');
+                    const previous = (await db.ref(`users/${userKey}`).once('value')).val();
+                    const passwordError = values.password ? validateUserPassword(values.password) : '';
+                    if(!previous && !values.password) throw new Error('Informe uma senha inicial.');
+                    if(passwordError) throw new Error(passwordError);
+                    const nextPermissions = values.role === 'ADMIN' ? ['all'] : ['dashboard.view', ...Object.entries(USER_PERMISSION_MAP).filter(([key]) => values[key] === 'yes').map(([, permission]) => permission)];
+                    const userRecord = { ...(previous || {}), username: userKey, displayName: String(values.displayName).trim() || userKey, role: values.role, permissions: nextPermissions, active: previous?.active !== false, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
+                    if(values.password) userRecord.passwordHash = await hashPassword(values.password);
+                    if(!previous) userRecord.createdAt = new Date().toISOString();
+                    await saveWithBackup(`users/${userKey}`, userRecord, previous ? 'Usuário e permissões atualizados' : 'Usuário criado', { username: userKey, role: values.role, permissions: nextPermissions });
+                    showToast(`Usuário ${userKey} salvo com sucesso.`, 'success');
+                }
+            });
+        }
+
+        async function toggleUserBlock(username) {
+            if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode alterar bloqueios.', 'warning');
+            if(username === currentUser.username) return showToast('Não é permitido bloquear o usuário da sessão atual.', 'warning');
+            const user = (await db.ref(`users/${username}`).once('value')).val();
+            if(!user) return;
+            const users = Object.values((await db.ref('users').once('value')).val() || {});
+            if(user.role === 'ADMIN' && user.active !== false && users.filter(item => item.role === 'ADMIN' && item.active !== false).length <= 1) return showToast('Mantenha ao menos um administrador ativo.', 'warning');
+            const next = { ...user, active: user.active === false, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
+            await saveWithBackup(`users/${username}`, next, next.active ? 'Usuário reativado' : 'Usuário bloqueado', { username, role: user.role });
+            showToast(`Usuário ${username} foi ${next.active ? 'reativado' : 'bloqueado'}.`, 'success');
+            openUserManager();
+        }
+
+        async function removeManagedUser(username) {
+            if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode remover usuários.', 'warning');
+            if(username === currentUser.username) return showToast('Não é permitido remover o usuário da sessão atual.', 'warning');
+            const user = (await db.ref(`users/${username}`).once('value')).val();
+            if(!user) return;
+            const users = Object.values((await db.ref('users').once('value')).val() || {});
+            if(user.role === 'ADMIN' && user.active !== false && users.filter(item => item.role === 'ADMIN' && item.active !== false).length <= 1) return showToast('Mantenha ao menos um administrador ativo.', 'warning');
+            requestConfirmation({ title: 'Remover usuário', description: `O acesso de ${user.displayName || username} será removido. O histórico de auditoria será preservado.`, confirmLabel: 'Remover definitivamente', danger: true, onConfirm: async () => { await removeWithBackup(`users/${username}`, 'Usuário removido', { username, role: user.role }); showToast('Usuário removido com sucesso.', 'success'); } });
+        }
+
+        function summarizeValue(value) {
+            if(value === null || value === undefined) return 'Sem dados';
+            if(Array.isArray(value)) return `${value.length} item(ns)`;
+            if(typeof value === 'object') return `${Object.keys(value).length} registro(s)`;
+            return String(value).slice(0, 120);
+        }
+
+        function getDataHealthSummary() {
+            const lastBackup = backupVersions[0];
+            const inactiveStores = accounts.filter(account => account.status === 'inactive').length;
+            const storesWithoutPrice = accounts.filter(account => account.status !== 'inactive' && !account.v.some(value => Number(value) > 0)).length;
+            const duplicateNames = accounts.length - new Set(accounts.map(account => account.n)).size;
+            return { online: navigator.onLine, pending: offlineQueue.length, lastBackup: lastBackup?.createdAtLabel || 'Ainda não criado nesta sessão', inactiveStores, storesWithoutPrice, duplicateNames, totalStores: accounts.length, totalOrdersAccounts: orderAccounts.length };
+        }
+
+        function rememberUndo(path, before, action, after) {
+            const undo = { path, before, afterSummary: summarizeValue(after), beforeSummary: summarizeValue(before), action, createdAt: new Date().toISOString(), actor: currentUser.username };
+            localStorage.setItem('mkt_last_undo', JSON.stringify(undo));
+        }
+
+        function undoRecentChange() {
+            if(!isAdmin) return;
+            const raw = localStorage.getItem('mkt_last_undo');
+            if(!raw) return showToast('Não há alteração recente disponível para desfazer neste dispositivo.', 'info');
+            const undo = JSON.parse(raw);
+            const beforeSummary = undo.beforeSummary || summarizeValue(undo.updatesBefore);
+            const afterSummary = undo.afterSummary || undo.updatesAfterSummary || 'Alteração recente';
+            requestConfirmation({ title: 'Desfazer alteração recente', description: `Ação: ${undo.action}. Antes: ${beforeSummary}. Depois: ${afterSummary}. Uma nova versão de segurança será criada antes da reversão.`, confirmLabel: 'Desfazer agora', danger: true, onConfirm: async () => {
+                await createBackupVersion('Backup antes de desfazer alteração', { originalAction: undo.action, path: undo.path || 'múltiplos dados' });
+                if(undo.updatesBefore) await db.ref().update(undo.updatesBefore); else await db.ref(undo.path).set(undo.before);
+                await logAction('Alteração desfeita', { originalAction: undo.action, path: undo.path || 'múltiplos dados', before: beforeSummary, after: afterSummary });
+                localStorage.removeItem('mkt_last_undo');
+                showToast('Alteração desfeita com sucesso.', 'success');
+            } });
+        }
+
+        function exportManagementReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const health = getDataHealthSummary();
+            const totalRevenue = Number(revenueData.total) || 0;
+            const totalOrders = Number(orderData.total) || 0;
+            doc.setFontSize(18); doc.text('Valores MKT — Relatório Gerencial', 14, 18);
+            doc.setFontSize(9); doc.text(`Período: ${selectedMonthKey} · Emitido em ${new Date().toLocaleString('pt-BR')} · Usuário: ${currentUser.displayName}`, 14, 25);
+            doc.autoTable({ startY: 32, head: [['Indicador', 'Valor']], body: [
+                ['Faturamento acumulado', formatCurrency(totalRevenue)],
+                ['Pedidos acumulados', String(totalOrders)],
+                ['Lojas cadastradas', String(accounts.length)],
+                ['Lojas sem preço', String(health.storesWithoutPrice)],
+                ['Alterações offline pendentes', String(health.pending)],
+                ['Último backup', health.lastBackup]
+            ], styles: { fontSize: 9 } });
+            doc.autoTable({ startY: doc.lastAutoTable.finalY + 8, head: [['Loja', 'Marketplace', 'Status', 'Meta de pedidos']], body: accounts.map(account => [account.n, account.marketplace, account.status === 'inactive' ? 'Inativa' : 'Ativa', String(account.orderGoal || 0)]), styles: { fontSize: 8 } });
+            doc.save(`valores-mkt-relatorio-gerencial-${selectedMonthKey}.pdf`);
+            if(isAdmin) logAction('Relatório gerencial exportado', { month: selectedMonthKey });
+        }
+
+        function makeStableId(prefix = 'store') {
+            return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
+        }
+
+        function asArray(value) {
+            if(Array.isArray(value)) return value.filter(Boolean);
+            return value && typeof value === 'object' ? Object.values(value).filter(Boolean) : [];
+        }
+
+        function escapeHtml(value = '') {
+            return String(value).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+        }
+
+        function formatCurrency(value) {
+            const numeric = Number(value);
+            const safeValue = Number.isFinite(numeric) ? numeric : 0;
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                .format(safeValue)
+                .replace(/\u00A0/g, ' ');
+        }
+
+        function parseMonetaryValue(value) {
+            if(typeof value === 'number') return Number.isFinite(value) ? value : NaN;
+            let raw = String(value ?? '').trim();
+            if(!raw) return 0;
+            raw = raw.replace(/R\$/gi, '').replace(/\s/g, '').replace(/[^\d,.-]/g, '');
+            const negative = raw.startsWith('-');
+            raw = raw.replace(/-/g, '');
+            if(!raw || !/[\d]/.test(raw)) return NaN;
+
+            const lastComma = raw.lastIndexOf(',');
+            const lastDot = raw.lastIndexOf('.');
+            let normalized = raw;
+            if(lastComma >= 0 && lastDot >= 0) {
+                const decimalSeparator = lastComma > lastDot ? ',' : '.';
+                const thousandSeparator = decimalSeparator === ',' ? '.' : ',';
+                normalized = raw.replace(new RegExp(`\\${thousandSeparator}`, 'g'), '');
+                const decimalIndex = normalized.lastIndexOf(decimalSeparator);
+                normalized = normalized.slice(0, decimalIndex).replace(new RegExp(`\\${decimalSeparator}`, 'g'), '') + '.' + normalized.slice(decimalIndex + 1);
+            } else if(lastComma >= 0 || lastDot >= 0) {
+                const separator = lastComma >= 0 ? ',' : '.';
+                const pieces = raw.split(separator);
+                const digitsAfterLast = pieces[pieces.length - 1].length;
+                const hasThousandsPattern = digitsAfterLast === 3 && (pieces.length > 1);
+                normalized = hasThousandsPattern ? pieces.join('') : `${pieces.slice(0, -1).join('')}.${pieces[pieces.length - 1]}`;
+            }
+            const parsed = Number(`${negative ? '-' : ''}${normalized}`);
+            return Number.isFinite(parsed) ? parsed : NaN;
+        }
+
+        function detectMarketplace(name = '') {
+            const label = String(name).toLowerCase();
+            if(label.includes('shopee')) return 'Shopee';
+            if(label.includes('tik tok') || label.includes('tiktok')) return 'TikTok';
+            if(label.includes('shein')) return 'Shein';
+            if(label.includes('ml') || label.includes('mercado livre') || label.includes('conta')) return 'ML';
+            return 'Outros';
+        }
+
+        function normalizeAccount(account = {}) {
+            const values = Array.isArray(account.v) ? account.v : [0, 0, 0, 0, 0, 0];
+            const fullValues = Array.isArray(account.c) ? account.c : [60, 60, 60, 60, 80, 80];
+            const discounts = Array.isArray(account.p) ? account.p : [40, 40, 40, 40, 0, 0];
+            return {
+                ...account,
+                id: account.id || makeStableId('store'),
+                n: String(account.n || 'LOJA SEM NOME').trim().toUpperCase(),
+                t: Number(account.t) === 2 ? 2 : 1,
+                c: Array.from({ length: 6 }, (_, index) => Math.max(0, Number(fullValues[index]) || 0)),
+                p: Array.from({ length: 6 }, (_, index) => Math.min(100, Math.max(0, Number(discounts[index]) || 0))),
+                v: Array.from({ length: 6 }, (_, index) => Math.max(0, Number(values[index]) || 0)),
+                marketplace: account.marketplace || detectMarketplace(account.n),
+                status: account.status === 'inactive' ? 'inactive' : 'active',
+                orderGoal: Math.max(0, Number(account.orderGoal) || 0),
+                note: account.note || '',
+                aliases: Array.isArray(account.aliases) ? [...new Set(account.aliases.filter(Boolean))] : []
+            };
+        }
+
+        function normalizeOrderAccount(account = {}) {
+            const raw = typeof account === 'string' ? { n: account } : account;
+            const primary = accounts.find(item => item.id === raw.storeId || item.n === raw.n);
+            return {
+                ...raw,
+                id: raw.id || primary?.id || makeStableId('order'),
+                storeId: raw.storeId || primary?.id || null,
+                n: String(raw.n || primary?.n || 'LOJA SEM NOME').trim().toUpperCase(),
+                status: raw.status === 'inactive' || primary?.status === 'inactive' ? 'inactive' : 'active',
+                aliases: Array.isArray(raw.aliases) ? [...new Set(raw.aliases.filter(Boolean))] : []
+            };
+        }
+
+        function buildAuditEntry(message, details = {}) {
+            return {
+                message,
+                details,
+                actor: currentUser.displayName || currentUser.username || (isAdmin ? 'ADMIN' : 'CONVIDADO'),
+                actorUsername: currentUser.username || '',
+                actorRole: currentUser.role || currentUserRole,
+                createdAt: new Date().toISOString(),
+                createdAtLabel: new Date().toLocaleString('pt-BR')
+            };
+        }
+
+        function logAction(message, details = {}) {
+            return db.ref('history').push(buildAuditEntry(message, details));
+        }
+
+        async function captureFullSnapshot() {
+            const paths = ['accounts', 'orderAccounts', 'orders', 'revenue', 'goals', 'monthConfig', 'history', 'users'];
+            const snapshots = await Promise.all(paths.map(path => db.ref(path).once('value')));
+            return snapshots.reduce((result, snapshot, index) => {
+                result[paths[index]] = snapshot.val() || (paths[index].includes('Accounts') || paths[index] === 'accounts' ? [] : {});
+                return result;
+            }, { schemaVersion: 2 });
+        }
+
+        async function createBackupVersion(reason, details = {}) {
+            if(!isAdmin) return null;
+            const snapshot = await captureFullSnapshot();
+            const ref = db.ref('backups/versions').push();
+            await ref.set({
+                id: ref.key,
+                reason,
+                details,
+                createdAt: new Date().toISOString(),
+                createdAtLabel: new Date().toLocaleString('pt-BR'),
+                createdBy: currentUser.username || 'ADMIN',
+                snapshot
+            });
+            const oldBackups = backupVersions.slice(BACKUP_LIMIT - 1);
+            oldBackups.forEach(backup => { if(backup.id) db.ref(`backups/versions/${backup.id}`).remove(); });
+            return ref.key;
+        }
+
+        function permissionForPath(path = '') {
+            if(path.startsWith('users')) return 'users.manage';
+            if(path.startsWith('accounts')) return 'prices.edit';
+            if(path.startsWith('orderAccounts') || path.startsWith('orders')) return 'orders.edit';
+            if(path.startsWith('revenue')) return 'sales.edit';
+            if(path.startsWith('backups')) return 'backups.manage';
+            return 'settings.manage';
+        }
+
+        async function saveWithBackup(path, value, action, details = {}) {
+            if(path.startsWith('users') && !isGeneralAdmin) throw new Error('Somente o Administrador Geral pode alterar usuários.');
+            if(!can(permissionForPath(path))) throw new Error('Seu usuário não possui permissão para alterar este módulo.');
+            if(!navigator.onLine) { queueOfflineAction({ operation: 'set', path, value, action, details }); rememberUndo(path, null, action, value); return { queued: true }; }
+            const before = (await db.ref(path).once('value')).val();
+            rememberUndo(path, before, action, value);
+            const comparison = { before: summarizeValue(before), after: summarizeValue(value) };
+            await createBackupVersion(action, { ...details, comparison });
+            await db.ref(path).set(value);
+            await logAction(action, { ...details, comparison });
+            return { queued: false };
+        }
+
+        async function removeWithBackup(path, action, details = {}) {
+            if(path.startsWith('users') && !isGeneralAdmin) throw new Error('Somente o Administrador Geral pode remover usuários.');
+            if(!can(permissionForPath(path))) throw new Error('Seu usuário não possui permissão para alterar este módulo.');
+            if(!navigator.onLine) { queueOfflineAction({ operation: 'remove', path, action, details }); return { queued: true }; }
+            await createBackupVersion(action, details);
+            await db.ref(path).remove();
+            await logAction(action, details);
+            return { queued: false };
+        }
+
+        async function updateWithBackup(updates, action, details = {}) {
+            if(Object.keys(updates).some(path => path.startsWith('users')) && !isGeneralAdmin) throw new Error('Somente o Administrador Geral pode alterar usuários.');
+            const requiredPermissions = Object.keys(updates).map(permissionForPath);
+            if(!requiredPermissions.every(permission => can(permission))) throw new Error('Seu usuário não possui permissão para alterar um ou mais módulos desta ação.');
+            if(!navigator.onLine) { queueOfflineAction({ operation: 'update', value: updates, action, details }); return { queued: true }; }
+            const before = {};
+            for(const path of Object.keys(updates)) before[path] = (await db.ref(path).once('value')).val();
+            localStorage.setItem('mkt_last_undo', JSON.stringify({ path: null, updatesBefore: before, updatesAfterSummary: summarizeValue(updates), action, createdAt: new Date().toISOString(), actor: currentUser.username }));
+            await createBackupVersion(action, { ...details, comparison: { before: summarizeValue(before), after: summarizeValue(updates) } });
+            await db.ref().update(updates);
+            await logAction(action, { ...details, comparison: { before: summarizeValue(before), after: summarizeValue(updates) } });
+            return { queued: false };
+        }
 
         const INITIAL_ORDER_STORES = [
             "CONTA 2", "CONTA 3", "CONTA 6", "CONTA 5", "CONTA 7", "CONTA 8", "CONTA 9", "CONTA 10",
@@ -353,10 +982,17 @@
             "TIK TOK: NEW", "TIK TOK: CUSTOM", "TIK TOK: FASHION", "TIK TOK: PRINT", "TIK TOK: CLOTHING", "TIK TOK: FG7"
         ];
 
-        function checkSession() {
-            const role = localStorage.getItem('mkt_logged');
+        async function checkSession() {
+            const stored = localStorage.getItem('mkt_session');
             const last = localStorage.getItem('mkt_last_activity');
-            if (role && last && (Date.now() - parseInt(last) < 7200000)) enterApp(role);
+            if(!stored || !last || (Date.now() - parseInt(last) >= 7200000)) { localStorage.removeItem('mkt_session'); return; }
+            try {
+                const session = JSON.parse(stored);
+                if(session.generalAdmin && session.username === GENERAL_ADMIN_SESSION) throw new Error('A senha do Administrador Geral deve ser informada novamente.');
+                const user = (await db.ref(`users/${normalizeUsername(session.username)}`).once('value')).val();
+                if(!user || user.active !== true) throw new Error('Sessão de usuário inativa.');
+                enterApp({ username: user.username, displayName: user.displayName || user.username, role: user.role || 'CONVIDADO', permissions: user.permissions || permissionDefaults(user.role || 'CONVIDADO') });
+            } catch(error) { localStorage.removeItem('mkt_session'); localStorage.removeItem('mkt_last_activity'); }
         }
         function updateActivity() { localStorage.setItem('mkt_last_activity', Date.now().toString()); }
         ['mousedown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, updateActivity));
@@ -367,25 +1003,54 @@
             else { input.type = "password"; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
         }
 
-        function checkPass() {
-            const v = document.getElementById('passInput').value.trim();
-            if (v === PASSWORDS.admin) { localStorage.setItem('mkt_logged', 'ADMIN'); updateActivity(); enterApp("ADMIN"); }
-            else if (v === PASSWORDS.viewer) { localStorage.setItem('mkt_logged', 'CONVIDADO'); updateActivity(); enterApp("CONVIDADO"); }
-            else alert("Incorreto");
+        async function checkPass() {
+            const usernameInput = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passInput').value;
+            const username = normalizeUsername(usernameInput);
+            if(!password) return showToast('Informe a senha de acesso.', 'warning');
+            if(!username) {
+                if(password !== GENERAL_ADMIN_PASSWORD) return showToast('Senha do Administrador Geral incorreta.', 'error');
+                const session = { username: GENERAL_ADMIN_SESSION, displayName: 'Administrador Geral', role: 'ADMIN', permissions: ['all'], generalAdmin: true };
+                updateActivity(); enterApp(session); return;
+            }
+            try {
+                const snapshot = await db.ref(`users/${username}`).once('value');
+                const user = snapshot.val();
+                if(!user || user.active !== true || user.passwordHash !== await hashPassword(password)) throw new Error('Usuário, senha ou status de acesso inválido.');
+                updateActivity();
+                enterApp({ username: user.username, displayName: user.displayName || user.username, role: user.role || 'CONVIDADO', permissions: user.permissions || permissionDefaults(user.role || 'CONVIDADO') });
+            } catch(error) { showToast(error.message || 'Não foi possível validar o acesso.', 'error'); }
         }
 
-        function enterApp(m) {
-            isAdmin = (m === 'ADMIN');
+        function enterApp(session) {
+            const normalized = typeof session === 'string' ? { username: session, displayName: session, role: session } : session;
+            currentUser = { username: normalized.username || 'convidado', displayName: normalized.displayName || normalized.username || 'Convidado', role: normalized.role || 'CONVIDADO', permissions: normalized.permissions || permissionDefaults(normalized.role || 'CONVIDADO'), generalAdmin: normalized.generalAdmin === true };
+            isGeneralAdmin = currentUser.generalAdmin === true;
+            isAdmin = currentUser.role === 'ADMIN';
+            currentUserRole = currentUser.role;
+            localStorage.setItem('mkt_session', JSON.stringify(currentUser));
             document.getElementById('lockScreen').style.display = 'none';
             document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userStatus').innerText = m;
+            document.getElementById('userStatus').innerText = `${currentUser.displayName} · ${getRoleLabel(currentUser.role)}`;
             document.getElementById('orderLaunchDate').valueAsDate = new Date();
-            if(isAdmin) document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            orderCalendarMonth = selectedMonthKey;
+            updateConnectionIndicator();
+            prioritizePlatformValues();
+            if(isAdmin) { document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block'); flushOfflineQueue(); }
             db.ref('monthConfig').on('value', s => { if(s.val()) customMonths = s.val(); renderMonthSelector(); startSync(); });
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
         function logout() { localStorage.clear(); location.reload(); }
+
+        function prioritizePlatformValues() {
+            const anchor = document.getElementById('platformValuesTopAnchor');
+            const panel = document.getElementById('platformValuesPanel');
+            const bulkPanel = document.getElementById('bulkUpdatePanel');
+            if(!anchor || !panel) return;
+            if(anchor.nextElementSibling !== panel) anchor.insertAdjacentElement('afterend', panel);
+            if(bulkPanel && panel.nextElementSibling !== bulkPanel) panel.insertAdjacentElement('afterend', bulkPanel);
+        }
 
         function switchPage(page) {
             currentPage = page;
@@ -411,20 +1076,122 @@
             else document.getElementById('noteAdminControls').style.display = 'block';
         }
         function closeNote() { document.getElementById('noteModal').classList.remove('active'); }
-        function saveNote() {
-            if(currentNoteIndex === null || !isAdmin) return;
-            accounts[currentNoteIndex].note = document.getElementById('noteContent').value;
-            db.ref('accounts').set(accounts).then(() => { closeNote(); render(); });
+        async function saveNote() {
+            if(currentNoteIndex === null || !isAdmin || !accounts[currentNoteIndex]) return;
+            const nextAccounts = accounts.map(account => ({ ...account }));
+            nextAccounts[currentNoteIndex].note = document.getElementById('noteContent').value.trim();
+            try {
+                await saveWithBackup('accounts', nextAccounts, 'Anotação da loja atualizada', { storeId: nextAccounts[currentNoteIndex].id, name: nextAccounts[currentNoteIndex].n });
+                closeNote();
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível salvar a anotação.');
+            }
+        }
+
+        function openBackupModal() {
+            if(!isAdmin) return;
+            document.getElementById('backupModal').classList.add('active');
+            renderBackupList();
+        }
+
+        function closeBackupModal() { document.getElementById('backupModal').classList.remove('active'); }
+
+        function renderBackupList() {
+            const list = document.getElementById('backupList');
+            if(!list) return;
+            if(!backupVersions.length) {
+                list.innerHTML = '<div class="p-5 rounded-2xl bg-gray-100 dark:bg-black/20 text-center text-[10px] font-bold opacity-60">Nenhuma versão de segurança disponível ainda.</div>';
+                return;
+            }
+            list.innerHTML = backupVersions.map(backup => `
+                <article class="backup-list-item p-4 rounded-2xl bg-gray-100 dark:bg-black/20 border border-gray-200 dark:border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="min-w-0"><p class="text-[10px] font-black uppercase text-brand-orange truncate">${escapeHtml(backup.reason || 'Backup automático')}</p><p class="text-[10px] opacity-60 mt-1">${escapeHtml(backup.createdAtLabel || new Date(backup.createdAt).toLocaleString('pt-BR'))}</p></div>
+                    <button onclick="restoreBackup('${backup.id}')" class="py-2.5 px-4 rounded-xl bg-white dark:bg-brand-card text-[9px] font-black uppercase text-brand-orange border border-brand-orange/20">Restaurar</button>
+                </article>`).join('');
+        }
+
+        async function createManualBackup() {
+            if(!isAdmin) return;
+            try {
+                await createBackupVersion('Backup manual criado pelo administrador');
+                await logAction('Backup manual criado pelo administrador');
+                alert('Versão de segurança criada com sucesso.');
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível criar o backup. Tente novamente.');
+            }
+        }
+
+        async function restoreBackup(backupId) {
+            if(!isAdmin) return;
+            const backup = backupVersions.find(item => item.id === backupId);
+            if(!backup?.snapshot) return alert('Versão de backup não encontrada.');
+            if(!confirm(`Restaurar a versão de ${backup.createdAtLabel || new Date(backup.createdAt).toLocaleString('pt-BR')}? Uma cópia do estado atual será criada antes.`)) return;
+            try {
+                await createBackupVersion('Backup automático antes da restauração', { restoredBackupId: backupId });
+                const snapshot = backup.snapshot;
+                await db.ref().update({
+                    accounts: snapshot.accounts || [],
+                    orderAccounts: snapshot.orderAccounts || [],
+                    orders: snapshot.orders || {},
+                    revenue: snapshot.revenue || {},
+                    goals: snapshot.goals || goals,
+                    monthConfig: snapshot.monthConfig || customMonths,
+                    history: snapshot.history || {},
+                    users: snapshot.users || {}
+                });
+                await logAction('Versão restaurada', { restoredBackupId: backupId, originalReason: backup.reason || '' });
+                closeBackupModal();
+                alert('Versão restaurada com sucesso.');
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível restaurar esta versão. Nenhuma alteração adicional foi aplicada.');
+            }
+        }
+
+        function downloadFile(filename, content, type = 'application/json;charset=utf-8') {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportFullBackup() {
+            if(!isAdmin) return;
+            try {
+                const snapshot = await captureFullSnapshot();
+                downloadFile(`valores-mkt-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), snapshot }, null, 2));
+                await logAction('Backup completo exportado para arquivo');
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível exportar o backup.');
+            }
         }
 
         function manageMonths() {
-            const action = prompt("ADD ou DEL?", "ADD");
-            if(action === 'ADD') {
-                const n = prompt("Formato AAAA-MM:", "2026-05");
-                if(n && !customMonths.includes(n)) { customMonths.push(n); customMonths.sort().reverse(); db.ref('monthConfig').set(customMonths); }
-            } else if (action === 'DEL') {
-                if(confirm("Zerar?")) { customMonths = customMonths.filter(m => m !== selectedMonthKey); db.ref('monthConfig').set(customMonths); }
-            }
+            if(!isAdmin) return;
+            openActionModal({
+                eyebrow: 'Configuração de meses', title: 'Gerenciar períodos', description: 'Adicionar ou remover um mês apenas altera a visualização; os dados armazenados não são apagados.', submitLabel: 'Aplicar alteração',
+                fields: [{ name: 'action', label: 'Ação', type: 'select', value: 'add', options: [{ value: 'add', label: 'ADICIONAR MÊS' }, { value: 'remove', label: 'REMOVER MÊS ATUAL' }] }, { name: 'month', label: 'Mês para adicionar', type: 'month', value: selectedMonthKey }],
+                onSubmit: async values => {
+                    if(values.action === 'add') {
+                        if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(values.month)) throw new Error('Informe um mês válido.');
+                        if(customMonths.includes(values.month)) throw new Error('Este mês já está disponível.');
+                        await saveWithBackup('monthConfig', [...customMonths, values.month].sort().reverse(), 'Mês adicionado à visualização', { month: values.month });
+                        showToast('Mês adicionado à visualização.', 'success');
+                    } else {
+                        const next = customMonths.filter(month => month !== selectedMonthKey);
+                        await saveWithBackup('monthConfig', next, 'Mês removido da visualização', { month: selectedMonthKey });
+                        showToast('Mês removido da lista de visualização.', 'success');
+                    }
+                }
+            });
         }
         function renderMonthSelector() {
             const select = document.getElementById('monthSelector'); select.innerHTML = '';
@@ -437,38 +1204,85 @@
         function changeViewMonth(key) { selectedMonthKey = key; startSync(); }
 
         function startSync() {
-            db.ref('goals').on('value', s => { 
+            // Remove escutas antigas antes de trocar de mês, evitando renderizações duplicadas.
+            ['goals', 'accounts', 'orderAccounts', 'orders', 'history', 'backups/versions', 'settings'].forEach(path => db.ref(path).off());
+            if(activeRevenuePath) db.ref(activeRevenuePath).off();
+            activeRevenuePath = `revenue/${selectedMonthKey}`;
+
+            db.ref('settings').on('value', snapshot => {
+                if(snapshot.val()) appSettings = { ...appSettings, ...snapshot.val(), rolePermissions: { ...appSettings.rolePermissions, ...(snapshot.val().rolePermissions || {}) } };
+                updateConnectionIndicator();
+                renderOrderOperationalPanels();
+            });
+
+            db.ref('goals').on('value', s => {
                 if(s.val()) {
-                    goals = s.val(); 
-                    // Se lvl4 não existir no Firebase, atualizar com os novos valores
+                    goals = { ...goals, ...s.val() };
                     if(!goals.lvl4) {
                         goals = { lvl1: 1500000, lvl2: 1650000, lvl3: 1800000, lvl4: 2000000 };
                         db.ref('goals').set(goals);
                     }
                 }
-                updateDash(); 
+                updateDash();
             });
-            db.ref(`revenue/${selectedMonthKey}`).on('value', s => {
+
+            db.ref(activeRevenuePath).on('value', s => {
                 const daily = s.val() || {}; revenueData.daily = daily;
-                let sum = 0; Object.values(daily).forEach(v => { let n = parseFloat(String(v).replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.')); if(!isNaN(n)) sum += n; });
-                revenueData.total = sum; updateDash(); renderHistTable();
+                let sum = 0;
+                Object.values(daily).forEach(v => {
+                    const number = parseMonetaryValue(v);
+                    if(!isNaN(number)) sum += number;
+                });
+                revenueData.total = sum;
+                updateDash();
+                renderHistTable();
             });
-            
-            db.ref(`orders`).on('value', s => {
+
+            db.ref('orders').on('value', s => {
                 const allOrders = s.val() || {};
                 const currentMonthOrders = allOrders[selectedMonthKey] || {};
                 orderData.daily = currentMonthOrders;
-                let sum = 0;
-                Object.values(currentMonthOrders).forEach(d => Object.values(d).forEach(v => sum += (parseInt(v) || 0)));
-                orderData.total = sum;
-                updateDash(); 
+                orderData.total = Object.values(currentMonthOrders)
+                    .reduce((total, day) => total + Object.values(day || {}).reduce((sum, value) => sum + (parseInt(value) || 0), 0), 0);
+                updateDash();
                 renderOrderTable();
                 renderMonthlyOrderHistory(allOrders);
+                renderStoreInsights();
             });
 
-            db.ref('accounts').on('value', s => { if(s.val()) { accounts = s.val(); render(); } });
-            db.ref('orderAccounts').on('value', s => { orderAccounts = s.val() || INITIAL_ORDER_STORES.map(n => ({n: n})); updateDash(); });
-            db.ref('history').limitToLast(30).on('value', snap => { if (snap.val()) { historyData = Object.values(snap.val()).reverse(); renderAuditHistory(); } });
+            db.ref('accounts').on('value', s => {
+                const rawAccounts = asArray(s.val());
+                accounts = rawAccounts.map(normalizeAccount);
+                const needsMigration = rawAccounts.length > 0 && rawAccounts.some((account, index) => !account?.id || !account?.marketplace || !account?.status || !Array.isArray(account?.aliases) || account?.id !== accounts[index].id);
+                if(needsMigration && !migrationSaving && isAdmin) {
+                    migrationSaving = true;
+                    db.ref('accounts').set(accounts).finally(() => { migrationSaving = false; });
+                }
+                render();
+                updateDash();
+                renderStoreInsights();
+            });
+
+            db.ref('orderAccounts').on('value', s => {
+                const rawOrderAccounts = asArray(s.val());
+                orderAccounts = (rawOrderAccounts.length ? rawOrderAccounts : INITIAL_ORDER_STORES.map(n => ({ n }))).map(normalizeOrderAccount);
+                const needsMigration = rawOrderAccounts.length > 0 && rawOrderAccounts.some((account, index) => !account?.id || !account?.storeId || !Array.isArray(account?.aliases) || account?.id !== orderAccounts[index].id);
+                if(needsMigration && !migrationSaving && isAdmin) {
+                    migrationSaving = true;
+                    db.ref('orderAccounts').set(orderAccounts).finally(() => { migrationSaving = false; });
+                }
+                updateDash();
+                renderStoreInsights();
+            });
+
+            db.ref('history').limitToLast(60).on('value', snap => {
+                historyData = snap.val() ? Object.values(snap.val()).reverse() : [];
+                renderAuditHistory();
+            });
+            db.ref('backups/versions').limitToLast(BACKUP_LIMIT).on('value', snap => {
+                backupVersions = snap.val() ? Object.values(snap.val()).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))) : [];
+                renderBackupList();
+            });
         }
 
         function renderMonthlyOrderHistory(allOrdersData) {
@@ -512,43 +1326,155 @@
             });
         }
 
-        function deleteDayFromKey(mKey, dayKey, path) { if(confirm("Deseja realmente excluir este registro?")) db.ref(`${path}/${mKey}/${dayKey}`).remove(); }
+        function deleteDayFromKey(monthKey, dayKey, path) {
+            if(!isAdmin || !confirm('Excluir este registro? Uma versão de segurança será criada antes.')) return;
+            removeWithBackup(`${path}/${monthKey}/${dayKey}`, 'Registro mensal excluído', { path, monthKey, dayKey })
+                .catch(error => { console.error(error); alert('Não foi possível excluir o registro.'); });
+        }
 
-        function addRow(type) {
+        function openStoreModal(index = null) {
             if(!isAdmin) return;
-            const name = prompt("Nome da Loja:"); if(!name) return;
-            if(type === 'main') {
-                const t = prompt("Tipo 1 ou 2:", "1");
-                accounts.unshift({n: name, t:parseInt(t), c:[60,60,60,60,80,80], p:[40,40,40,40,0,0], v:[0,0,0,0,0,0]});
-                db.ref('accounts').set(accounts);
+            const account = Number.isInteger(index) ? accounts[index] : null;
+            document.getElementById('storeEditIndex').value = account ? index : '';
+            document.getElementById('storeModalTitle').innerText = account ? 'Editar Loja' : 'Nova Loja';
+            document.getElementById('storeNameInput').value = account?.n || '';
+            document.getElementById('storeMarketplaceInput').value = account?.marketplace || 'Outros';
+            document.getElementById('storeTypeInput').value = String(account?.t || 1);
+            document.getElementById('storeStatusInput').value = account?.status || 'active';
+            document.getElementById('storeGoalInput').value = account?.orderGoal || '';
+            document.getElementById('storeNotesInput').value = account?.note || '';
+            document.getElementById('storeModal').classList.add('active');
+            setTimeout(() => document.getElementById('storeNameInput').focus(), 50);
+        }
+
+        function closeStoreModal() { document.getElementById('storeModal').classList.remove('active'); }
+
+        async function saveStoreFromModal() {
+            if(!isAdmin) return;
+            const indexValue = document.getElementById('storeEditIndex').value;
+            const editIndex = indexValue === '' ? null : Number(indexValue);
+            const name = document.getElementById('storeNameInput').value.trim().toUpperCase();
+            const marketplace = document.getElementById('storeMarketplaceInput').value;
+            const type = Number(document.getElementById('storeTypeInput').value);
+            const status = document.getElementById('storeStatusInput').value;
+            const goalRaw = document.getElementById('storeGoalInput').value;
+            const orderGoal = goalRaw === '' ? 0 : Number(goalRaw);
+            const note = document.getElementById('storeNotesInput').value.trim();
+
+            if(name.length < 3) return alert('Informe um nome de loja com pelo menos 3 caracteres.');
+            if(!Number.isInteger(orderGoal) || orderGoal < 0) return alert('A meta mensal de pedidos deve ser um número inteiro igual ou maior que zero.');
+            if(accounts.some((account, index) => index !== editIndex && account.n === name)) return alert('Já existe uma loja com este nome.');
+
+            const previous = editIndex === null ? null : accounts[editIndex];
+            const account = normalizeAccount({
+                ...(previous || {}),
+                id: previous?.id || makeStableId('store'),
+                n: name,
+                t: type,
+                marketplace,
+                status,
+                orderGoal,
+                note,
+                aliases: previous ? [...new Set([...(previous.aliases || []), ...(previous.n !== name ? [previous.n] : [])])] : []
+            });
+            const nextAccounts = accounts.slice();
+            if(editIndex === null) nextAccounts.unshift(account);
+            else nextAccounts[editIndex] = account;
+
+            let nextOrderAccounts = orderAccounts.slice();
+            const matchingIndexes = nextOrderAccounts
+                .map((item, index) => item.storeId === account.id || item.n === previous?.n ? index : -1)
+                .filter(index => index >= 0);
+            if(matchingIndexes.length) {
+                matchingIndexes.forEach(orderIndex => {
+                    const oldOrder = nextOrderAccounts[orderIndex];
+                    nextOrderAccounts[orderIndex] = normalizeOrderAccount({
+                        ...oldOrder,
+                        id: oldOrder.id || account.id,
+                        storeId: account.id,
+                        n: account.n,
+                        status: account.status,
+                        aliases: [...new Set([...(oldOrder.aliases || []), ...(oldOrder.n !== account.n ? [oldOrder.n] : [])])]
+                    });
+                });
             } else {
-                if(!Array.isArray(orderAccounts)) orderAccounts = [];
-                orderAccounts.push({n: name});
-                db.ref('orderAccounts').set(orderAccounts);
+                nextOrderAccounts.push(normalizeOrderAccount({ id: account.id, storeId: account.id, n: account.n, status: account.status }));
+            }
+
+            try {
+                await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, previous ? 'Cadastro de loja atualizado' : 'Nova loja cadastrada', { storeId: account.id, name: account.n, status: account.status });
+                closeStoreModal();
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível salvar a loja. Tente novamente.');
             }
         }
 
-        function removeOrderStore(i) { if(isAdmin && confirm("Excluir conta de pedidos?")) { orderAccounts.splice(i, 1); db.ref('orderAccounts').set(orderAccounts); } }
+        function addRow(type) {
+            if(!isAdmin) return;
+            if(type === 'main') return openStoreModal();
+            const name = prompt('Nome da Loja para Pedidos:');
+            if(!name) return;
+            const normalizedName = name.trim().toUpperCase();
+            if(orderAccounts.some(account => account.n === normalizedName)) return alert('Esta conta já está disponível em pedidos.');
+            const mainAccount = accounts.find(account => account.n === normalizedName);
+            const orderAccount = normalizeOrderAccount({ id: mainAccount?.id || makeStableId('order'), storeId: mainAccount?.id || null, n: normalizedName, status: mainAccount?.status || 'active' });
+            saveWithBackup('orderAccounts', [...orderAccounts, orderAccount], 'Conta de pedidos criada', { storeId: orderAccount.storeId, name: orderAccount.n })
+                .catch(error => { console.error(error); alert('Não foi possível adicionar a conta de pedidos.'); });
+        }
 
-        function submitAllOrders() {
-            const dVal = document.getElementById('orderLaunchDate').value;
-            if(!dVal) return alert("Selecione data!");
-            const inputs = document.querySelectorAll('.order-card-field');
-            const p = dVal.split('-'); const mKey = `${p[0]}-${p[1]}`;
+        function removeOrderStore(i) {
+            if(!isAdmin || !orderAccounts[i]) return;
+            if(!confirm('Desativar esta conta de pedidos? O histórico será preservado.')) return;
+            const next = orderAccounts.slice();
+            next[i] = { ...next[i], status: 'inactive' };
+            saveWithBackup('orderAccounts', next, 'Conta de pedidos desativada', { storeId: next[i].storeId, name: next[i].n })
+                .catch(error => { console.error(error); alert('Não foi possível desativar a conta.'); });
+        }
+
+        async function submitAllOrders(fromReview = false, reviewNotes = '') {
+            if(!isAdmin || !can('orders')) return showToast('Seu perfil não possui permissão para lançar pedidos.', 'error');
+            const dateKey = getOrderDateKey();
+            if(!dateKey) return showToast('Selecione uma data para os pedidos.', 'warning');
+            if(appSettings.requireOrderReview && !fromReview) return reviewPendingOrders();
+            const inputs = [...document.querySelectorAll('.order-card-field')];
+            const invalidInput = inputs.find(input => input.value !== '' && (!Number.isInteger(Number(input.value)) || Number(input.value) < 0));
+            if(invalidInput) return showToast('Cada pedido deve ser um número inteiro igual ou maior que zero.', 'error');
+
+            const monthKey = dateKey.slice(0, 7);
+            const nextDay = { ...(orderData.daily[dateKey] || {}) };
             inputs.forEach(input => {
-                const name = input.dataset.name; const val = input.value;
-                if(val !== "") db.ref(`orders/${mKey}/${dVal}/${name}`).set(parseInt(val));
-                else db.ref(`orders/${mKey}/${dVal}/${name}`).remove();
+                const name = input.dataset.name;
+                if(input.value === '') delete nextDay[name];
+                else nextDay[name] = Number(input.value);
             });
-            alert("Pedidos salvos com sucesso!");
+
+            try {
+                const result = await saveWithBackup(`orders/${monthKey}/${dateKey}`, nextDay, 'Pedidos diários salvos', { date: dateKey, stores: inputs.length, total: Object.values(nextDay).reduce((sum, value) => sum + (Number(value) || 0), 0), reviewNotes });
+                pendingOrderChanges.clear();
+                renderOrderOperationalPanels();
+                showToast(result?.queued ? 'Pedidos guardados para sincronização.' : 'Pedidos salvos e registrados com sucesso.', 'success');
+            } catch(error) {
+                console.error(error);
+                showToast('Não foi possível salvar os pedidos.', 'error');
+            }
         }
 
         function renderHistTable() {
-            const hTable = document.getElementById('histTable'); if(!hTable) return; hTable.innerHTML = '';
-            Object.keys(revenueData.daily).sort().reverse().forEach(k => {
-                let v = parseFloat(String(revenueData.daily[k]).replace(/[^\d,.]/g, '').replace(',', '.'));
-                hTable.innerHTML += `<tr><td class="px-6 py-4 font-bold opacity-50">${k.split('-').reverse().join('/')}</td><td class="px-6 py-4 font-black text-brand-orange text-lg">R$ ${v.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td><td class="px-6 py-4 text-right">${isAdmin ? `<button onclick="deleteDay('${k}', 'revenue')" class="text-rose-500 hover:scale-125">×</button>` : ''}</td></tr>`;
-            });
+            const container = document.getElementById('histTable');
+            const summary = document.getElementById('revenueDailySummary');
+            if(!container || !summary) return;
+            const entries = Object.entries(revenueData.daily).map(([date, rawValue]) => ({ date, value: parseMonetaryValue(rawValue) })).filter(item => Number.isFinite(item.value)).sort((a, b) => a.date.localeCompare(b.date));
+            const total = entries.reduce((sum, item) => sum + item.value, 0);
+            const average = entries.length ? total / entries.length : 0;
+            const latest = entries[entries.length - 1];
+            summary.innerHTML = [
+                ['Dias lançados', String(entries.length), 'text-blue-500', 'fa-calendar-check'],
+                ['Total do período', formatCurrency(total), 'text-brand-orange', 'fa-wallet'],
+                ['Média diária', formatCurrency(average), 'text-violet-500', 'fa-calculator'],
+                ['Último lançamento', latest ? formatCurrency(latest.value) : 'Sem lançamentos', 'text-emerald-500', 'fa-chart-line']
+            ].map(([label, value, color, icon]) => `<article class="p-4 rounded-2xl bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5"><div class="flex items-start justify-between gap-3"><div><p class="text-[8px] font-black uppercase tracking-widest opacity-55">${label}</p><p class="text-lg font-black ${color} mt-2">${value}</p></div><span class="w-9 h-9 rounded-xl bg-gray-100 dark:bg-brand-card flex items-center justify-center ${color}"><i class="fas ${icon}"></i></span></div></article>`).join('');
+            container.innerHTML = entries.map(({ date, value }, index) => { const [year, month, day] = date.split('-'); const isLatest = index === entries.length - 1; return `<article class="relative flex flex-col sm:flex-row sm:items-center gap-4 p-4 md:p-5 rounded-2xl border ${isLatest ? 'border-brand-orange/35 bg-brand-orange/5' : 'border-gray-200 dark:border-white/5 bg-white dark:bg-black/20'} transition-transform hover:-translate-y-0.5"><div class="w-full sm:w-40"><p class="text-[8px] font-black uppercase tracking-widest ${isLatest ? 'text-brand-orange' : 'text-gray-400'}">${isLatest ? 'Lançamento mais recente' : 'Lançamento diário'}</p><p class="text-sm font-black mt-2">${day}/${month}/${year}</p></div><div class="flex-1 sm:border-l sm:pl-5 border-gray-200 dark:border-white/5"><p class="text-[8px] uppercase font-black opacity-55">Faturamento do dia</p><p class="text-xl md:text-2xl font-black text-brand-orange mt-1">${formatCurrency(value)}</p></div>${isAdmin ? `<button type="button" onclick="deleteDay('${date}', 'revenue')" aria-label="Excluir faturamento de ${day}/${month}/${year}" class="w-10 h-10 shrink-0 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</article>`; }).join('') || '<div class="p-8 text-center rounded-2xl border border-dashed border-gray-300 dark:border-white/10 text-[10px] font-black uppercase opacity-55">Ainda não há faturamento lançado neste mês.</div>';
         }
 
         function renderOrderTable() {
@@ -560,19 +1486,33 @@
             });
         }
 
-        function deleteDay(k, path) { if(confirm("Excluir?")) db.ref(`${path}/${selectedMonthKey}/${k}`).remove(); }
-        function clearOrders() { if(isAdmin && confirm("Zerar mês?")) db.ref(`orders/${selectedMonthKey}`).remove(); }
-        function clearAllRevenue() { if(isAdmin && confirm("Zerar mês?")) db.ref(`revenue/${selectedMonthKey}`).remove(); }
+        function deleteDay(dayKey, path) {
+            if(!isAdmin || !confirm('Excluir este registro? Uma versão de segurança será criada antes.')) return;
+            removeWithBackup(`${path}/${selectedMonthKey}/${dayKey}`, 'Registro diário excluído', { path, month: selectedMonthKey, dayKey })
+                .catch(error => { console.error(error); alert('Não foi possível excluir o registro.'); });
+        }
+        function clearOrders() {
+            if(!isAdmin || !confirm('Zerar os pedidos deste mês? Uma versão de segurança será criada antes.')) return;
+            removeWithBackup(`orders/${selectedMonthKey}`, 'Pedidos mensais zerados', { month: selectedMonthKey })
+                .catch(error => { console.error(error); alert('Não foi possível zerar os pedidos.'); });
+        }
+        function clearAllRevenue() {
+            if(!isAdmin || !confirm('Zerar o faturamento deste mês? Uma versão de segurança será criada antes.')) return;
+            removeWithBackup(`revenue/${selectedMonthKey}`, 'Faturamento mensal zerado', { month: selectedMonthKey })
+                .catch(error => { console.error(error); alert('Não foi possível zerar o faturamento.'); });
+        }
 
         // ==========================================
         // FUNÇÃO DE ANÁLISE DE TENDÊNCIA (NOVO)
         // ==========================================
-        function analyzeStoreTrend(storeName) {
+        function analyzeStoreTrend(store) {
+            const names = new Set(typeof store === 'string' ? [store] : getOrderNames(store));
             const keys = Object.keys(orderData.daily).sort();
             const values = [];
             keys.forEach(k => {
-                if(orderData.daily[k][storeName] !== undefined) {
-                    values.push({ date: k, val: orderData.daily[k][storeName] });
+                const value = Object.entries(orderData.daily[k] || {}).reduce((total, [name, quantity]) => total + (names.has(name) ? (Number(quantity) || 0) : 0), 0);
+                if(value > 0 || Object.keys(orderData.daily[k] || {}).some(name => names.has(name))) {
+                    values.push({ date: k, val: value });
                 }
             });
             
@@ -597,7 +1537,7 @@
             // Detectar queda significativa (mais de 30% abaixo da média)
             const lastVal = allVals[allVals.length - 1];
             const dropPercent = avg > 0 ? ((avg - lastVal) / avg) * 100 : 0;
-            const isDrop = dropPercent > 30 && allVals.length > 3;
+            const isDrop = dropPercent > (Number(appSettings.alertDropPercent) || 30) && allVals.length > 3;
             
             // Tendência baseada nos últimos dias vs período anterior
             let trend = 'neutral';
@@ -644,12 +1584,272 @@
             return { icon: 'fa-equals', text: 'Estável', class: 'text-blue-400' };
         }
 
+        function getOrderNames(account) {
+            const linkedStore = accounts.find(item => item.id === account.storeId || item.id === account.id || item.n === account.n);
+            return [...new Set([account.n, ...(account.aliases || []), ...(linkedStore?.aliases || []), linkedStore?.n].filter(Boolean))];
+        }
+
+        function getOrderSeries(account) {
+            const names = new Set(getOrderNames(account));
+            return Object.keys(orderData.daily).sort().map(date => ({
+                date,
+                value: Object.entries(orderData.daily[date] || {}).reduce((total, [name, value]) => total + (names.has(name) ? (Number(value) || 0) : 0), 0)
+            })).filter(item => item.value !== 0 || Object.keys(orderData.daily).length > 0);
+        }
+
+        function calculateStoreMetric(account) {
+            const series = getOrderSeries(account);
+            const total = series.reduce((sum, item) => sum + item.value, 0);
+            const values = series.map(item => item.value).filter(value => value >= 0);
+            const average = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+            const recent = values.slice(-3);
+            const recentAverage = recent.length ? recent.reduce((sum, value) => sum + value, 0) / recent.length : 0;
+            const previous = values.slice(-6, -3);
+            const previousAverage = previous.length ? previous.reduce((sum, value) => sum + value, 0) / previous.length : average;
+            const lastValue = values.length ? values[values.length - 1] : 0;
+            const dropPercent = average > 0 ? ((average - lastValue) / average) * 100 : 0;
+            const trendPercent = previousAverage > 0 ? ((recentAverage - previousAverage) / previousAverage) * 100 : 0;
+            const mainAccount = accounts.find(item => item.id === account.storeId || item.id === account.id || item.n === account.n);
+            const goal = Number(mainAccount?.orderGoal) || 0;
+            const today = new Date();
+            const [year, month] = selectedMonthKey.split('-').map(Number);
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() + 1 === month;
+            const referenceDays = Math.max(1, isCurrentMonth ? today.getDate() : new Date(year, month, 0).getDate());
+            const expectedGoal = goal ? goal * (referenceDays / new Date(year, month, 0).getDate()) : 0;
+            const hasPrices = mainAccount ? mainAccount.v.some(value => Number(value) > 0) : true;
+            const alerts = [];
+            if(mainAccount && !hasPrices) alerts.push({ level: 'warning', text: 'Sem preço definido' });
+            if(Object.keys(orderData.daily).length >= 3 && total === 0) alerts.push({ level: 'critical', text: 'Sem pedidos no mês' });
+            if(values.length >= 4 && dropPercent >= (Number(appSettings.alertDropPercent) || 30)) alerts.push({ level: 'critical', text: `Queda de ${dropPercent.toFixed(0)}% no último registro` });
+            if(goal > 0 && referenceDays >= 3 && total < expectedGoal * 0.7) alerts.push({ level: 'warning', text: `Abaixo do ritmo da meta (${total}/${goal})` });
+            return { total, average, lastValue, trendPercent, dropPercent, goal, alerts, mainAccount, active: account.status !== 'inactive' && (mainAccount?.status || 'active') !== 'inactive' };
+        }
+
+        function renderStoreInsights() {
+            const grid = document.getElementById('storeIndicatorsGrid');
+            const alertList = document.getElementById('autoAlertsList');
+            const badge = document.getElementById('alertCountBadge');
+            if(!grid || !alertList || !badge) return;
+            const filter = document.getElementById('storeMetricFilter')?.value || 'all';
+            const metrics = orderAccounts.map((account, index) => ({ account, index, metric: calculateStoreMetric(account) }));
+            const alerts = metrics.flatMap(({ account, index, metric }) => metric.alerts.map(alert => ({ ...alert, account, index })));
+            const visible = metrics.filter(({ metric }) => filter === 'all' || (filter === 'active' && metric.active) || (filter === 'attention' && metric.alerts.length));
+
+            grid.innerHTML = visible.length ? visible.map(({ account, metric }) => {
+                const mainIndex = accounts.findIndex(item => item.id === account.storeId || item.id === account.id || item.n === account.n);
+                const trendClass = metric.trendPercent > 10 ? 'text-emerald-500' : metric.trendPercent < -10 ? 'text-rose-500' : 'text-gray-400';
+                const trendIcon = metric.trendPercent > 10 ? 'fa-arrow-up' : metric.trendPercent < -10 ? 'fa-arrow-down' : 'fa-minus';
+                const goalLabel = metric.goal ? `${metric.total}/${metric.goal} pedidos` : 'Meta não definida';
+                return `<article class="metric-card ${metric.active ? '' : 'store-inactive'} bg-white dark:bg-black/20 p-4 rounded-3xl border border-gray-200 dark:border-white/5">
+                    <div class="flex justify-between gap-3"><div class="min-w-0"><p class="metric-store-name truncate text-[10px] font-black uppercase">${escapeHtml(account.n)}</p><p class="text-[8px] uppercase opacity-50 mt-1">${escapeHtml(metric.mainAccount?.marketplace || detectMarketplace(account.n))}</p></div>${metric.active ? '<span class="text-[8px] font-black text-emerald-500">ATIVA</span>' : '<span class="text-[8px] font-black text-gray-400">INATIVA</span>'}</div>
+                    <div class="grid grid-cols-2 gap-3 mt-4"><div><p class="text-[8px] uppercase opacity-50">Pedidos</p><p class="text-xl font-black text-emerald-500">${metric.total}</p></div><div><p class="text-[8px] uppercase opacity-50">Média</p><p class="text-xl font-black">${metric.average.toFixed(1)}</p></div></div>
+                    <div class="flex items-center justify-between gap-2 mt-3 pt-3 border-t dark:border-white/5"><span class="text-[8px] font-bold opacity-60 truncate">${goalLabel}</span><span class="text-[9px] font-black ${trendClass}"><i class="fas ${trendIcon}"></i> ${Math.abs(metric.trendPercent).toFixed(0)}%</span></div>
+                    ${isAdmin && mainIndex >= 0 ? `<button onclick="openStoreModal(${mainIndex})" class="mt-3 w-full py-2 rounded-xl bg-gray-100 dark:bg-brand-card text-[8px] font-black uppercase">Gerenciar</button>` : ''}
+                </article>`;
+            }).join('') : '<div class="col-span-full p-5 rounded-2xl bg-white/50 dark:bg-black/20 text-center text-[10px] opacity-60">Nenhuma loja encontrada para este filtro.</div>';
+
+            badge.innerText = alerts.length;
+            badge.className = `min-w-8 h-8 px-2 rounded-full flex items-center justify-center text-[10px] font-black ${alerts.length ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500'}`;
+            alertList.innerHTML = alerts.length ? alerts.slice(0, 8).map(alert => `<article class="alert-item is-${alert.level} p-3 rounded-r-2xl bg-white dark:bg-black/20"><p class="text-[9px] font-black uppercase truncate">${escapeHtml(alert.account.n)}</p><p class="text-[9px] opacity-65 mt-1">${escapeHtml(alert.text)}</p></article>`).join('') : '<div class="alert-item is-good p-4 rounded-r-2xl bg-emerald-500/5"><p class="text-[10px] font-black text-emerald-500">Nenhum alerta crítico</p><p class="text-[9px] opacity-60 mt-1">As lojas ativas estão dentro dos critérios configurados.</p></div>';
+        }
+
+        function getOrderDateKey() { return document.getElementById('orderLaunchDate')?.value || new Date().toISOString().slice(0, 10); }
+
+        function getOrderField(index) { return document.querySelector(`.order-card-field[data-index="${index}"]`); }
+
+        function registerOrderChange(index) {
+            const input = getOrderField(index);
+            if(!input) return;
+            const value = input.value === '' ? '' : Math.max(0, Math.floor(Number(input.value) || 0));
+            input.value = value;
+            pendingOrderChanges.set(input.dataset.name, value);
+            renderOrderOperationalPanels();
+        }
+
+        function adjustOrderField(index, delta) {
+            const input = getOrderField(index);
+            if(!input || input.disabled) return;
+            input.value = Math.max(0, (Number(input.value) || 0) + delta);
+            registerOrderChange(index);
+            input.focus();
+        }
+
+        function getOrderValueForDate(account, dateKey) {
+            const names = new Set(getOrderNames(account));
+            return Object.entries(orderData.daily[dateKey] || {}).reduce((sum, [name, value]) => sum + (names.has(name) ? (Number(value) || 0) : 0), 0);
+        }
+
+        function renderOrderOperationalPanels() {
+            const dateKey = getOrderDateKey();
+            const summary = document.getElementById('orderDailySummary');
+            const status = document.getElementById('orderPendingStatus');
+            if(!summary || !status) return;
+            const values = orderAccounts.map((account, index) => {
+                const field = getOrderField(index);
+                return field ? (Number(field.value) || 0) : getOrderValueForDate(account, dateKey);
+            });
+            const total = values.reduce((sum, value) => sum + value, 0);
+            const filled = values.filter(value => value > 0).length;
+            const active = orderAccounts.filter(account => account.status !== 'inactive').length;
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const previousDate = new Date(year, month - 1, day - 1).toISOString().slice(0, 10);
+            const previousTotal = orderAccounts.reduce((sum, account) => sum + getOrderValueForDate(account, previousDate), 0);
+            const variation = previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : 0;
+            const totalGoal = orderAccounts.reduce((sum, account) => sum + (accounts.find(item => item.id === account.storeId || item.id === account.id)?.orderGoal || 0), 0);
+            const monthDays = new Date(year, month, 0).getDate();
+            const dailyGoal = totalGoal ? totalGoal / monthDays : appSettings.dailyOrderTarget;
+            const pending = pendingOrderChanges.size;
+            const cards = [
+                ['Total do dia', total, 'text-emerald-500'],
+                ['Contas preenchidas', `${filled}/${active}`, 'text-brand-orange'],
+                ['Vs. dia anterior', previousTotal ? `${variation >= 0 ? '+' : ''}${variation.toFixed(0)}%` : 'Sem base', variation < -10 ? 'text-rose-500' : 'text-blue-400'],
+                ['Meta diária', dailyGoal ? `${total}/${Math.ceil(dailyGoal)}` : 'Não definida', totalGoal && total < dailyGoal ? 'text-amber-500' : 'text-emerald-500']
+            ];
+            summary.innerHTML = cards.map(([label, value, color]) => `<article class="bg-white dark:bg-brand-card rounded-2xl p-4 border border-gray-200 dark:border-white/5"><p class="text-[8px] uppercase font-black opacity-55">${label}</p><p class="text-lg font-black mt-1 ${color}">${value}</p></article>`).join('');
+            status.innerHTML = pending ? `<span class="pending-dot mr-2"></span>${pending} alteração(ões) pendente(s) de conferência` : '<span class="text-emerald-500"><i class="fas fa-check-circle mr-1"></i>Sem alterações pendentes</span>';
+            renderOrderCalendar();
+            renderDailyMarketplaceComparison();
+        }
+
+        function renderOrderCalendar() {
+            const grid = document.getElementById('orderCalendarGrid');
+            const title = document.getElementById('calendarTitle');
+            if(!grid || !title) return;
+            const [year, month] = orderCalendarMonth.split('-').map(Number);
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const days = new Date(year, month, 0).getDate();
+            const selected = getOrderDateKey();
+            const todayKey = new Date().toISOString().slice(0, 10);
+            title.innerText = new Date(year, month - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
+            grid.innerHTML = Array.from({ length: firstDay }, () => '<div></div>').join('') + Array.from({ length: days }, (_, index) => {
+                const day = index + 1;
+                const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const total = Object.values(orderData.daily[dateKey] || {}).reduce((sum, value) => sum + (Number(value) || 0), 0);
+                const classes = `calendar-day ${total > 0 ? 'has-orders' : ''} ${selected === dateKey ? 'selected' : ''} ${todayKey === dateKey ? 'is-today' : ''}`;
+                return `<button class="${classes}" onclick="selectOrderCalendarDate('${dateKey}')"><span class="block text-[10px] font-black opacity-60">${day}</span><span class="calendar-total block text-[11px] font-black mt-1">${total || '—'}</span></button>`;
+            }).join('');
+        }
+
+        function moveOrderCalendar(delta) {
+            const [year, month] = orderCalendarMonth.split('-').map(Number);
+            const date = new Date(year, month - 1 + delta, 1);
+            orderCalendarMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            renderOrderCalendar();
+        }
+
+        function selectOrderCalendarDate(dateKey) {
+            const input = document.getElementById('orderLaunchDate');
+            input.value = dateKey;
+            orderCalendarMonth = dateKey.slice(0, 7);
+            pendingOrderChanges.clear();
+            if(selectedMonthKey !== orderCalendarMonth) {
+                selectedMonthKey = orderCalendarMonth;
+                const selector = document.getElementById('monthSelector');
+                if([...selector.options].some(option => option.value === selectedMonthKey)) selector.value = selectedMonthKey;
+                startSync();
+            } else updateDash();
+        }
+
+        function copyPreviousDayOrders() {
+            if(!isAdmin) return;
+            const dateKey = getOrderDateKey();
+            const date = new Date(`${dateKey}T12:00:00`);
+            date.setDate(date.getDate() - 1);
+            const previousKey = date.toISOString().slice(0, 10);
+            orderAccounts.forEach((account, index) => {
+                const field = getOrderField(index);
+                if(field) { field.value = getOrderValueForDate(account, previousKey); registerOrderChange(index); }
+            });
+            showToast('Pedidos do dia anterior foram copiados para conferência.', 'info');
+        }
+
+        function reviewPendingOrders() {
+            if(!isAdmin) return;
+            const changes = [...document.querySelectorAll('.order-card-field')].map(input => ({ name: input.dataset.name, value: input.value === '' ? 0 : Number(input.value) || 0 }));
+            const total = changes.reduce((sum, item) => sum + item.value, 0);
+            openActionModal({
+                eyebrow: 'Conferência de pedidos', title: 'Revisar lançamento diário', description: `${changes.length} contas · ${total} pedidos no total para ${getOrderDateKey()}.`, submitLabel: 'Salvar lançamentos', tone: 'success',
+                fields: [{ name: 'notes', label: 'Observação opcional da revisão', type: 'textarea', placeholder: 'Ex.: conferido com a equipe operacional.' }],
+                onSubmit: async values => { await submitAllOrders(true, values.notes); showToast('Pedidos salvos com segurança.', 'success'); }
+            });
+        }
+
+        function renderDailyMarketplaceComparison() {
+            const container = document.getElementById('dailyMarketplaceComparison');
+            if(!container) return;
+            const totals = {};
+            orderAccounts.forEach((account, index) => {
+                const market = accounts.find(item => item.id === account.storeId || item.id === account.id)?.marketplace || detectMarketplace(account.n);
+                const field = getOrderField(index);
+                const value = field ? (Number(field.value) || 0) : getOrderValueForDate(account, getOrderDateKey());
+                totals[market] = (totals[market] || 0) + value;
+            });
+            const max = Math.max(...Object.values(totals), 1);
+            container.innerHTML = Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([market, value]) => `<div><div class="flex justify-between gap-3 text-[10px] font-black mb-1"><span>${escapeHtml(market)}</span><span class="text-emerald-500">${value}</span></div><div class="h-2 rounded-full bg-white dark:bg-black/30 overflow-hidden"><div class="comparison-bar" style="width:${(value / max) * 100}%"></div></div></div>`).join('') || '<p class="text-[10px] opacity-60">Nenhum pedido lançado para a data selecionada.</p>';
+        }
+
+        function renderFinancialPanel() {
+            const metricsGrid = document.getElementById('financialMetricsGrid');
+            const marketplaceContainer = document.getElementById('financialMarketplaceBreakdown');
+            const storeContainer = document.getElementById('storeComparisonList');
+            const projectionPanel = document.getElementById('goalProjectionPanel');
+            if(!metricsGrid || !marketplaceContainer || !storeContainer || !projectionPanel) return;
+            const totalRevenue = Number(revenueData.total) || 0;
+            const revenueDays = Object.keys(revenueData.daily).length;
+            const [year, month] = selectedMonthKey.split('-').map(Number);
+            const monthDays = new Date(year, month, 0).getDate();
+            const today = new Date();
+            const elapsedDays = Math.max(1, today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : monthDays);
+            const dailyRevenue = revenueDays ? totalRevenue / revenueDays : 0;
+            const projectedRevenue = dailyRevenue * monthDays;
+            const activeStores = accounts.filter(account => account.status !== 'inactive');
+            const storesWithPrices = activeStores.filter(account => account.v.some(value => Number(value) > 0));
+            const averagePrice = storesWithPrices.length ? storesWithPrices.reduce((sum, account) => sum + (account.v.reduce((total, value) => total + (Number(value) || 0), 0) / Math.max(1, account.v.filter(value => Number(value) > 0).length)), 0) / storesWithPrices.length : 0;
+            const financialCards = [
+                ['Faturamento', formatCurrency(totalRevenue), 'text-brand-orange'],
+                ['Média de vendas/dia', formatCurrency(dailyRevenue), 'text-blue-500'],
+                ['Projeção mensal', formatCurrency(projectedRevenue), 'text-emerald-500'],
+                ['Preço médio ativo', formatCurrency(averagePrice), 'text-brand-orange']
+            ];
+            metricsGrid.innerHTML = financialCards.map(([label, value, color]) => `<article class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-gray-200 dark:border-white/5"><p class="text-[8px] font-black uppercase opacity-55">${label}</p><p class="text-sm md:text-base font-black mt-1 ${color}">${value}</p></article>`).join('');
+
+            const byMarketplace = {};
+            activeStores.forEach(account => {
+                const market = account.marketplace || detectMarketplace(account.n);
+                const storePrices = account.v.filter(value => Number(value) > 0).map(Number);
+                if(storePrices.length) {
+                    if(!byMarketplace[market]) byMarketplace[market] = { total: 0, count: 0 };
+                    byMarketplace[market].total += storePrices.reduce((sum, value) => sum + value, 0);
+                    byMarketplace[market].count += storePrices.length;
+                }
+            });
+            const marketplaceAverage = Object.entries(byMarketplace).map(([market, data]) => [market, data.total / data.count]).sort((a, b) => b[1] - a[1]);
+            const maxMarket = Math.max(...marketplaceAverage.map(([, value]) => value), 1);
+            marketplaceContainer.innerHTML = marketplaceAverage.map(([market, average]) => `<div><div class="flex justify-between text-[10px] font-black mb-1"><span>${escapeHtml(market)}</span><span>${formatCurrency(average)}</span></div><div class="h-2 rounded-full bg-gray-200 dark:bg-black/40 overflow-hidden"><div class="comparison-bar" style="width:${(average / maxMarket) * 100}%"></div></div></div>`).join('') || '<p class="text-[10px] opacity-60">Nenhum preço ativo para comparar.</p>';
+
+            const topStores = activeStores.map(account => {
+                const values = account.v.filter(value => Number(value) > 0).map(Number);
+                return { account, average: values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0 };
+            }).filter(item => item.average > 0).sort((a, b) => b.average - a.average).slice(0, 5);
+            const maxStore = Math.max(...topStores.map(item => item.average), 1);
+            storeContainer.innerHTML = topStores.map(({ account, average }, index) => `<div class="flex items-center gap-3"><span class="w-5 text-[10px] font-black text-brand-orange">${index + 1}</span><div class="flex-1 min-w-0"><div class="flex justify-between text-[9px] font-black gap-2"><span class="truncate">${escapeHtml(account.n)}</span><span>${formatCurrency(average)}</span></div><div class="h-1.5 rounded-full bg-gray-200 dark:bg-black/40 overflow-hidden mt-1"><div class="comparison-bar" style="width:${(average / maxStore) * 100}%"></div></div></div></div>`).join('') || '<p class="text-[10px] opacity-60">Nenhuma loja com preço ativo.</p>';
+
+            const targets = Object.entries(goals).map(([key, value]) => ({ key, value: Number(value) || 0 })).sort((a, b) => a.value - b.value);
+            const nextTarget = targets.find(target => totalRevenue < target.value) || targets[targets.length - 1];
+            const remainingValue = Math.max(0, (nextTarget?.value || 0) - totalRevenue);
+            const remainingDays = Math.max(1, monthDays - elapsedDays);
+            const neededDaily = remainingValue / remainingDays;
+            const projectionStatus = projectedRevenue >= (nextTarget?.value || 0) ? 'Ritmo suficiente para atingir a meta' : 'Ritmo abaixo da próxima meta';
+            projectionPanel.innerHTML = `<div class="p-4 rounded-2xl bg-brand-orange/5 border border-brand-orange/15"><p class="text-[8px] uppercase font-black opacity-55">Próxima meta</p><p class="text-lg font-black text-brand-orange mt-1">${formatCurrency(nextTarget?.value || 0)}</p><p class="text-[10px] mt-2 opacity-70">Faltam ${formatCurrency(remainingValue)}</p></div><div class="grid grid-cols-2 gap-3"><div class="p-3 rounded-2xl bg-white dark:bg-black/20"><p class="text-[8px] uppercase opacity-55">Necessário/dia</p><p class="text-sm font-black">${formatCurrency(neededDaily)}</p></div><div class="p-3 rounded-2xl bg-white dark:bg-black/20"><p class="text-[8px] uppercase opacity-55">Status</p><p class="text-[10px] font-black ${projectedRevenue >= (nextTarget?.value || 0) ? 'text-emerald-500' : 'text-amber-500'}">${projectionStatus}</p></div></div>`;
+        }
+
         function updateDash() {
             const total = revenueData.total || 0; const count = Object.keys(revenueData.daily).length; const avg = count > 0 ? total / count : 0;
             const [y, m] = selectedMonthKey.split('-'); const daysInMonth = new Date(y, m, 0).getDate();
-            document.getElementById('revTotal').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('revAvg').innerText = `R$ ${avg.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
-            document.getElementById('revProj').innerText = `R$ ${(avg * daysInMonth).toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('revTotal').innerText = formatCurrency(total);
+            document.getElementById('revAvg').innerText = formatCurrency(avg);
+            document.getElementById('revProj').innerText = formatCurrency(avg * daysInMonth);
+            renderFinancialPanel();
             
             const oTotal = orderData.total || 0; const oCount = Object.keys(orderData.daily).length; const oAvg = oCount > 0 ? oTotal / oCount : 0;
             document.getElementById('ordersTotal').innerText = oTotal;
@@ -668,10 +1868,12 @@
                 let dropInsights = [];
 
                 orderAccounts.forEach((acc, i) => {
-                    const analysis = analyzeStoreTrend(acc.n);
-                    let dateVal = "";
-                    const keys = Object.keys(orderData.daily).sort();
-                    keys.forEach(k => { if(orderData.daily[k][acc.n] !== undefined && k === dateKey) dateVal = orderData.daily[k][acc.n]; });
+                    const analysis = analyzeStoreTrend(acc);
+                    let dateVal = '';
+                    const matchingNames = new Set(getOrderNames(acc));
+                    const currentDay = orderData.daily[dateKey] || {};
+                    const matchingEntries = Object.entries(currentDay).filter(([name]) => matchingNames.has(name));
+                    if(matchingEntries.length) dateVal = matchingEntries.reduce((sum, [, quantity]) => sum + (Number(quantity) || 0), 0);
                     
                     const valToShow = (dateVal !== "") ? dateVal : 0;
                     const isDrop = analysis.drop;
@@ -699,7 +1901,7 @@
                         ${isAdmin ? `<button onclick="removeOrderStore(${i})" class="absolute top-4 right-4 text-rose-500 opacity-30 hover:opacity-100 transition-all"><i class="fas fa-times"></i></button>` : ''}
                         <div class="flex justify-center mb-2">${getIcon(acc.n)}</div>
                         <p class="text-[9px] font-black uppercase text-gray-400 mb-1" ${isAdmin?'contenteditable="true" onblur="upOrderName('+i+', this.innerText)"':''}>${acc.n}</p>
-                        ${isAdmin ? `<input type="number" data-name="${acc.n}" class="order-card-field order-card-input mb-3 text-lg" value="${dateVal}" placeholder="${analysis.lastVal || 0}">` : `<h5 class="text-xl font-black ${isDrop?'text-rose-500':'text-[#10B981]'} mb-3">${valToShow}</h5>`}
+                        ${isAdmin ? `<div class="order-stepper mb-3"><button type="button" onclick="adjustOrderField(${i}, -1)" ${acc.status === 'inactive' ? 'disabled' : ''}><i class="fas fa-minus"></i></button><input type="number" min="0" step="1" data-index="${i}" data-name="${acc.n}" class="order-card-field order-card-input text-lg" value="${dateVal}" placeholder="${analysis.lastVal || 0}" ${acc.status === 'inactive' ? 'disabled' : ''} oninput="registerOrderChange(${i})"><button type="button" onclick="adjustOrderField(${i}, 1)" ${acc.status === 'inactive' ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>` : `<h5 class="text-xl font-black ${isDrop?'text-rose-500':'text-[#10B981]'} mb-3">${valToShow}</h5>`}
                         <div class="flex justify-center mb-2">${trendBadge}</div>
                         <div class="mini-chart flex justify-center">${miniChartBars}</div>
                         <div class="pt-3 mt-2 border-t dark:border-white/5">
@@ -762,10 +1964,10 @@
                 const target = goals[`lvl${i}`]; 
                 const valEl = document.getElementById(`l${i}Val`);
                 const stEl = document.getElementById(`l${i}Status`);
-                if(valEl) valEl.innerText = `R$ ${target.toLocaleString('pt-BR')}`;
+                if(valEl) valEl.innerText = formatCurrency(target);
                 if(stEl) {
                     if (total >= target) { stEl.innerHTML = '<span class="text-[#10B981]">Check! ✅</span>'; }
-                    else { stEl.innerText = `Falta R$ ${(target - total).toLocaleString('pt-BR', {minimumFractionDigits:2})}`; }
+                    else { stEl.innerText = `Falta ${formatCurrency(target - total)}`; }
                 }
             }
         }
@@ -783,28 +1985,41 @@
             const head = document.getElementById('tableHeadRow'); 
             const body = document.getElementById('tableBody'); 
             const q = document.getElementById('globalSearch')?.value.toLowerCase() || "";
+            const marketplaceFilter = document.getElementById('advancedMarketplaceFilter')?.value || '';
+            const statusFilter = document.getElementById('advancedStatusFilter')?.value || '';
+            const priceFilter = document.getElementById('advancedPriceFilter')?.value || '';
             
-            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>Careca</th><th>Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
+            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th class="px-4 py-6 text-center">Status</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>M. Careca</th><th class="canguru-column text-brand-orange">M. Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             
             body.innerHTML = '';
             accounts.forEach((acc, idx) => {
                 if(q && !acc.n.toLowerCase().includes(q)) return;
+                if(marketplaceFilter && acc.marketplace !== marketplaceFilter) return;
+                if(statusFilter && acc.status !== statusFilter) return;
+                const hasPrice = acc.v.some(value => Number(value) > 0);
+                const hasDiscount = acc.t === 2 && acc.p.some(value => Number(value) > 0);
+                if(priceFilter === 'priced' && !hasPrice) return;
+                if(priceFilter === 'unpriced' && hasPrice) return;
+                if(priceFilter === 'discount' && !hasDiscount) return;
                 
                 const tr = document.createElement('tr'); 
-                tr.className = selectedIndices.has(idx) ? 'bg-brand-orange/5 transition-colors' : '';
+                // Mantém a referência ao índice original mesmo quando a tabela estiver filtrada.
+                tr.dataset.accountIndex = idx;
+                tr.className = `${selectedIndices.has(idx) ? 'bg-brand-orange/5 ' : ''}${acc.status === 'inactive' ? 'store-inactive ' : ''}transition-colors`;
                 
                 let row = isAdmin ? `<td class="px-6 py-8 text-center"><input type="checkbox" onclick="toggleSelect(${idx})" ${selectedIndices.has(idx)?'checked':''}></td>` : '';
-                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5"><div class="flex items-center justify-between"><div class="flex items-center">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30"></i>':''}${getIcon(acc.n)} <span ${isAdmin?'contenteditable="true" onblur="upName('+idx+', this.innerText)"':''}>${acc.n}</span></div><button onclick="openNote(${idx})" class="ml-4 ${acc.note ? 'text-brand-orange scale-125' : 'text-gray-300 dark:text-white/20'} transition-all"><i class="fas fa-sticky-note text-xs"></i></button></div></td>`;
+                row += `<td class="px-8 py-8 font-black border-r dark:border-white/5"><div class="flex items-center justify-between"><div class="min-w-0 flex items-center">${isAdmin?'<i class="fas fa-grip-vertical handle mr-2 opacity-30"></i>':''}${getIcon(acc.n)} <div class="min-w-0"><span class="block truncate">${acc.n}</span><span class="text-[7px] ${acc.status === 'inactive' ? 'text-gray-400' : 'text-emerald-500'} uppercase tracking-widest">${acc.marketplace || detectMarketplace(acc.n)}</span></div></div><button onclick="openNote(${idx})" class="ml-4 ${acc.note ? 'text-brand-orange scale-125' : 'text-gray-300 dark:text-white/20'} transition-all"><i class="fas fa-sticky-note text-xs"></i></button></div></td>`;
+                row += `<td class="px-4 py-8 text-center">${isAdmin ? `<select aria-label="Status da loja ${escapeHtml(acc.n)}" onchange="setStoreStatus(${idx}, this.value)" class="min-w-24 p-2 rounded-xl text-[8px] font-black uppercase border ${acc.status === 'inactive' ? 'bg-gray-100 dark:bg-black/30 text-gray-500 border-gray-300 dark:border-white/10' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'}"><option value="active" ${acc.status !== 'inactive' ? 'selected' : ''}>ATIVA</option><option value="inactive" ${acc.status === 'inactive' ? 'selected' : ''}>INATIVA</option></select>` : `<span class="inline-flex px-2.5 py-1 rounded-full text-[8px] font-black uppercase ${acc.status === 'inactive' ? 'bg-gray-200 dark:bg-white/10 text-gray-500' : 'bg-emerald-500/10 text-emerald-600'}">${acc.status === 'inactive' ? 'Inativa' : 'Ativa'}</span>`}</td>`;
                 
                 acc.v.forEach((v, vi) => {
                     let dV = acc.t === 2 && acc.c[vi] > 0 ? acc.c[vi] * (1 - (acc.p[vi] / 100)) : v;
-                    row += `<td class="px-8 py-8 font-mono"><div class="flex flex-col gap-1">
-                        ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px]"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>R$ ${acc.c[vi].toFixed(2)}</span></span></div>` : ''}
-                        <div class="flex flex-col"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>R$ ${dV.toFixed(2)}</span></div>
+                    row += `<td class="px-8 py-8 font-mono ${vi === CANGURU_PRODUCT_INDEX ? 'canguru-column' : ''}"><div class="flex flex-col gap-1">
+                        ${acc.t===2 && acc.c[vi]>0 ? `<div class="flex flex-col opacity-50 text-[8px]"><span>Cheio: <span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>${formatCurrency(acc.c[vi])}</span></span></div>` : ''}
+                        <div class="flex flex-col"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>${formatCurrency(dV)}</span></div>
                         ${acc.t===2 && dV>0 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(1)}% OFF</span></div>` : ''}
                     </div></td>`;
                 });
-                if(isAdmin) row += `<td class="px-8 py-8 text-center"><button onclick="removeRow(${idx})" class="text-gray-400 hover:text-rose-500 transition-colors">×</button></td>`;
+                if(isAdmin) row += `<td class="px-8 py-8 text-center"><div class="flex items-center justify-center gap-2"><button onclick="openStoreModal(${idx})" class="table-action-button rounded-xl bg-gray-100 dark:bg-black/30 text-brand-orange" title="Editar loja"><i class="fas fa-pen text-[10px]"></i></button><button onclick="removeRow(${idx})" class="table-action-button rounded-xl bg-rose-500/10 text-rose-500" title="Desativar loja"><i class="fas fa-power-off text-[10px]"></i></button></div></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
             });
             if(isAdmin) initSortable();
@@ -823,73 +2038,216 @@
             render(); 
         }
 
-        function removeRow(idx) { if(confirm("Remover loja?")) { accounts.splice(idx,1); db.ref('accounts').set(accounts); } }
+        async function setStoreStatus(idx, status) {
+            if(!isAdmin || !accounts[idx]) return;
+            const nextStatus = status === 'inactive' ? 'inactive' : 'active';
+            const account = accounts[idx];
+            if(account.status === nextStatus) return;
+            const nextAccounts = accounts.slice();
+            nextAccounts[idx] = { ...account, status: nextStatus };
+            const nextOrderAccounts = orderAccounts.map(item => item.storeId === account.id || item.n === account.n ? { ...item, status: nextStatus } : item);
+            try {
+                await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, `Status da loja alterado para ${nextStatus === 'active' ? 'ativa' : 'inativa'}`, { storeId: account.id, name: account.n, previousStatus: account.status, nextStatus });
+                showToast(`${account.n} está ${nextStatus === 'active' ? 'ativa' : 'inativa'} agora.`, 'success');
+            } catch(error) {
+                console.error(error);
+                showToast(error.message || 'Não foi possível alterar o status da loja.', 'error');
+                render();
+            }
+        }
 
-        function logAction(msg) { const t = new Date().toLocaleString('pt-BR'); db.ref('history').push(`[${t}] ${msg}`); }
+        async function removeRow(idx) {
+            if(!isAdmin || !accounts[idx]) return;
+            if(!confirm('Desativar esta loja? Ela continuará disponível no histórico e poderá ser reativada depois.')) return;
+            const account = accounts[idx];
+            const nextAccounts = accounts.slice();
+            nextAccounts[idx] = { ...account, status: 'inactive' };
+            const nextOrderAccounts = orderAccounts.map(item => item.storeId === account.id || item.n === account.n ? { ...item, status: 'inactive' } : item);
+            try {
+                await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, 'Loja desativada', { storeId: account.id, name: account.n });
+            } catch(error) {
+                console.error(error);
+                alert('Não foi possível desativar a loja.');
+            }
+        }
         
-        function applyBulkUpdate() {
+        async function applyBulkUpdate() {
             if(!isAdmin) return;
             const cat = document.getElementById('bulkCategory').value;
             const mode = document.getElementById('bulkMode').value;
-            const val = parseFloat(document.getElementById('bulkValue').value);
-            if (isNaN(val) || selectedIndices.size === 0) return alert("Selecione as contas e insira um valor válido!");
+            const value = parseMonetaryValue(document.getElementById('bulkValue').value);
+            if(!Number.isFinite(value) || value < 0 || selectedIndices.size === 0) return alert('Selecione as contas e insira um valor válido maior ou igual a zero.');
+            if(mode === 'perc' && value > 100) return alert('O desconto deve ficar entre 0% e 100%.');
 
-            selectedIndices.forEach(idx => {
-                let a = accounts[idx];
-                const updateCol = (i) => {
-                    if (mode === 'val') { a.v[i] = val; if(a.t === 2 && a.c[i] > 0) a.p[i] = (1 - (val / a.c[i])) * 100; }
-                    else if (mode === 'cheio' && a.t === 2) { a.c[i] = val; a.v[i] = val * (1 - (a.p[i] / 100)); }
-                    else if (mode === 'perc' && a.t === 2) { a.p[i] = val; a.v[i] = a.c[i] * (1 - (val / 100)); }
+            const nextAccounts = accounts.map(account => ({ ...account, v: [...account.v], c: [...account.c], p: [...account.p] }));
+            for(const index of selectedIndices) {
+                const account = nextAccounts[index];
+                if(!account) continue;
+                const updateColumn = column => {
+                    if(mode === 'val') {
+                        if(account.t === 2 && account.c[column] > 0 && value > account.c[column]) throw new Error(`${account.n}: o valor final não pode ultrapassar o valor cheio.`);
+                        account.v[column] = value;
+                        if(account.t === 2 && account.c[column] > 0) account.p[column] = (1 - (value / account.c[column])) * 100;
+                    } else if(mode === 'cheio' && account.t === 2) {
+                        account.c[column] = value;
+                        account.v[column] = value * (1 - (account.p[column] / 100));
+                    } else if(mode === 'perc' && account.t === 2) {
+                        account.p[column] = value;
+                        account.v[column] = account.c[column] * (1 - (value / 100));
+                    }
                 };
-                if (cat === 'all') a.v.forEach((_, i) => updateCol(i));
-                else updateCol(parseInt(cat));
-            });
+                if(cat === 'all') account.v.forEach((_, column) => updateColumn(column));
+                else updateColumn(Number(cat));
+            }
 
-            db.ref('accounts').set(accounts).then(() => {
-                logAction(`Bulk Update: Mode ${mode}, Value ${val}`);
+            try {
+                await saveWithBackup('accounts', nextAccounts, 'Alteração de preços em massa', { category: cat, mode, value, stores: selectedIndices.size });
                 selectedIndices.clear();
-                render();
-                alert("Valores atualizados!");
+                alert('Valores atualizados com sucesso.');
+            } catch(error) {
+                console.error(error);
+                alert(error.message || 'Não foi possível atualizar os valores.');
+            }
+        }
+
+        function hSync(idx, col, input, mode) {
+            if(!isAdmin || !accounts[idx]) return;
+            const value = parseMonetaryValue(input);
+            if(!Number.isFinite(value) || value < 0 || (mode === 'perc' && value > 100)) {
+                alert(mode === 'perc' ? 'O desconto deve estar entre 0% e 100%.' : 'Informe um valor igual ou maior que zero.');
+                return render();
+            }
+            const nextAccounts = accounts.map(account => ({ ...account, v: [...account.v], c: [...account.c], p: [...account.p] }));
+            const account = nextAccounts[idx];
+            if(mode === 'val') {
+                if(account.t === 2 && account.c[col] > 0 && value > account.c[col]) { alert('O valor final não pode ultrapassar o valor cheio.'); return render(); }
+                account.v[col] = value;
+                if(account.t === 2 && account.c[col] > 0) account.p[col] = (1 - (value / account.c[col])) * 100;
+            } else if(mode === 'perc') {
+                account.p[col] = value;
+                if(account.t === 2 && account.c[col] > 0) account.v[col] = account.c[col] * (1 - (value / 100));
+            } else if(mode === 'cheio') {
+                account.c[col] = value;
+                account.v[col] = value * (1 - (account.p[col] / 100));
+            }
+            saveWithBackup('accounts', nextAccounts, 'Preço atualizado', { storeId: account.id, name: account.n, product: PRODUCT_FIELDS[col], mode, value })
+                .catch(error => { console.error(error); alert('Não foi possível salvar o preço.'); render(); });
+        }
+
+        function upName(index, text) { if(accounts[index] && text.trim().toUpperCase() !== accounts[index].n) openStoreModal(index); }
+        function upOrderName(index, text) { if(orderAccounts[index] && text.trim().toUpperCase() !== orderAccounts[index].n) alert('Edite o nome pela opção de cadastro da loja para preservar o histórico.'); }
+        
+        function configGoals() {
+            if(!isAdmin) return;
+            openActionModal({
+                eyebrow: 'Metas comerciais', title: 'Configurar objetivos', description: 'Os indicadores e projeções serão atualizados logo após o salvamento.', submitLabel: 'Salvar metas', tone: 'success',
+                fields: [1, 2, 3, 4].map(level => ({ name: `lvl${level}`, label: level === 4 ? 'Meta extraordinária (R$)' : `Meta nível ${level} (R$)`, type: 'number', min: 0, step: '0.01', value: goals[`lvl${level}`] })),
+                onSubmit: async values => {
+                    const nextGoals = Object.fromEntries([1, 2, 3, 4].map(level => [`lvl${level}`, Number(values[`lvl${level}`])]));
+                    if(Object.values(nextGoals).some(value => !Number.isFinite(value) || value < 0)) throw new Error('Todas as metas devem ser maiores ou iguais a zero.');
+                    await saveWithBackup('goals', nextGoals, 'Metas comerciais atualizadas', nextGoals);
+                    showToast('Metas atualizadas.', 'success');
+                }
             });
         }
 
-        function hSync(idx, col, input, m) { if(!isAdmin) return; let n = parseFloat(input.replace(/[^\d.,-]/g, '').replace(',', '.')); if (isNaN(n)) return render(); let a = accounts[idx]; if (m === 'val') { a.v[col] = n; if(a.t === 2 && a.c[col]>0) a.p[col] = (1-(n/a.c[col]))*100; } else if (m === 'perc') { a.p[col] = n; if(a.t === 2 && a.c[col]>0) a.v[col] = a.c[col]*(1-(n/100)); } else if (m === 'cheio') { a.c[col] = n; a.v[col] = n*(1-(a.p[col]/100)); } db.ref('accounts').set(accounts); }
-        function upName(i, t) { if(!isAdmin) return; accounts[i].n = t.trim(); db.ref('accounts').set(accounts); }
-        function upOrderName(i, t) { if(!isAdmin) return; orderAccounts[i].n = t.trim(); db.ref('orderAccounts').set(orderAccounts); }
-        
-        // Config de metas atualizada para 4 níveis
-        function configGoals(){ 
-            if(!isAdmin) return; 
-            const l1=prompt("Meta Nível 1:", goals.lvl1); 
-            const l2=prompt("Meta Nível 2:", goals.lvl2); 
-            const l3=prompt("Meta Nível 3:", goals.lvl3); 
-            const l4=prompt("Meta Extraordinário:", goals.lvl4); 
-            if(l1) db.ref('goals').set({lvl1:parseFloat(l1), lvl2:parseFloat(l2), lvl3:parseFloat(l3), lvl4:parseFloat(l4)}); 
+        function inputRevenue() {
+            if(!isAdmin) return;
+            openActionModal({
+                eyebrow: 'Lançamento financeiro', title: 'Adicionar faturamento', description: 'O valor será incluído no mês correspondente à data escolhida.', submitLabel: 'Lançar faturamento', tone: 'success',
+                fields: [{ name: 'date', label: 'Data', type: 'date', value: new Date().toISOString().slice(0, 10), required: true }, { name: 'value', label: 'Faturamento (R$)', type: 'text', placeholder: 'Ex.: 34.954,65', required: true }],
+                onSubmit: async values => {
+                    const value = parseMonetaryValue(values.value);
+                    if(!values.date || !Number.isFinite(value) || value < 0) throw new Error('Informe uma data e um faturamento válido.');
+                    await saveWithBackup(`revenue/${values.date.slice(0, 7)}/${values.date}`, value, 'Faturamento lançado', { date: values.date, value });
+                    showToast('Faturamento lançado com sucesso.', 'success');
+                }
+            });
         }
 
-        function inputRevenue(){ 
-            if(!isAdmin) return; const d=prompt("Data (DD/MM/AAAA):", new Date().toLocaleDateString()), v=prompt("Valor:"); 
-            if(v){ const p=d.split('/'), k=`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`, mKey=`${p[2]}-${p[1].padStart(2,'0')}`; db.ref(`revenue/${mKey}/${k}`).set(v); } 
-        }
         function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('mkt_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
-        function renderAuditHistory() { document.getElementById('historyList').innerHTML = historyData.map(h => `<li class="border-b dark:border-white/5 pb-1">${h}</li>`).join(''); }
-        function setFilter(v) { document.getElementById('globalSearch').value = v; render(); }
+        function clearAuditHistory() {
+            if(!isAdmin || !confirm('Limpar os logs visíveis? Uma versão de segurança dos dados será criada antes.')) return;
+            removeWithBackup('history', 'Histórico de auditoria limpo')
+                .catch(error => { console.error(error); alert('Não foi possível limpar o histórico.'); });
+        }
+        function toggleAuditPanel() {
+            if(!isAdmin) return;
+            const panel = document.getElementById('auditPanel');
+            const button = document.getElementById('auditToggleButton');
+            const opening = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden');
+            button.querySelector('span:last-child').innerHTML = `${opening ? 'Ocultar registros' : 'Ver registros'} <i class="fas ${opening ? 'fa-chevron-up' : 'fa-chevron-down'} ml-2"></i>`;
+            if(opening) renderAuditHistory();
+        }
+
+        function renderAuditHistory() {
+            const list = document.getElementById('historyList');
+            if(!list) return;
+            list.innerHTML = historyData.map(entry => {
+                const item = typeof entry === 'string' ? { message: entry, createdAtLabel: '' } : entry;
+                const comparison = item.details?.comparison;
+                const details = comparison ? `<p class="text-[8px] opacity-55 mt-1">Antes: ${escapeHtml(comparison.before)} · Depois: ${escapeHtml(comparison.after)}</p>` : '';
+                return `<li class="border-b dark:border-white/5 pb-2"><p class="font-bold">${escapeHtml(item.message || 'Alteração registrada')}</p><p class="text-[8px] opacity-50 mt-1">${escapeHtml(item.createdAtLabel || '')}${item.actor ? ` · ${escapeHtml(item.actor)}` : ''}${item.actorRole ? ` (${escapeHtml(getRoleLabel(item.actorRole))})` : ''}</p>${details}</li>`;
+            }).join('') || '<li class="opacity-50">Nenhuma alteração registrada.</li>';
+        }
+        function setFilter(value) { document.getElementById('globalSearch').value = value; render(); }
         
         // SORTABLE COM PERSISTÊNCIA NO FIREBASE (posição salva automaticamente)
-        function initSortable() { 
-            if(!isAdmin) return; 
-            new Sortable(document.getElementById('tableBody'), { 
-                handle: '.handle', 
+        function initSortable() {
+            if(!isAdmin) return;
+
+            const tableBody = document.getElementById('tableBody');
+            if(!tableBody) return;
+
+            // O render é chamado após cada atualização. Sem destruir a instância anterior,
+            // vários listeners eram acumulados e a ordem podia ser aplicada mais de uma vez.
+            if(mainTableSortableInstance) {
+                mainTableSortableInstance.destroy();
+                mainTableSortableInstance = null;
+            }
+
+            mainTableSortableInstance = new Sortable(tableBody, {
+                handle: '.handle',
                 animation: 200,
                 onEnd: (evt) => {
-                    // Reordenar o array de accounts conforme a nova posição
-                    const item = accounts.splice(evt.oldIndex, 1)[0];
-                    accounts.splice(evt.newIndex, 0, item);
-                    // Salvar no Firebase para persistir a ordem
-                    db.ref('accounts').set(accounts);
-                    logAction(`Reordenação: ${item.n} movido de posição ${evt.oldIndex+1} para ${evt.newIndex+1}`);
+                    if(evt.oldIndex === evt.newIndex) return;
+
+                    // Lê a ordem final dos itens exibidos. Cada linha conserva o índice que
+                    // possuía em accounts antes do arraste, o que também torna a ação segura
+                    // quando a tabela está usando a busca ou algum filtro.
+                    const displayedIndexes = Array.from(tableBody.querySelectorAll('tr[data-account-index]'))
+                        .map(row => Number(row.dataset.accountIndex))
+                        .filter(index => Number.isInteger(index) && accounts[index]);
+
+                    if(displayedIndexes.length === 0) return;
+
+                    const previousAccounts = accounts.slice();
+                    const selectedAccounts = new Set([...selectedIndices].map(index => previousAccounts[index]));
+                    const movedAccount = previousAccounts[Number(evt.item.dataset.accountIndex)];
+                    const reorderedVisibleAccounts = displayedIndexes.map(index => previousAccounts[index]);
+                    const originalVisibleIndexes = displayedIndexes.slice().sort((a, b) => a - b);
+
+                    // Substitui somente as posições que estavam visíveis, preservando as demais
+                    // contas em seus lugares se uma busca/filtro estiver ativo.
+                    originalVisibleIndexes.forEach((accountIndex, position) => {
+                        accounts[accountIndex] = reorderedVisibleAccounts[position];
+                    });
+
+                    // Mantém as seleções vinculadas às mesmas lojas após a mudança de posição.
+                    selectedIndices = new Set(accounts
+                        .map((account, index) => selectedAccounts.has(account) ? index : null)
+                        .filter(index => index !== null));
+
+                    saveWithBackup('accounts', accounts, 'Posição da loja alterada', { storeId: (movedAccount || reorderedVisibleAccounts[0]).id, name: (movedAccount || reorderedVisibleAccounts[0]).n, from: evt.oldIndex + 1, to: evt.newIndex + 1 })
+                        .catch(() => {
+                            accounts = previousAccounts;
+                            selectedIndices = new Set(previousAccounts.map((account, index) => selectedAccounts.has(account) ? index : null).filter(index => index !== null));
+                            render();
+                            alert('Não foi possível salvar a nova posição. Tente novamente.');
+                        });
                 }
-            }); 
+            });
         }
 
         // SORTABLE PARA GRID DE PEDIDOS (cards reordenáveis com persistência)
@@ -920,9 +2278,9 @@
                     // Reordenar o array de orderAccounts
                     const item = orderAccounts.splice(evt.oldIndex, 1)[0];
                     orderAccounts.splice(evt.newIndex, 0, item);
-                    // Salvar no Firebase para persistir a ordem
-                    db.ref('orderAccounts').set(orderAccounts);
-                    logAction(`Pedidos reordenados: ${item.n} movido de posição ${evt.oldIndex+1} para ${evt.newIndex+1}`);
+                    // Salva a nova ordem com versão de segurança e auditoria.
+                    saveWithBackup('orderAccounts', orderAccounts, 'Posição de conta de pedidos alterada', { storeId: item.storeId || item.id, name: item.n, from: evt.oldIndex + 1, to: evt.newIndex + 1 })
+                        .catch(error => { console.error(error); alert('Não foi possível salvar a posição da conta de pedidos.'); updateDash(); });
                 }
             });
         }
@@ -935,8 +2293,112 @@
             if(s.includes('shein')) return '<i class="fas fa-shopping-cart text-[#9CA3AF] mr-2"></i>'; 
             return '<i class="fas fa-store opacity-20 mr-2"></i>'; 
         }
-        function exportCSV() { let csv = "Loja,Unissex,Regata,Infantil,Plus,Careca,Canguru\n"; accounts.forEach(a => csv += `${a.n},${a.v.map(v => v.toFixed(2)).join(",")}\n`); const b = new Blob(["\ufeff" + csv], { type: 'text/csv;' }); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = `Relatorio.csv`; l.click(); }
-        function exportPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.autoTable({ head: [['Conta', 'Unissex', 'Regata', 'Infantil', 'Plus', 'Careca', 'Canguru']], body: accounts.map(a => [a.n, ...a.v.map(v => `R$ ${v.toFixed(2)}`)]), styles: { fontSize: 8 } }); doc.save('Relatorio.pdf'); }
+        function csvCell(value = '') { return `"${String(value).replace(/"/g, '""')}"`; }
+
+        function exportCSV() {
+            const header = ['id', 'nome', 'marketplace', 'tipo', 'status', 'metaPedidos', 'observacoes', ...PRODUCT_FIELDS];
+            const rows = accounts.map(account => [account.id, account.n, account.marketplace, account.t, account.status, account.orderGoal || '', account.note || '', ...account.v.map(value => Number(value).toFixed(2))]);
+            const csv = [header, ...rows].map(row => row.map(csvCell).join(';')).join('\n');
+            downloadFile(`valores-mkt-lojas-${new Date().toISOString().slice(0, 10)}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8');
+            if(isAdmin) logAction('Cadastro de lojas exportado em CSV');
+        }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            doc.autoTable({
+                head: [['Conta', 'Marketplace', 'Status', 'Unissex', 'Regata', 'Infantil', 'Plus', 'M. Careca', 'M. Canguru']],
+                body: accounts.map(account => [account.n, account.marketplace, account.status === 'inactive' ? 'Inativa' : 'Ativa', ...account.v.map(value => formatCurrency(Number(value)))]),
+                styles: { fontSize: 8 }
+            });
+            doc.save(`valores-mkt-precos-${new Date().toISOString().slice(0, 10)}.pdf`);
+            if(isAdmin) logAction('Tabela de preços exportada em PDF');
+        }
+
+        function openImportModal() { if(isAdmin) document.getElementById('importModal').classList.add('active'); }
+        function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
+
+        function downloadImportTemplate() {
+            const header = ['id', 'nome', 'marketplace', 'tipo', 'status', 'metaPedidos', 'observacoes', ...PRODUCT_FIELDS];
+            const example = ['', 'SHOPEE: EXEMPLO', 'Shopee', '1', 'active', '300', 'Conta de exemplo', '59.90', '54.90', '49.90', '64.90', '59.90', '79.90'];
+            downloadFile('modelo-importacao-lojas.csv', '\ufeff' + [header, example].map(row => row.map(csvCell).join(';')).join('\n'), 'text/csv;charset=utf-8');
+        }
+
+        function parseCsv(content) {
+            const rows = [];
+            let row = [], value = '', quoted = false;
+            for(let index = 0; index < content.length; index++) {
+                const char = content[index];
+                const next = content[index + 1];
+                if(char === '"' && quoted && next === '"') { value += '"'; index++; }
+                else if(char === '"') quoted = !quoted;
+                else if((char === ';' || char === ',') && !quoted) { row.push(value.trim()); value = ''; }
+                else if((char === '\n' || char === '\r') && !quoted) {
+                    if(char === '\r' && next === '\n') index++;
+                    row.push(value.trim());
+                    if(row.some(cell => cell !== '')) rows.push(row);
+                    row = []; value = '';
+                } else value += char;
+            }
+            row.push(value.trim());
+            if(row.some(cell => cell !== '')) rows.push(row);
+            if(rows.length < 2) throw new Error('O arquivo precisa ter um cabeçalho e ao menos uma loja.');
+            const headers = rows[0].map(header => header.trim().toLowerCase());
+            return rows.slice(1).map(row => Object.fromEntries(headers.map((header, index) => [header, row[index] || ''])));
+        }
+
+        function parseImportNumber(value, fieldName) {
+            const number = parseMonetaryValue(value);
+            if(!Number.isFinite(number) || number < 0) throw new Error(`${fieldName} precisa ser um número igual ou maior que zero.`);
+            return number;
+        }
+
+        async function importStoresFromFile() {
+            if(!isAdmin) return;
+            const input = document.getElementById('importFileInput');
+            const file = input.files?.[0];
+            if(!file) return alert('Selecione um arquivo CSV para importar.');
+            try {
+                const records = parseCsv(await file.text());
+                const nextAccounts = accounts.map(account => ({ ...account, v: [...account.v], c: [...account.c], p: [...account.p] }));
+                const nextOrderAccounts = orderAccounts.slice();
+                let created = 0, updated = 0;
+                records.forEach((record, rowIndex) => {
+                    const name = String(record.nome || record.name || '').trim().toUpperCase();
+                    if(name.length < 3) throw new Error(`Linha ${rowIndex + 2}: informe um nome de loja válido.`);
+                    const importedId = String(record.id || '').trim();
+                    const index = nextAccounts.findIndex(account => account.id === importedId || account.n === name);
+                    const previous = index >= 0 ? nextAccounts[index] : null;
+                    const type = Number(record.tipo || previous?.t || 1) === 2 ? 2 : 1;
+                    const values = PRODUCT_FIELDS.map(field => parseImportNumber(record[field] == null || record[field] === '' ? previous?.v[PRODUCT_FIELDS.indexOf(field)] : record[field], `Linha ${rowIndex + 2} — ${field}`));
+                    const account = normalizeAccount({
+                        ...(previous || {}),
+                        id: previous?.id || importedId || makeStableId('store'),
+                        n: name,
+                        t: type,
+                        marketplace: String(record.marketplace || previous?.marketplace || detectMarketplace(name)).trim() || 'Outros',
+                        status: String(record.status || previous?.status || 'active').toLowerCase() === 'inactive' ? 'inactive' : 'active',
+                        orderGoal: parseImportNumber(record.metapedidos == null || record.metapedidos === '' ? previous?.orderGoal : record.metapedidos, `Linha ${rowIndex + 2} — metaPedidos`),
+                        note: String(record.observacoes || record.observações || previous?.note || '').trim(),
+                        v: values,
+                        aliases: previous ? [...new Set([...(previous.aliases || []), ...(previous.n !== name ? [previous.n] : [])])] : []
+                    });
+                    if(index >= 0) { nextAccounts[index] = account; updated++; }
+                    else { nextAccounts.push(account); created++; }
+                    const orderIndex = nextOrderAccounts.findIndex(item => item.storeId === account.id || item.n === previous?.n || item.n === account.n);
+                    const linked = normalizeOrderAccount({ ...(orderIndex >= 0 ? nextOrderAccounts[orderIndex] : {}), id: account.id, storeId: account.id, n: account.n, status: account.status });
+                    if(orderIndex >= 0) nextOrderAccounts[orderIndex] = linked;
+                    else nextOrderAccounts.push(linked);
+                });
+                await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, 'Importação de lojas concluída', { created, updated, fileName: file.name });
+                input.value = '';
+                closeImportModal();
+                alert(`Importação concluída: ${created} criada(s) e ${updated} atualizada(s).`);
+            } catch(error) {
+                console.error(error);
+                alert(error.message || 'Não foi possível importar o arquivo.');
+            }
+        }
         window.onload = checkSession;
     </script>
 </body>
