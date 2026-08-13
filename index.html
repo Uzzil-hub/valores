@@ -1989,7 +1989,7 @@
             const statusFilter = document.getElementById('advancedStatusFilter')?.value || '';
             const priceFilter = document.getElementById('advancedPriceFilter')?.value || '';
             
-            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th class="px-4 py-6 text-center">Status</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>M. Careca</th><th class="canguru-column text-brand-orange">M. Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
+            head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th class="px-4 py-6 text-center">Status</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>M. Careca</th><th class="canguru-column">M. Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             
             body.innerHTML = '';
             accounts.forEach((acc, idx) => {
