@@ -2019,7 +2019,7 @@
                         ${acc.t===2 && dV>0 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(1)}% OFF</span></div>` : ''}
                     </div></td>`;
                 });
-                if(isAdmin) row += `<td class="px-8 py-8 text-center"><div class="flex items-center justify-center gap-2"><button onclick="openStoreModal(${idx})" class="table-action-button rounded-xl bg-gray-100 dark:bg-black/30 text-brand-orange" title="Editar loja"><i class="fas fa-pen text-[10px]"></i></button><button onclick="removeRow(${idx})" class="table-action-button rounded-xl bg-rose-500/10 text-rose-500" title="Desativar loja"><i class="fas fa-power-off text-[10px]"></i></button></div></td>`;
+                if(isAdmin) row += `<td class="px-8 py-8 text-center"><div class="flex items-center justify-center gap-2"><button onclick="openStoreModal(${idx})" class="table-action-button rounded-xl bg-gray-100 dark:bg-black/30 text-brand-orange" title="Editar loja"><i class="fas fa-pen text-[10px]"></i></button><button onclick="removeRow(${idx})" class="table-action-button rounded-xl bg-amber-500/10 text-amber-600" title="Inativar loja"><i class="fas fa-power-off text-[10px]"></i></button>${isGeneralAdmin ? `<button onclick="deletePriceAccount(${idx})" class="table-action-button rounded-xl bg-rose-500/10 text-rose-500" title="Remover conta definitivamente"><i class="fas fa-trash-alt text-[10px]"></i></button>` : ''}</div></td>`;
                 tr.innerHTML = row; body.appendChild(tr);
             });
             if(isAdmin) initSortable();
@@ -2058,17 +2058,35 @@
 
         async function removeRow(idx) {
             if(!isAdmin || !accounts[idx]) return;
-            if(!confirm('Desativar esta loja? Ela continuará disponível no histórico e poderá ser reativada depois.')) return;
             const account = accounts[idx];
-            const nextAccounts = accounts.slice();
-            nextAccounts[idx] = { ...account, status: 'inactive' };
-            const nextOrderAccounts = orderAccounts.map(item => item.storeId === account.id || item.n === account.n ? { ...item, status: 'inactive' } : item);
-            try {
+            openActionModal({ eyebrow: 'Status da conta', title: 'Inativar loja', description: `${account.n} continuará preservada no histórico e poderá ser reativada depois.`, submitLabel: 'Inativar loja', tone: 'danger', onSubmit: async () => {
+                const nextAccounts = accounts.slice();
+                nextAccounts[idx] = { ...account, status: 'inactive' };
+                const nextOrderAccounts = orderAccounts.map(item => item.storeId === account.id || item.n === account.n ? { ...item, status: 'inactive' } : item);
                 await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, 'Loja desativada', { storeId: account.id, name: account.n });
-            } catch(error) {
-                console.error(error);
-                alert('Não foi possível desativar a loja.');
-            }
+                showToast(`${account.n} foi inativada.`, 'success');
+            }});
+        }
+
+        async function deletePriceAccount(idx) {
+            if(!isGeneralAdmin || !accounts[idx]) return showToast('Somente o Administrador Geral pode remover contas.', 'warning');
+            const account = accounts[idx];
+            openActionModal({
+                eyebrow: 'Remoção definitiva',
+                title: 'Remover conta da tabela',
+                description: `${account.n} será removida da tabela de valores e da lista de pedidos. Um backup será criado antes da remoção.`,
+                fields: [{ name: 'confirmation', label: 'Digite REMOVER para confirmar', placeholder: 'REMOVER', required: true }],
+                submitLabel: 'Remover conta',
+                tone: 'danger',
+                onSubmit: async (values) => {
+                    if(String(values.confirmation || '').trim().toUpperCase() !== 'REMOVER') throw new Error('Digite REMOVER para confirmar a exclusão definitiva.');
+                    const nextAccounts = accounts.filter((_, accountIndex) => accountIndex !== idx);
+                    const nextOrderAccounts = orderAccounts.filter(item => item.storeId !== account.id && item.n !== account.n);
+                    await updateWithBackup({ accounts: nextAccounts, orderAccounts: nextOrderAccounts }, 'Conta removida definitivamente', { storeId: account.id, name: account.n, removedAccount: account });
+                    selectedIndices.clear();
+                    showToast(`${account.n} foi removida da tabela.`, 'success');
+                }
+            });
         }
         
         async function applyBulkUpdate() {
