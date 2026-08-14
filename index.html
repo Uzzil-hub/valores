@@ -1007,17 +1007,31 @@
             "TIK TOK: NEW", "TIK TOK: CUSTOM", "TIK TOK: FASHION", "TIK TOK: PRINT", "TIK TOK: CLOTHING", "TIK TOK: FG7"
         ];
 
+        const USER_SESSION_IDLE_MS = 7 * 24 * 60 * 60 * 1000;
+        const GENERAL_ADMIN_SESSION_IDLE_MS = 12 * 60 * 60 * 1000;
+
+        function clearAppSession() {
+            localStorage.removeItem('mkt_session');
+            localStorage.removeItem('mkt_last_activity');
+        }
+
         async function checkSession() {
             const stored = localStorage.getItem('mkt_session');
-            const last = localStorage.getItem('mkt_last_activity');
-            if(!stored || !last || (Date.now() - parseInt(last) >= 7200000)) { localStorage.removeItem('mkt_session'); return; }
+            const last = Number(localStorage.getItem('mkt_last_activity'));
+            if(!stored || !Number.isFinite(last)) return clearAppSession();
             try {
                 const session = JSON.parse(stored);
-                if(session.generalAdmin && session.username === GENERAL_ADMIN_SESSION) throw new Error('A senha do Administrador Geral deve ser informada novamente.');
+                const idleLimit = session.generalAdmin === true ? GENERAL_ADMIN_SESSION_IDLE_MS : USER_SESSION_IDLE_MS;
+                if(Date.now() - last >= idleLimit) throw new Error('Sessão expirada por inatividade.');
+                if(session.generalAdmin === true && session.username === GENERAL_ADMIN_SESSION) {
+                    updateActivity();
+                    return enterApp({ username: GENERAL_ADMIN_SESSION, displayName: 'Administrador Geral', role: 'ADMIN', permissions: ['all'], generalAdmin: true });
+                }
                 const user = (await db.ref(`users/${normalizeUsername(session.username)}`).once('value')).val();
                 if(!user || user.active !== true) throw new Error('Sessão de usuário inativa.');
+                updateActivity();
                 enterApp({ username: user.username, displayName: user.displayName || user.username, role: user.role || 'CONVIDADO', permissions: user.permissions || permissionDefaults(user.role || 'CONVIDADO') });
-            } catch(error) { localStorage.removeItem('mkt_session'); localStorage.removeItem('mkt_last_activity'); }
+            } catch(error) { clearAppSession(); }
         }
         function updateActivity() { localStorage.setItem('mkt_last_activity', Date.now().toString()); }
         ['mousedown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, updateActivity));
@@ -1066,7 +1080,7 @@
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-        function logout() { localStorage.clear(); location.reload(); }
+        function logout() { clearAppSession(); localStorage.removeItem('mkt_offline_queue'); location.reload(); }
 
         function prioritizePlatformValues() {
             const anchor = document.getElementById('platformValuesTopAnchor');
