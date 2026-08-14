@@ -844,6 +844,22 @@
             return Number.isFinite(parsed) ? parsed : NaN;
         }
 
+        function roundFinancial(value, decimalPlaces = 2) {
+            const factor = 10 ** decimalPlaces;
+            const numeric = Number(value);
+            return Number.isFinite(numeric) ? Math.round((numeric + Number.EPSILON) * factor) / factor : 0;
+        }
+
+        function calculateFinalPrice(fullValue, discountPercent) {
+            return roundFinancial(Number(fullValue) * (1 - (Number(discountPercent) / 100)));
+        }
+
+        function calculateDiscountPercent(fullValue, finalValue) {
+            const full = Number(fullValue);
+            if(!Number.isFinite(full) || full <= 0) return 0;
+            return Math.min(100, Math.max(0, roundFinancial((1 - (Number(finalValue) / full)) * 100, 4)));
+        }
+
         function detectMarketplace(name = '') {
             const label = String(name).toLowerCase();
             if(label.includes('shopee')) return 'Shopee';
@@ -1477,17 +1493,17 @@
             const container = document.getElementById('histTable');
             const summary = document.getElementById('revenueDailySummary');
             if(!container || !summary) return;
-            const entries = Object.entries(revenueData.daily).map(([date, rawValue]) => ({ date, value: parseMonetaryValue(rawValue) })).filter(item => Number.isFinite(item.value)).sort((a, b) => a.date.localeCompare(b.date));
+            const entries = Object.entries(revenueData.daily).map(([date, rawValue]) => ({ date, value: parseMonetaryValue(rawValue) })).filter(item => Number.isFinite(item.value)).sort((a, b) => b.date.localeCompare(a.date));
             const total = entries.reduce((sum, item) => sum + item.value, 0);
             const average = entries.length ? total / entries.length : 0;
-            const latest = entries[entries.length - 1];
+            const latest = entries[0];
             summary.innerHTML = [
                 ['Dias lançados', String(entries.length), 'text-blue-500', 'fa-calendar-check'],
                 ['Total do período', formatCurrency(total), 'text-brand-orange', 'fa-wallet'],
                 ['Média diária', formatCurrency(average), 'text-violet-500', 'fa-calculator'],
                 ['Último lançamento', latest ? formatCurrency(latest.value) : 'Sem lançamentos', 'text-emerald-500', 'fa-chart-line']
             ].map(([label, value, color, icon]) => `<article class="p-4 rounded-2xl bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5"><div class="flex items-start justify-between gap-3"><div><p class="text-[8px] font-black uppercase tracking-widest opacity-55">${label}</p><p class="text-lg font-black ${color} mt-2">${value}</p></div><span class="w-9 h-9 rounded-xl bg-gray-100 dark:bg-brand-card flex items-center justify-center ${color}"><i class="fas ${icon}"></i></span></div></article>`).join('');
-            container.innerHTML = entries.map(({ date, value }, index) => { const [year, month, day] = date.split('-'); const isLatest = index === entries.length - 1; return `<article class="relative flex flex-col sm:flex-row sm:items-center gap-4 p-4 md:p-5 rounded-2xl border ${isLatest ? 'border-brand-orange/35 bg-brand-orange/5' : 'border-gray-200 dark:border-white/5 bg-white dark:bg-black/20'} transition-transform hover:-translate-y-0.5"><div class="w-full sm:w-40"><p class="text-[8px] font-black uppercase tracking-widest ${isLatest ? 'text-brand-orange' : 'text-gray-400'}">${isLatest ? 'Lançamento mais recente' : 'Lançamento diário'}</p><p class="text-sm font-black mt-2">${day}/${month}/${year}</p></div><div class="flex-1 sm:border-l sm:pl-5 border-gray-200 dark:border-white/5"><p class="text-[8px] uppercase font-black opacity-55">Faturamento do dia</p><p class="text-xl md:text-2xl font-black text-brand-orange mt-1">${formatCurrency(value)}</p></div>${isAdmin ? `<button type="button" onclick="deleteDay('${date}', 'revenue')" aria-label="Excluir faturamento de ${day}/${month}/${year}" class="w-10 h-10 shrink-0 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</article>`; }).join('') || '<div class="p-8 text-center rounded-2xl border border-dashed border-gray-300 dark:border-white/10 text-[10px] font-black uppercase opacity-55">Ainda não há faturamento lançado neste mês.</div>';
+            container.innerHTML = entries.map(({ date, value }, index) => { const [year, month, day] = date.split('-'); const isLatest = index === 0; return `<article class="relative flex flex-col sm:flex-row sm:items-center gap-4 p-4 md:p-5 rounded-2xl border ${isLatest ? 'border-brand-orange/35 bg-brand-orange/5' : 'border-gray-200 dark:border-white/5 bg-white dark:bg-black/20'} transition-transform hover:-translate-y-0.5"><div class="w-full sm:w-40"><p class="text-[8px] font-black uppercase tracking-widest ${isLatest ? 'text-brand-orange' : 'text-gray-400'}">${isLatest ? 'Lançamento mais recente' : 'Lançamento diário'}</p><p class="text-sm font-black mt-2">${day}/${month}/${year}</p></div><div class="flex-1 sm:border-l sm:pl-5 border-gray-200 dark:border-white/5"><p class="text-[8px] uppercase font-black opacity-55">Faturamento do dia</p><p class="text-xl md:text-2xl font-black text-brand-orange mt-1">${formatCurrency(value)}</p></div>${isAdmin ? `<button type="button" onclick="deleteDay('${date}', 'revenue')" aria-label="Excluir faturamento de ${day}/${month}/${year}" class="w-10 h-10 shrink-0 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>` : ''}</article>`; }).join('') || '<div class="p-8 text-center rounded-2xl border border-dashed border-gray-300 dark:border-white/10 text-[10px] font-black uppercase opacity-55">Ainda não há faturamento lançado neste mês.</div>';
         }
 
         function renderOrderTable() {
@@ -2029,7 +2045,7 @@
                     row += `<td class="px-8 py-8 font-mono ${vi === CANGURU_PRODUCT_INDEX ? 'canguru-column' : ''}"><div class="flex flex-col gap-1">
                         ${acc.t===2 ? `<div class="flex flex-col text-[8px] opacity-65"><span class="font-black uppercase tracking-wider">Cheio</span><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'cheio\')\"':''}>${formatCurrency(acc.c[vi])}</span>${acc.c[vi] <= 0 ? '<span class="text-[7px] text-amber-600 dark:text-amber-400 font-black mt-1">Informe o valor cheio</span>' : ''}</div>` : ''}
                         <div class="flex flex-col"><span class="text-[7px] text-brand-orange font-black uppercase">Final</span><span class="font-black text-sm" ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'val\')\"':''}>${formatCurrency(dV)}</span></div>
-                        ${acc.t===2 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(1)}% OFF</span></div>` : ''}
+                        ${acc.t===2 ? `<div class="flex flex-col text-[8px] font-black text-brand-orange"><span ${isAdmin?'contenteditable="true" onblur="hSync('+idx+','+vi+',this.innerText,\'perc\')\"':''}>${acc.p[vi].toFixed(2)}% OFF</span></div>` : ''}
                     </div></td>`;
                 });
                 if(isAdmin) row += `<td class="px-8 py-8 text-center"><div class="flex items-center justify-center gap-2"><button onclick="openStoreModal(${idx})" class="table-action-button rounded-xl bg-gray-100 dark:bg-black/30 text-brand-orange" title="Editar loja e estratégia de preço"><i class="fas fa-pen text-[10px]"></i></button><button onclick="removeRow(${idx})" class="table-action-button rounded-xl bg-amber-500/10 text-amber-600" title="Inativar loja"><i class="fas fa-power-off text-[10px]"></i></button>${isGeneralAdmin ? `<button onclick="deletePriceAccount(${idx})" class="table-action-button rounded-xl bg-rose-500/10 text-rose-500" title="Remover conta definitivamente"><i class="fas fa-trash-alt text-[10px]"></i></button>` : ''}</div></td>`;
@@ -2116,15 +2132,18 @@
                 if(!account) continue;
                 const updateColumn = column => {
                     if(mode === 'val') {
-                        if(account.t === 2 && account.c[column] > 0 && value > account.c[column]) throw new Error(`${account.n}: o valor final não pode ultrapassar o valor cheio.`);
-                        account.v[column] = value;
-                        if(account.t === 2 && account.c[column] > 0) account.p[column] = (1 - (value / account.c[column])) * 100;
+                        if(account.t === 2 && account.c[column] <= 0) throw new Error(`${account.n}: informe o valor cheio antes de calcular o desconto.`);
+                        if(account.t === 2 && value > account.c[column]) throw new Error(`${account.n}: o valor final não pode ultrapassar o valor cheio.`);
+                        account.v[column] = roundFinancial(value);
+                        if(account.t === 2) account.p[column] = calculateDiscountPercent(account.c[column], account.v[column]);
                     } else if(mode === 'cheio' && account.t === 2) {
-                        account.c[column] = value;
-                        account.v[column] = value * (1 - (account.p[column] / 100));
+                        if(value <= 0) throw new Error(`${account.n}: informe um valor cheio maior que zero.`);
+                        account.c[column] = roundFinancial(value);
+                        account.v[column] = calculateFinalPrice(account.c[column], account.p[column]);
                     } else if(mode === 'perc' && account.t === 2) {
-                        account.p[column] = value;
-                        account.v[column] = account.c[column] * (1 - (value / 100));
+                        if(account.c[column] <= 0) throw new Error(`${account.n}: informe o valor cheio antes de calcular o valor final.`);
+                        account.p[column] = roundFinancial(value);
+                        account.v[column] = calculateFinalPrice(account.c[column], account.p[column]);
                     }
                 };
                 if(cat === 'all') account.v.forEach((_, column) => updateColumn(column));
@@ -2151,16 +2170,20 @@
             const nextAccounts = accounts.map(account => ({ ...account, v: [...account.v], c: [...account.c], p: [...account.p] }));
             const account = nextAccounts[idx];
             if(mode === 'val') {
-                if(account.t === 2 && account.c[col] > 0 && value > account.c[col]) { alert('O valor final não pode ultrapassar o valor cheio.'); return render(); }
-                account.v[col] = value;
-                if(account.t === 2 && account.c[col] > 0) account.p[col] = (1 - (value / account.c[col])) * 100;
+                if(account.t === 2 && account.c[col] <= 0) { showToast('Informe o valor cheio antes de calcular o desconto.', 'warning'); return render(); }
+                if(account.t === 2 && value > account.c[col]) { showToast('O valor final não pode ultrapassar o valor cheio.', 'warning'); return render(); }
+                account.v[col] = roundFinancial(value);
+                if(account.t === 2) account.p[col] = calculateDiscountPercent(account.c[col], account.v[col]);
             } else if(mode === 'perc') {
-                account.p[col] = value;
-                if(account.t === 2 && account.c[col] > 0) account.v[col] = account.c[col] * (1 - (value / 100));
+                if(account.t !== 2) return render();
+                if(account.c[col] <= 0) { showToast('Informe o valor cheio antes de calcular o valor final.', 'warning'); return render(); }
+                account.p[col] = roundFinancial(value);
+                account.v[col] = calculateFinalPrice(account.c[col], account.p[col]);
             } else if(mode === 'cheio') {
+                if(account.t !== 2) return render();
                 if(value <= 0) { showToast('Informe um valor cheio maior que zero para calcular o desconto.', 'warning'); return render(); }
-                account.c[col] = value;
-                account.v[col] = value * (1 - (account.p[col] / 100));
+                account.c[col] = roundFinancial(value);
+                account.v[col] = calculateFinalPrice(account.c[col], account.p[col]);
             }
             saveWithBackup('accounts', nextAccounts, 'Preço atualizado', { storeId: account.id, name: account.n, product: PRODUCT_FIELDS[col], mode, value })
                 .catch(error => { console.error(error); alert('Não foi possível salvar o preço.'); render(); });
