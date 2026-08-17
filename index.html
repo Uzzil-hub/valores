@@ -27,6 +27,7 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #FF6B00; border-radius: 10px; }
         .admin-only { display: none; }
+        .general-admin-only { display: none; }
         .handle { cursor: grab; margin-right: 8px; opacity: 0.3; }
         input[type="checkbox"] { accent-color: #FF6B00; width: 22px; height: 22px; cursor: pointer; }
         .sidebar-transition { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -261,6 +262,7 @@
                         <button onclick="manageMonths()" class="w-full flex items-center justify-between p-4 bg-gray-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Config. Meses <i class="fas fa-calendar-alt text-brand-orange"></i></button>
                         <button onclick="openSettingsPanel()" class="w-full flex items-center justify-between p-4 bg-slate-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Central de Configurações <i class="fas fa-sliders-h text-brand-orange"></i></button>
                         <button onclick="openUserManager()" class="w-full flex items-center justify-between p-4 bg-indigo-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Usuários e Permissões <i class="fas fa-users-cog text-brand-orange"></i></button>
+                        <button onclick="openManagerGroups()" class="general-admin-only w-full items-center justify-between p-4 bg-violet-700 text-white font-black rounded-2xl text-[10px] uppercase border border-white/5">Grupos de Gestores <i class="fas fa-sitemap text-violet-200"></i></button>
                         <button onclick="undoRecentChange()" class="w-full flex items-center justify-between p-4 bg-white dark:bg-brand-card text-gray-900 dark:text-white font-black rounded-2xl text-[10px] uppercase border border-gray-200 dark:border-white/10">Desfazer Alteração <i class="fas fa-undo text-brand-orange"></i></button>
                     </div>
                     <div id="menuOrderOps" class="hidden space-y-3">
@@ -282,7 +284,8 @@
                 
                 <!-- PAGINA PRINCIPAL (FATURAMENTO) -->
                 <div id="pageMain" class="page-content active">
-                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-6 italic border-l-4 border-brand-orange pl-4 uppercase">Vendas e Valores por Plataforma</h2>
+                    <h2 class="text-[10px] md:text-[11px] font-black uppercase tracking-widest text-gray-400 mb-2 italic border-l-4 border-brand-orange pl-4 uppercase">Vendas e Valores por Plataforma</h2>
+                    <div id="managerScopeBanner" class="hidden mb-6 px-4 py-3 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-700 dark:text-violet-200 text-[9px] font-black uppercase tracking-wider"></div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         <div class="bg-gray-50 dark:bg-brand-card p-6 rounded-[35px] border border-gray-200 dark:border-white/5 text-center shadow-sm"><p class="text-[9px] font-black text-brand-orange uppercase mb-1">Faturamento Mês</p><h3 id="revTotal" class="text-2xl md:text-3xl font-black tracking-tighter">R$ 0,00</h3></div>
@@ -514,7 +517,7 @@
         const BACKUP_LIMIT = 40;
         const PRODUCT_FIELDS = Object.freeze(['unissex', 'regata', 'infantil', 'plus', 'careca', 'canguru']);
         const CANGURU_PRODUCT_INDEX = PRODUCT_FIELDS.indexOf('canguru');
-        let appSettings = { alertDropPercent: 30, dailyOrderTarget: 0, requireOrderReview: true, rolePermissions: { ADMIN: ['all'], GESTOR: ['view', 'prices', 'reports'], OPERADOR: ['view', 'orders'], CONVIDADO: ['view'] } };
+        let appSettings = { alertDropPercent: 30, dailyOrderTarget: 0, requireOrderReview: true, rolePermissions: { ADMIN: ['all'], GESTOR: ['view', 'prices', 'reports'], CONVIDADO: ['view'] } };
         let currentUserRole = 'CONVIDADO';
         let pendingOrderChanges = new Map();
         let offlineQueue = JSON.parse(localStorage.getItem('mkt_offline_queue') || '[]');
@@ -622,14 +625,18 @@
             return isAdmin || permissions.includes('all') || permissions.includes(permission);
         }
 
+        function normalizeAppRole(role, allowAdmin = false) {
+            if(role === 'ADMIN') return allowAdmin ? 'ADMIN' : 'GESTOR';
+            return role === 'GESTOR' ? 'GESTOR' : 'CONVIDADO';
+        }
+
         function permissionDefaults(role) {
             const defaults = {
                 ADMIN: ['all'],
                 GESTOR: ['dashboard.view', 'sales.view', 'sales.edit', 'prices.view', 'prices.edit', 'orders.view', 'orders.edit', 'reports.export'],
-                OPERADOR: ['dashboard.view', 'orders.view', 'orders.edit'],
                 CONVIDADO: ['dashboard.view', 'sales.view', 'prices.view', 'orders.view']
             };
-            return [...(defaults[role] || defaults.CONVIDADO)];
+            return [...(defaults[normalizeAppRole(role)] || defaults.CONVIDADO)];
         }
 
         function openSettingsPanel() {
@@ -640,10 +647,9 @@
                     { name: 'alertDropPercent', label: 'Queda que gera alerta (%)', type: 'number', min: 1, max: 100, step: 1, value: appSettings.alertDropPercent },
                     { name: 'dailyOrderTarget', label: 'Meta diária geral de pedidos', type: 'number', min: 0, step: 1, value: appSettings.dailyOrderTarget },
                     { name: 'requireOrderReview', label: 'Revisar pedidos antes de salvar', type: 'select', value: String(appSettings.requireOrderReview), options: [{ value: 'true', label: 'SIM, EXIGIR CONFERÊNCIA' }, { value: 'false', label: 'NÃO, SALVAR DIRETAMENTE' }] },
-                    { name: 'operatorPermissions', label: 'Permissão do perfil OPERADOR', type: 'select', value: appSettings.rolePermissions?.OPERADOR?.includes('orders') ? 'orders' : 'view', options: [{ value: 'orders', label: 'CONSULTAR E LANÇAR PEDIDOS' }, { value: 'view', label: 'SOMENTE CONSULTAR' }] }
                 ],
                 onSubmit: async values => {
-                    const next = { ...appSettings, alertDropPercent: Math.min(100, Math.max(1, Number(values.alertDropPercent) || 30)), dailyOrderTarget: Math.max(0, Number(values.dailyOrderTarget) || 0), requireOrderReview: values.requireOrderReview === 'true', rolePermissions: { ...(appSettings.rolePermissions || {}), OPERADOR: values.operatorPermissions === 'orders' ? ['view', 'orders'] : ['view'] } };
+                    const next = { ...appSettings, alertDropPercent: Math.min(100, Math.max(1, Number(values.alertDropPercent) || 30)), dailyOrderTarget: Math.max(0, Number(values.dailyOrderTarget) || 0), requireOrderReview: values.requireOrderReview === 'true', rolePermissions: { ...(appSettings.rolePermissions || {}), ADMIN: ['all'], GESTOR: appSettings.rolePermissions?.GESTOR || ['view', 'prices', 'reports'], CONVIDADO: ['view'] } };
                     await saveWithBackup('settings', next, 'Configurações da operação atualizadas', next);
                     appSettings = next;
                     updateDash();
@@ -667,9 +673,57 @@
             return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, '0')).join('');
         }
 
-        function getRoleLabel(role) { return ({ ADMIN: 'Administrador', GESTOR: 'Gestor', OPERADOR: 'Operador', CONVIDADO: 'Convidado' })[role] || 'Convidado'; }
+        function getRoleLabel(role) { return ({ ADMIN: 'Administrador Geral', GESTOR: 'Gestor', CONVIDADO: 'Convidado' })[normalizeAppRole(role, role === 'ADMIN')] || 'Convidado'; }
 
         const USER_PERMISSION_MAP = { salesView: 'sales.view', salesEdit: 'sales.edit', pricesView: 'prices.view', pricesEdit: 'prices.edit', ordersView: 'orders.view', ordersEdit: 'orders.edit', reportsExport: 'reports.export', backupsManage: 'backups.manage', usersManage: 'users.manage' };
+        let currentUserScopeRef = null;
+
+        function getManagedAccountIds(user = currentUser) {
+            return new Set(Array.isArray(user?.managedAccountIds) ? user.managedAccountIds.filter(Boolean) : []);
+        }
+
+        function isAccountInCurrentScope(account) {
+            if(isGeneralAdmin || currentUserRole !== 'GESTOR') return true;
+            return getManagedAccountIds().has(account?.id);
+        }
+
+        function getVisibleAccounts() {
+            return accounts.filter(isAccountInCurrentScope);
+        }
+
+        function getVisibleOrderAccountEntries() {
+            return orderAccounts.map((account, index) => ({ account, index })).filter(({ account }) => isAccountInCurrentScope(accounts.find(item => item.id === account.storeId || item.id === account.id || item.n === account.n) || account));
+        }
+
+        function updateManagerScopeBanner() {
+            const banner = document.getElementById('managerScopeBanner');
+            if(!banner) return;
+            if(currentUserRole === 'GESTOR' && !isGeneralAdmin) {
+                banner.classList.remove('hidden');
+                banner.innerHTML = `<i class="fas fa-user-tie mr-2"></i>Visão do gestor · ${getVisibleAccounts().length} conta(s) atribuída(s) a você`;
+            } else {
+                banner.classList.add('hidden');
+                banner.innerHTML = '';
+            }
+        }
+
+        function startUserScopeSync() {
+            if(currentUserScopeRef) { currentUserScopeRef.off(); currentUserScopeRef = null; }
+            if(isGeneralAdmin || !currentUser.username) { updateManagerScopeBanner(); return; }
+            currentUserScopeRef = db.ref(`users/${normalizeUsername(currentUser.username)}`);
+            currentUserScopeRef.on('value', snapshot => {
+                const record = snapshot.val();
+                if(!record || record.active !== true) { clearAppSession(); location.reload(); return; }
+                currentUser.displayName = record.displayName || currentUser.displayName;
+                currentUser.role = normalizeAppRole(record.role || currentUser.role);
+                currentUserRole = currentUser.role;
+                currentUser.managedAccountIds = currentUser.role === 'GESTOR' && Array.isArray(record.managedAccountIds) ? record.managedAccountIds : [];
+                currentUser.permissions = record.role === 'OPERADOR' ? permissionDefaults('CONVIDADO') : (record.role === 'ADMIN' ? permissionDefaults('GESTOR') : (record.permissions || permissionDefaults(currentUser.role)));
+                updateManagerScopeBanner();
+                render();
+                updateDash();
+            });
+        }
 
         async function openUserManager() {
             if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode gerenciar usuários.', 'warning');
@@ -678,22 +732,57 @@
             document.getElementById('actionModalEyebrow').innerText = 'Usuários e permissões';
             document.getElementById('actionModalTitle').innerText = `Usuários cadastrados (${users.length})`;
             document.getElementById('actionModalDescription').innerText = 'Visualize o status e o perfil de cada acesso. Você pode editar permissões, bloquear, reativar ou remover usuários.';
-            form.innerHTML = users.length ? `<div class="space-y-3 max-h-[58vh] overflow-y-auto pr-1">${users.map(user => { const permissions = user.permissions || permissionDefaults(user.role || 'CONVIDADO'); const active = user.active !== false; return `<article class="p-4 rounded-2xl border ${active ? 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20' : 'border-rose-500/20 bg-rose-500/5 opacity-70'}"><div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3"><div class="min-w-0"><p class="font-black text-xs truncate">${escapeHtml(user.displayName || user.username)}</p><p class="text-[9px] uppercase font-black text-gray-400 mt-1">@${escapeHtml(user.username)} · ${escapeHtml(getRoleLabel(user.role))} · ${active ? 'Ativo' : 'Bloqueado'}</p><p class="text-[8px] opacity-60 mt-2">${permissions.includes('all') ? 'Acesso total' : `${permissions.length} permissão(ões): ${permissions.join(', ')}`}</p></div><div class="grid grid-cols-2 gap-2 shrink-0"><button type="button" onclick="openUserEditor('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl bg-white dark:bg-brand-card text-brand-orange text-[8px] font-black uppercase border border-brand-orange/20">Editar</button><button type="button" onclick="toggleUserBlock('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl ${active ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600'} text-[8px] font-black uppercase">${active ? 'Bloquear' : 'Reativar'}</button><button type="button" onclick="removeManagedUser('${escapeHtml(user.username)}')" class="col-span-2 py-2 px-3 rounded-xl bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase">Remover usuário</button></div></div></article>`; }).join('')}</div>` : '<div class="p-5 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] opacity-70">Nenhum usuário individual cadastrado ainda. Use o botão abaixo para criar o primeiro acesso.</div>';
+            form.innerHTML = users.length ? `<div class="space-y-3 max-h-[58vh] overflow-y-auto pr-1">${users.map(user => {             const safeRole = normalizeAppRole(user.role); const permissions = user.role === 'OPERADOR' ? permissionDefaults('CONVIDADO') : (user.role === 'ADMIN' ? permissionDefaults('GESTOR') : (user.permissions || permissionDefaults(safeRole))); const active = user.active !== false; return `<article class="p-4 rounded-2xl border ${active ? 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20' : 'border-rose-500/20 bg-rose-500/5 opacity-70'}"><div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3"><div class="min-w-0"><p class="font-black text-xs truncate">${escapeHtml(user.displayName || user.username)}</p><p class="text-[9px] uppercase font-black text-gray-400 mt-1">@${escapeHtml(user.username)} · ${escapeHtml(getRoleLabel(safeRole))} · ${active ? 'Ativo' : 'Bloqueado'}</p><p class="text-[8px] opacity-60 mt-2">${permissions.includes('all') ? 'Acesso total' : `${permissions.length} permissão(ões): ${permissions.join(', ')}`}</p></div><div class="grid grid-cols-2 gap-2 shrink-0"><button type="button" onclick="openUserEditor('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl bg-white dark:bg-brand-card text-brand-orange text-[8px] font-black uppercase border border-brand-orange/20">Editar</button><button type="button" onclick="toggleUserBlock('${escapeHtml(user.username)}')" class="py-2 px-3 rounded-xl ${active ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600'} text-[8px] font-black uppercase">${active ? 'Bloquear' : 'Reativar'}</button><button type="button" onclick="removeManagedUser('${escapeHtml(user.username)}')" class="col-span-2 py-2 px-3 rounded-xl bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase">Remover usuário</button></div></div></article>`; }).join('')}</div>` : '<div class="p-5 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] opacity-70">Nenhum usuário individual cadastrado ainda. Use o botão abaixo para criar o primeiro acesso.</div>';
             const submit = document.getElementById('actionModalSubmit'); submit.innerText = 'Novo usuário'; submit.className = 'py-3.5 rounded-2xl text-white text-[10px] font-black uppercase shadow-lg bg-indigo-600'; submit.onclick = () => openUserEditor();
+            document.getElementById('actionModal').classList.add('active');
+        }
+
+        async function openManagerGroups() {
+            if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode gerenciar grupos.', 'warning');
+            const usersData = Object.values((await db.ref('users').once('value')).val() || {});
+            const managers = usersData.filter(user => user.active !== false && user.role === 'GESTOR').sort((a, b) => String(a.displayName || a.username).localeCompare(String(b.displayName || b.username), 'pt-BR'));
+            const managerOptions = [{ value: '', label: 'SEM GESTOR' }, ...managers.map(manager => ({ value: manager.username, label: `${manager.displayName || manager.username} (@${manager.username})` }))];
+            const managerForAccount = account => account.managerUsername || managers.find(manager => Array.isArray(manager.managedAccountIds) && manager.managedAccountIds.includes(account.id))?.username || '';
+            const form = document.getElementById('actionModalForm');
+            document.getElementById('actionModalEyebrow').innerText = 'Distribuição operacional';
+            document.getElementById('actionModalTitle').innerText = `Grupos de Gestores (${accounts.length} contas)`;
+            document.getElementById('actionModalDescription').innerText = 'Defina um gestor principal para cada conta. A alteração aparece automaticamente na visão do gestor responsável.';
+            form.innerHTML = `<div class="space-y-3 max-h-[62vh] overflow-y-auto pr-1">${accounts.length ? accounts.map(account => `<label class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20"><span class="min-w-0"><span class="block text-[10px] font-black uppercase truncate">${escapeHtml(account.n)}</span><span class="block text-[8px] uppercase opacity-55 mt-1">${escapeHtml(account.marketplace || detectMarketplace(account.n))} · ${account.status === 'inactive' ? 'INATIVA' : 'ATIVA'}</span></span><select data-group-account-id="${escapeHtml(account.id)}" class="dialog-field sm:max-w-[280px] mt-0">${managerOptions.map(option => `<option value="${escapeHtml(option.value)}" ${managerForAccount(account) === option.value ? 'selected' : ''}>${escapeHtml(option.label)}</option>`).join('')}</select></label>`).join('') : '<div class="p-5 rounded-2xl bg-gray-100 dark:bg-black/30 text-[10px] opacity-70">Nenhuma conta cadastrada.</div>'}</div>`;
+            const submit = document.getElementById('actionModalSubmit');
+            submit.innerText = 'Salvar distribuição';
+            submit.className = 'py-3.5 rounded-2xl text-white text-[10px] font-black uppercase shadow-lg bg-violet-700';
+            submit.onclick = async () => {
+                try {
+                    const assignment = Object.fromEntries([...form.querySelectorAll('[data-group-account-id]')].map(select => [select.dataset.groupAccountId, select.value]));
+                    const nextAccounts = accounts.map(account => ({ ...account, managerUsername: assignment[account.id] || '' }));
+                    const updates = { accounts: nextAccounts };
+                    const managerSummary = [];
+                    managers.forEach(manager => {
+                        const managedAccountIds = nextAccounts.filter(account => account.managerUsername === manager.username).map(account => account.id);
+                        updates[`users/${normalizeUsername(manager.username)}`] = { ...manager, managedAccountIds, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
+                        managerSummary.push({ username: manager.username, accountIds: managedAccountIds });
+                    });
+                    await updateWithBackup(updates, 'Distribuição de contas por gestores atualizada', { managerSummary, totalAccounts: nextAccounts.length });
+                    closeActionModal();
+                    showToast('Grupos de gestores atualizados com sucesso.', 'success');
+                    render();
+                } catch(error) { showToast(error.message || 'Não foi possível salvar os grupos.', 'error'); }
+            };
             document.getElementById('actionModal').classList.add('active');
         }
 
         async function openUserEditor(username = '') {
             if(!isGeneralAdmin) return showToast('Somente o Administrador Geral pode editar usuários.', 'warning');
             const existing = username ? (await db.ref(`users/${username}`).once('value')).val() : null;
-            const permissions = existing?.permissions || permissionDefaults(existing?.role || 'CONVIDADO');
+            const editorRole = normalizeAppRole(existing?.role || 'CONVIDADO');
+            const permissions = existing?.role === 'OPERADOR' || existing?.role === 'ADMIN' ? permissionDefaults('GESTOR') : (existing?.permissions || permissionDefaults(editorRole));
             const allow = [{ value: 'yes', label: 'PERMITIR' }, { value: 'no', label: 'NÃO PERMITIR' }];
             openActionModal({
                 eyebrow: 'Usuários e permissões', title: existing ? `Editar: ${existing.displayName || existing.username}` : 'Novo usuário', description: 'Defina exatamente o que esta pessoa pode visualizar, alterar, exportar ou administrar.', submitLabel: 'Salvar usuário', tone: 'success',
                 fields: [
                     { name: 'username', label: 'Usuário de acesso', type: 'text', value: existing?.username || '', placeholder: 'Ex.: joao_silva ou joao@empresa', required: true },
                     { name: 'displayName', label: 'Nome de exibição', type: 'text', value: existing?.displayName || '', placeholder: 'Ex.: João Silva', required: true },
-                    { name: 'role', label: 'Perfil base', type: 'select', value: existing?.role || 'CONVIDADO', options: [{ value: 'ADMIN', label: 'ADMINISTRADOR' }, { value: 'GESTOR', label: 'GESTOR' }, { value: 'OPERADOR', label: 'OPERADOR' }, { value: 'CONVIDADO', label: 'CONVIDADO' }] },
+                    { name: 'role', label: 'Perfil base', type: 'select', value: editorRole, options: [{ value: 'GESTOR', label: 'GESTOR' }, { value: 'CONVIDADO', label: 'CONVIDADO' }] },
                     { name: 'password', label: 'Senha inicial ou nova senha', type: 'password', placeholder: existing ? 'Vazio mantém a senha atual' : 'Mínimo de 8 caracteres', required: !existing },
                     ...Object.entries(USER_PERMISSION_MAP).map(([key, permission]) => ({ name: key, label: ({ salesView: 'Visualizar vendas e faturamento', salesEdit: 'Lançar ou editar vendas', pricesView: 'Visualizar valores e preços', pricesEdit: 'Alterar valores e preços', ordersView: 'Visualizar pedidos', ordersEdit: 'Lançar ou editar pedidos', reportsExport: 'Exportar relatórios', backupsManage: 'Gerenciar backups e restauração', usersManage: 'Gerenciar usuários e permissões' })[key], type: 'select', value: permissions.includes('all') || permissions.includes(permission) ? 'yes' : 'no', options: allow }))
                 ],
@@ -705,7 +794,7 @@
                     if(!previous && !values.password) throw new Error('Informe uma senha inicial.');
                     if(passwordError) throw new Error(passwordError);
                     const nextPermissions = values.role === 'ADMIN' ? ['all'] : ['dashboard.view', ...Object.entries(USER_PERMISSION_MAP).filter(([key]) => values[key] === 'yes').map(([, permission]) => permission)];
-                    const userRecord = { ...(previous || {}), username: userKey, displayName: String(values.displayName).trim() || userKey, role: values.role, permissions: nextPermissions, active: previous?.active !== false, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
+                    const userRecord = { ...(previous || {}), username: userKey, displayName: String(values.displayName).trim() || userKey, role: normalizeAppRole(values.role), permissions: nextPermissions, active: previous?.active !== false, updatedAt: new Date().toISOString(), updatedBy: currentUser.username };
                     if(values.password) userRecord.passwordHash = await hashPassword(values.password);
                     if(!previous) userRecord.createdAt = new Date().toISOString();
                     await saveWithBackup(`users/${userKey}`, userRecord, previous ? 'Usuário e permissões atualizados' : 'Usuário criado', { username: userKey, role: values.role, permissions: nextPermissions });
@@ -1063,7 +1152,9 @@
 
         function enterApp(session) {
             const normalized = typeof session === 'string' ? { username: session, displayName: session, role: session } : session;
-            currentUser = { username: normalized.username || 'convidado', displayName: normalized.displayName || normalized.username || 'Convidado', role: normalized.role || 'CONVIDADO', permissions: normalized.permissions || permissionDefaults(normalized.role || 'CONVIDADO'), generalAdmin: normalized.generalAdmin === true };
+            const normalizedRole = normalized.generalAdmin === true ? 'ADMIN' : normalizeAppRole(normalized.role || 'CONVIDADO');
+            const legacyRolePermissions = normalized.role === 'OPERADOR' ? permissionDefaults('CONVIDADO') : (normalized.role === 'ADMIN' && normalized.generalAdmin !== true ? permissionDefaults('GESTOR') : (normalized.permissions || permissionDefaults(normalizedRole)));
+            currentUser = { username: normalized.username || 'convidado', displayName: normalized.displayName || normalized.username || 'Convidado', role: normalizedRole, permissions: legacyRolePermissions, managedAccountIds: normalizedRole === 'GESTOR' && Array.isArray(normalized.managedAccountIds) ? normalized.managedAccountIds : [], generalAdmin: normalized.generalAdmin === true };
             isGeneralAdmin = currentUser.generalAdmin === true;
             isAdmin = currentUser.role === 'ADMIN';
             currentUserRole = currentUser.role;
@@ -1076,6 +1167,9 @@
             updateConnectionIndicator();
             prioritizePlatformValues();
             if(isAdmin) { document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block'); flushOfflineQueue(); }
+            document.querySelectorAll('.general-admin-only').forEach(el => { el.style.display = isGeneralAdmin ? 'flex' : 'none'; });
+            startUserScopeSync();
+            updateManagerScopeBanner();
             db.ref('monthConfig').on('value', s => { if(s.val()) customMonths = s.val(); renderMonthSelector(); startSync(); });
         }
 
@@ -1522,9 +1616,12 @@
 
         function renderOrderTable() {
             const oTable = document.getElementById('orderTable'); if(!oTable) return; oTable.innerHTML = '';
+            const visibleNames = new Set(getVisibleOrderAccountEntries().flatMap(({ account }) => getOrderNames(account)));
             Object.keys(orderData.daily).sort().reverse().forEach(k => {
-                const stores = orderData.daily[k]; let daySum = 0; Object.values(stores).forEach(v => daySum += v);
-                const dt = Object.entries(stores).map(([n, q]) => `<span class="text-[8px] mr-2 opacity-50">${n}: ${q}</span>`).join('');
+                const stores = Object.fromEntries(Object.entries(orderData.daily[k] || {}).filter(([name]) => visibleNames.has(name)));
+                if(!Object.keys(stores).length) return;
+                let daySum = 0; Object.values(stores).forEach(v => daySum += Number(v) || 0);
+                const dt = Object.entries(stores).map(([n, q]) => `<span class="text-[8px] mr-2 opacity-50">${escapeHtml(n)}: ${q}</span>`).join('');
                 oTable.innerHTML += `<tr><td class="px-6 py-6 font-black opacity-50 border-r dark:border-white/5 w-32">${k.split('-').reverse().join('/')}</td><td class="px-6 py-6"><div class="flex justify-between items-center mb-2"><span class="text-[9px] font-black uppercase text-gray-400">Total:</span><span class="text-xl font-black text-emerald-500">${daySum}</span></div><div class="flex flex-wrap">${dt}</div></td><td class="px-6 py-6 text-right">${isAdmin ? `<button onclick="deleteDay('${k}', 'orders')" class="text-rose-500">×</button>` : ''}</td></tr>`;
             });
         }
@@ -1674,7 +1771,7 @@
             const badge = document.getElementById('alertCountBadge');
             if(!grid || !alertList || !badge) return;
             const filter = document.getElementById('storeMetricFilter')?.value || 'all';
-            const metrics = orderAccounts.map((account, index) => ({ account, index, metric: calculateStoreMetric(account) }));
+            const metrics = getVisibleOrderAccountEntries().map(({ account, index }) => ({ account, index, metric: calculateStoreMetric(account) }));
             const alerts = metrics.flatMap(({ account, index, metric }) => metric.alerts.map(alert => ({ ...alert, account, index })));
             const visible = metrics.filter(({ metric }) => filter === 'all' || (filter === 'active' && metric.active) || (filter === 'attention' && metric.alerts.length));
 
@@ -1727,18 +1824,19 @@
             const summary = document.getElementById('orderDailySummary');
             const status = document.getElementById('orderPendingStatus');
             if(!summary || !status) return;
-            const values = orderAccounts.map((account, index) => {
+            const scopedOrderEntries = getVisibleOrderAccountEntries();
+            const values = scopedOrderEntries.map(({ account, index }) => {
                 const field = getOrderField(index);
                 return field ? (Number(field.value) || 0) : getOrderValueForDate(account, dateKey);
             });
             const total = values.reduce((sum, value) => sum + value, 0);
             const filled = values.filter(value => value > 0).length;
-            const active = orderAccounts.filter(account => account.status !== 'inactive').length;
+            const active = scopedOrderEntries.filter(({ account }) => account.status !== 'inactive').length;
             const [year, month, day] = dateKey.split('-').map(Number);
             const previousDate = new Date(year, month - 1, day - 1).toISOString().slice(0, 10);
-            const previousTotal = orderAccounts.reduce((sum, account) => sum + getOrderValueForDate(account, previousDate), 0);
+            const previousTotal = scopedOrderEntries.reduce((sum, { account }) => sum + getOrderValueForDate(account, previousDate), 0);
             const variation = previousTotal > 0 ? ((total - previousTotal) / previousTotal) * 100 : 0;
-            const totalGoal = orderAccounts.reduce((sum, account) => sum + (accounts.find(item => item.id === account.storeId || item.id === account.id)?.orderGoal || 0), 0);
+            const totalGoal = scopedOrderEntries.reduce((sum, { account }) => sum + (accounts.find(item => item.id === account.storeId || item.id === account.id)?.orderGoal || 0), 0);
             const monthDays = new Date(year, month, 0).getDate();
             const dailyGoal = totalGoal ? totalGoal / monthDays : appSettings.dailyOrderTarget;
             const pending = pendingOrderChanges.size;
@@ -1821,7 +1919,7 @@
             const container = document.getElementById('dailyMarketplaceComparison');
             if(!container) return;
             const totals = {};
-            orderAccounts.forEach((account, index) => {
+            getVisibleOrderAccountEntries().forEach(({ account, index }) => {
                 const market = accounts.find(item => item.id === account.storeId || item.id === account.id)?.marketplace || detectMarketplace(account.n);
                 const field = getOrderField(index);
                 const value = field ? (Number(field.value) || 0) : getOrderValueForDate(account, getOrderDateKey());
@@ -1837,6 +1935,7 @@
             const storeContainer = document.getElementById('storeComparisonList');
             const projectionPanel = document.getElementById('goalProjectionPanel');
             if(!metricsGrid || !marketplaceContainer || !storeContainer || !projectionPanel) return;
+            const scopedAccounts = getVisibleAccounts();
             const totalRevenue = Number(revenueData.total) || 0;
             const revenueDays = Object.keys(revenueData.daily).length;
             const [year, month] = selectedMonthKey.split('-').map(Number);
@@ -1845,7 +1944,7 @@
             const elapsedDays = Math.max(1, today.getFullYear() === year && today.getMonth() + 1 === month ? today.getDate() : monthDays);
             const dailyRevenue = revenueDays ? totalRevenue / revenueDays : 0;
             const projectedRevenue = dailyRevenue * monthDays;
-            const activeStores = accounts.filter(account => account.status !== 'inactive');
+            const activeStores = scopedAccounts.filter(account => account.status !== 'inactive');
             const storesWithPrices = activeStores.filter(account => account.v.some(value => Number(value) > 0));
             const averagePrice = storesWithPrices.length ? storesWithPrices.reduce((sum, account) => sum + (account.v.reduce((total, value) => total + (Number(value) || 0), 0) / Math.max(1, account.v.filter(value => Number(value) > 0).length)), 0) / storesWithPrices.length : 0;
             const financialCards = [
@@ -1910,7 +2009,7 @@
                 let drops = [];
                 let dropInsights = [];
 
-                orderAccounts.forEach((acc, i) => {
+                getVisibleOrderAccountEntries().forEach(({ account: acc, index: i }) => {
                     const analysis = analyzeStoreTrend(acc);
                     let dateVal = '';
                     const matchingNames = new Set(getOrderNames(acc));
@@ -2035,7 +2134,9 @@
             head.innerHTML = (isAdmin ? `<th class="px-6 py-6 text-center w-10"><input type="checkbox" id="masterCheckbox" onclick="toggleSelectAll(this.checked)" ${selectedIndices.size > 0 && selectedIndices.size === accounts.length ? 'checked' : ''}></th>` : '') + `<th class="px-8 py-6 border-r dark:border-white/5">Conta</th><th class="px-4 py-6 text-center">Status</th><th>Unissex</th><th>Regata</th><th>Infantil</th><th>Plus</th><th>M. Careca</th><th class="canguru-column">M. Canguru</th>` + (isAdmin ? `<th class="px-8 py-6 text-center">Ações</th>` : '');
             
             body.innerHTML = '';
-            accounts.forEach((acc, idx) => {
+            updateManagerScopeBanner();
+            getVisibleAccounts().forEach(acc => {
+                const idx = accounts.indexOf(acc);
                 if(q && !acc.n.toLowerCase().includes(q)) return;
                 if(marketplaceFilter && acc.marketplace !== marketplaceFilter) return;
                 if(statusFilter && acc.status !== statusFilter) return;
@@ -2366,7 +2467,7 @@
 
         function exportCSV() {
             const header = ['id', 'nome', 'marketplace', 'tipo', 'status', 'metaPedidos', 'observacoes', ...PRODUCT_FIELDS];
-            const rows = accounts.map(account => [account.id, account.n, account.marketplace, account.t, account.status, account.orderGoal || '', account.note || '', ...account.v.map(value => Number(value).toFixed(2))]);
+                const rows = getVisibleAccounts().map(account => [account.id, account.n, account.marketplace, account.t, account.status, account.orderGoal || '', account.note || '', ...account.v.map(value => Number(value).toFixed(2))]);
             const csv = [header, ...rows].map(row => row.map(csvCell).join(';')).join('\n');
             downloadFile(`valores-mkt-lojas-${new Date().toISOString().slice(0, 10)}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8');
             if(isAdmin) logAction('Cadastro de lojas exportado em CSV');
@@ -2377,7 +2478,7 @@
             const doc = new jsPDF('l', 'mm', 'a4');
             doc.autoTable({
                 head: [['Conta', 'Marketplace', 'Status', 'Unissex', 'Regata', 'Infantil', 'Plus', 'M. Careca', 'M. Canguru']],
-                body: accounts.map(account => [account.n, account.marketplace, account.status === 'inactive' ? 'Inativa' : 'Ativa', ...account.v.map(value => formatCurrency(Number(value)))]),
+                    body: getVisibleAccounts().map(account => [account.n, account.marketplace, account.status === 'inactive' ? 'Inativa' : 'Ativa', ...account.v.map(value => formatCurrency(Number(value)))]),
                 styles: { fontSize: 8 }
             });
             doc.save(`valores-mkt-precos-${new Date().toISOString().slice(0, 10)}.pdf`);
